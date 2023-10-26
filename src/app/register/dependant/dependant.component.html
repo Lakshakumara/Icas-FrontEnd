@@ -1,0 +1,31 @@
+<form [formGroup]="dForm" (ngSubmit)="addDependentDetails()">
+    <h1 mat-dialog-title>{{inputdata.title}}</h1>
+    <div mat-dialog-content>
+        <mat-form-field>
+            <mat-label>Name</mat-label>
+            <input formControlName="name" matInput>
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>NIC</mat-label>
+            <input matInput formControlName="nic">
+        </mat-form-field>
+
+        <mat-form-field class="example-full-width">
+            <mat-label>Date of Birth</mat-label>
+            <input matInput [matDatepicker]="picker" placeholder="DOB" formControlName="dob">
+            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+            <mat-hint>yyyy-mm-dd</mat-hint>
+          </mat-form-field>
+
+        <mat-form-field>
+            <mat-label>Relationship</mat-label>
+            <input matInput formControlName="relationship">
+        </mat-form-field>
+    </div>
+    <div mat-dialog-actions>
+        <button mat-raised-button color="primary" (click)="addDependentDetails()">Save</button>
+        <button mat-raised-button color="warn" (click)="closePopup()">Close</button>
+        <!--<button mat-raised-button mat-dialog-close color="accent">Cancel</button>-->
+    </div>
+</form>
