@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
-import { HttpClient} from '@angular/common/http'
+import { HttpClient } from '@angular/common/http'
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment.development';
 import { LoaderService } from './loader.service';
 import { Member } from '../Model/member';
 import { map } from 'rxjs/operators';
 import { Dependant } from '../Model/dependant';
+import { ClaimOPD } from '../Model/claimOPD';
 
 @Injectable({
   providedIn: 'root'
@@ -13,36 +14,46 @@ import { Dependant } from '../Model/dependant';
 export class AuthServiceService {
   private API_URL = environment.baseUrl;
 
-  constructor(private http:HttpClient) { }
+  constructor(private http: HttpClient) { }
 
-  isGuest(year: any, empNo: any):Observable<Map<String, Object>>{
-    return this.http
-    .get(`${this.API_URL}/guest/${year}/${empNo}`)
-    .pipe<Map<String, Object>>(map((data: any) => data));
+  saveOPD(claimOPD: any) {
+    this.http.post(`${this.API_URL}/claim/opd`, claimOPD)
+      //.pipe<Map<string, Object>>(map((data: any) => data))
+      .subscribe(
+        (response: any) => {
+          console.log(response);
+        }
+      );
   }
-  
-  getMember(empNo: any):Observable<Member>{
+
+  isGuest(year: any, empNo: any): Observable<Map<String, Object>> {
+    return this.http
+      .get(`${this.API_URL}/guest/${year}/${empNo}`)
+      .pipe<Map<string, Object>>(map((data: any) => data));
+  }
+
+  getMember(empNo: any): Observable<Member> {
     //return this.http.get(`${this.API_URL}/member/details`, data);
     return this.http
-    .get(`${this.API_URL}/member/${empNo}`)
-    .pipe<Member>(map((data: any) => data));
+      .get(`${this.API_URL}/member/${empNo}`)
+      .pipe<Member>(map((data: any) => data));
   }
-  
-  getHRDetails(empNo: any):Observable<any>{
+
+  getHRDetails(empNo: any): Observable<any> {
     //return this.http.get(`${this.API_URL}/member/details`, data);
     return this.http.get(`${this.API_URL}/hr/${empNo}`);
 
   }
-  getUser(data: any):Observable<any>{
+  getUser(data: any): Observable<any> {
     return this.http.get(`${this.API_URL}/member/data`, data);
   }
-  getDependant(name: any):Observable<any>{
+  getDependant(name: any): Observable<any> {
     return this.http
-    .get(`${this.API_URL}/dependant/${name}`)
-    .pipe<Dependant>(map((data: any) => data));
+      .get(`${this.API_URL}/dependant/${name}`)
+      .pipe<Dependant>(map((data: any) => data));
   }
 
-  login(data: any):Observable<any>{
+  login(data: any): Observable<any> {
     console.log(data)
     return this.http.post(`${this.API_URL}/member/signin`, data);
   }
@@ -53,7 +64,7 @@ export class AuthServiceService {
     //return this.http.post(`${this.API_URL}/user/signup`, data);
   }*/
 
-  register(data: any){
+  register(data: any) {
     console.log("call Register method in auth service");
     this.http.post(`${this.API_URL}/member/signup`, data, { responseType: 'blob' }).subscribe(
       (response: any) => {

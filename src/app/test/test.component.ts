@@ -4,7 +4,7 @@ import {DataSource} from '@angular/cdk/collections';
 import {Observable, ReplaySubject} from 'rxjs';
 
 const ELEMENT_DATA: Dependant[] = [
-  {id: "1", name: "Hydrogen", nic: "773661227v",dob:new Date(), relationship:"father"},
+  {id: 1, name: "Hydrogen", nic: "773661227v", dob:new Date(), relationship:"father"},
 ];
 
 /**

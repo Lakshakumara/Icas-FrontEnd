@@ -1,5 +1,6 @@
 import { Registration } from './registration';
 import { Dependant } from "./dependant";
+import { Benificiary } from './benificiary';
 
 export interface Member {
     id: number;
@@ -21,5 +22,5 @@ export interface Member {
     deleted: boolean;
     registrations: Registration[];
     dependants: Dependant[];
-    beneficiaries: any;
+    beneficiaries: Benificiary[];
 }

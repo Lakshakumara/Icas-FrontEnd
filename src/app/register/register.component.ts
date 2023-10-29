@@ -1,5 +1,4 @@
-import { Observable } from 'rxjs';
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { AuthServiceService } from '../service/auth-service.service';
@@ -7,7 +6,9 @@ import { SharedService } from '../shared/shared.service';
 import { DependantComponent } from './dependant/dependant.component';
 import { Dependant } from '../Model/dependant';
 import { MatTableDataSource } from '@angular/material/table';
-import Utils from '../util/Utils';
+import { Utils } from '../util/utils';
+import { Benificiary, BenificiaryColumns } from '../Model/benificiary';
+import Swal from 'sweetalert2'
 
 @Component({
   selector: 'app-register',
@@ -23,18 +24,17 @@ export class RegisterComponent implements OnInit {
 
   dependantData = new MatTableDataSource<Dependant>();
   displayedColumns: string[] = ["id", "name", "nic", "dob", "relationship", "action"];
-  //displayedColumns: string[] = COLUMNS_SCHEMA.map(col => col.key);
+
+  benificiaryData = new MatTableDataSource<Benificiary>();
+  benificiaryColumns: string[] = BenificiaryColumns.map((col) => col.key)
 
   constructor(private fb: FormBuilder, private shared: SharedService,
     private authService: AuthServiceService, private dialog: MatDialog) { }
 
   ngOnInit(): void {
     this.member = this.shared.getUser();
-   
     this.initForm();
     if (this.member != null) {
-
-      //this.dependantData.data = this.member.dependants;
       this.formGroup.patchValue({
         empNo: this.member.empNo,
         name: this.member.name,
@@ -50,26 +50,8 @@ export class RegisterComponent implements OnInit {
         department: this.member.department
       })
     }
-
   }
   initForm() {
-    /*this.formGroup = new FormGroup({
-      empNo: new FormControl('', [Validators.required]),
-      name: new FormControl('', [Validators.required]),
-      address: new FormControl(),
-      email: new FormControl(),
-      contactNo: new FormControl(),
-      civilStatus: new FormControl(),
-      nic: new FormControl(),
-      sex: new FormControl(),
-      dob: new FormControl(),
-      designation: new FormControl(),
-      department: new FormControl(),
-      password: new FormControl(),
-      depLst: this.builder.array([]);
-      this.loadDependant({id:1, name:"saman", nic:"77366", 
-      dob:"no", relationship:"Son"});*/
-
   }
   formGroup = this.fb.group({
     empNo: new FormControl('', [Validators.required]),
@@ -89,15 +71,13 @@ export class RegisterComponent implements OnInit {
       {
         id: new FormControl(),
         year: new FormControl(),
-      }
-    ),
-    dependants: this.fb.array([this.dependantData]),
+      }),
+    dependants: this.fb.array([]),
     beneficiaries: this.fb.array([
       this.fb.group({
         id: new FormControl(),
         name: new FormControl('', [Validators.required]),
         nic: new FormControl(),
-        dob: new FormControl(),
         percent: new FormControl(),
         relationship: new FormControl(),
       })
@@ -106,89 +86,26 @@ export class RegisterComponent implements OnInit {
     status: new FormControl(),
     //beneficiaries: this.builder.array([]),
   })
-
-  /*  form = this.fb.group({
-      name: ['', {
-          validators: [
-              Validators.required,
-              Validators.minLength(5),
-              Validators.maxLength(60)
-          ]
-      }],
-      dob: [new Date(), Validators.required],
-      nic: ['', Validators.required],
-      relationship: ['', Validators.requiredTrue]});
-
-  dependants !: FormArray<any>;
-  id: any;
-  name: any;
-  nic: any;
-  dob: any;
-  relationship: any;*/
-  
-  get depArray(): FormArray {
-    return this.formGroup.controls["dependants"] as FormArray;
-  }
-  /*addDependant(dependant: Dependant): void {
-    this.depArray.push(this.newDependant(dependant));
-    console.log("this.depArray ", this.depArray.value);
-    this.dependantData = [this.depArray, ...this.dependantData];
-
-    //this.dependantData = new MatTableDataSource((this.depArray.get('VORows') as FormArray).controls);
-    console.log("dependantData  from addDependant ", this.dependantData);
-  }*/
-  onDeleteRow(rowIndex: number): void {
-    this.depArray.removeAt(rowIndex);
-  }
   popupDependant() {
-    this.Openpopup(0, 'Add Dependants details', DependantComponent);
-  }
-  /*addDependant() {
-    console.log("addDependant method");
-    this.depList = this.depList as FormArray;
-    this.depList.push(this.generateRow());
+    this.Openpopup('', 'Add Dependants details', DependantComponent);
   }
 
-  generateRow() {
-    return this.builder.group({
-      id: this.builder.control({ value: 0, disabled: true }),
-      name: this.builder.control(this.dependants.value.name),
-      nic: this.builder.control(this.dependants.value.nic),
-      reletionship: this.builder.control(this.dependants.value.reletionship),
-      dob: this.builder.control(this.dependants.value.dob),
-    });
-  }*/
-  /*get dependantList() {
-    return this.dependants as FormArray;
-  }*/
-  /* deleteDependant(index: any) {
-     this.dependantData.filter((d) => d.id != index);
-     if (confirm('do you want to remove this Dependant?')) {
-       //console.log("date removed .... {}", index);
-       this.dependantData.filter((d) => d.id != index);
-     } else {
-       //console.log("not confirm", index);
-     }
-   }*/
-
-  /* OpenDialog(){
-     this.dialog.open(DependantComponent);
-   }*/
-  Openpopup(id: any, title: any, component: any) {
+  Openpopup(name: string, title: any, component: any) {
     var _popup = this.dialog.open(component, {
       width: '40%',
       enterAnimationDuration: '1000ms',
       exitAnimationDuration: '1000ms',
       data: {
-        formGroup: this.formGroup,
+        dataSet: this.dependantData.data.filter(d => d.name === name),
         title: title,
-        id: id,
+        name: name,
       }
     });
 
     _popup.afterClosed().subscribe((item: FormGroup) => {
-      if (item != null) {
-        console.log(`send to newDependant`,item);
+      console.log("received from popup ", item.value)
+      if (item.value.name != '') {
+        console.log(`send to newDependant`, item);
         this.newDependant(item);
       } else
         console.log("afterClosed ")
@@ -196,66 +113,109 @@ export class RegisterComponent implements OnInit {
   }
 
   private newDependant(data: FormGroup): FormGroup {
-       /* const depForm = this.fb.group({
-          id: new FormControl(data.id),
-          name: new FormControl(data.name, [Validators.required]),
-          nic: new FormControl(data.nic),
-          dob: new FormControl(data.dob),
-          relationship: new FormControl(data.relationship),
-        });
-        */
-        //this.depArray.push(data);
-
-        const newRow: Dependant = {
-          id: data.value.id,
-          name: data.value.name,
-          nic: data.value.nic,
-          dob:data.value.dob,
-          relationship: data.value.relationship
-        }
-
-        this.dependantData.data = [newRow, ...this.dependantData.data];
-        console.log(`this.dependantData after depArray`, this.dependantData);
-        return data;
-      }
-
-
-  /*xregisterProcess(){
-    console.log("call register process block");
-    //this.formGroup.setControl("role", "USER");
-    if(this.formGroup.valid){
-      this.authService.xregister(this.formGroup.value).subscribe(response =>{
-        //if(result.status == "true"){
-         // console.log("Rgistration Success");
-        //}else
-         // alert(result.massage);
-      })
-    }else{
-      console.log("form not valid");
+    const newRow: Dependant = {
+      id: data.value.id,
+      name: data.value.name,
+      nic: data.value.nic,
+      dob: data.value.dob,
+      relationship: data.value.relationship
     }
-  }*/
+
+    this.dependantData.data = [newRow, ...this.dependantData.data];
+    console.log(`this.dependantData after depArray`, this.dependantData);
+    return data;
+  }
+
+  private setDEp() {
+    const userCtrl = this.formGroup.get('dependants') as FormArray;
+    this.dependantData.data.forEach((user) => {
+      userCtrl.push(this.setUsersFormArray(user))
+    });
+  }
+
   registerProcess() {
+    this.setDEp();
     this.formGroup.patchValue({
       role: "USER",
-      registrations: { id: null, year: Utils.currentYear},
+      registrations: { id: null, year: Utils.currentYear },
       mdate: new Date(),
       status: "Pending",
     });
-    //this.authService.register(this.formGroup.value);
-    console.log("register data set ", this.formGroup.value);
+    this.authService.register(this.formGroup.value);
+    this.showThis(this.formGroup.value, this.formGroup.value.dependants);
   }
 
-  editDependant(index: any) {
-    this.Openpopup(index, 'Add Dependants details', DependantComponent);
+  private setUsersFormArray(x: any) {
+    return this.fb.group({
+      id: this.fb.control(x.id),
+      name: this.fb.control(x.name),
+      nic: this.fb.control(x.nic),
+      dob: this.fb.control(x.dob),
+      relationship: this.fb.control(x.relationship)
+    });
+  }
+ /* depAsArray(x: Dependant): FormGroup {
+    return this.fb.group({
+      id: this.fb.control(x.id),
+      name: this.fb.control(x.name),
+      nic: this.fb.control(x.nic),
+      dob: this.fb.control(x.dob),
+      relationship: this.fb.control(x.relationship)
+    });
+  }*/
+  editDependant(name: string) {
+    this.Openpopup(name, 'Add Dependants details', DependantComponent);
+    this.dependantData.data = this.dependantData.data.filter((u: Dependant) => {
+      return u.name !== name;
+    });
   }
 
   removeDependant(name: string) {
     console.log("before removing  ", this.dependantData.data);
-    this.dependantData.data = this.dependantData.data.filter((u: Dependant) => {
-      console.log("removed item name  ", u.name);
-      u.name !== name;
-    });
-    console.log("after removing  ", this.dependantData.data);
+
+    Swal.fire({
+      title: `Confirm to delete ${name} ?`,
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+      
+      if (result.isConfirmed) {
+        /*a= this.dependantData.data.filter((u) => u.name !== name);
+        this.dependantData.data = this.a ;
+        */
+        this.dependantData.data = this.dependantData.data.filter((u: Dependant) => {
+          console.log("removed item name  ", u.name, name, u.name !== name);
+          return u.name !== name;
+        });
+        Swal.fire(
+          'Deleted!',
+          'Dependant has been deleted.',
+          'success'
+        );
+        console.log("after removing  ", this.dependantData.data);
+      }
+    })
+    
+    /*Swal.fire({
+      title: `Confirm to delete ${name} ?`,
+      showDenyButton: true,
+      showCancelButton: true,
+      confirmButtonText: 'Delete',
+      denyButtonText: `Don't delete`,
+    }).then((result) => {
+      /* Read more about isConfirmed, isDenied below */
+      /*if (result.isConfirmed) {
+        
+        Swal.fire('Deleted!', '', 'success')
+
+      } else if (result.isDenied) {
+        Swal.fire('Changes are not discarded', '', 'info')
+      }
+    })*/
     /*this.dependantData.filter((u) => u.name != name);
     console.log("after removal ", this.dependantData);
     this.dialog
@@ -274,5 +234,30 @@ export class RegisterComponent implements OnInit {
           //this.dependantData = this.dependantData.filter((u: any) => !u.isSelected);
         }
       });*/
+  }
+
+  popupBenificiary() {
+    this.Openpopup("", 'Add Dependants details', DependantComponent);
+  }
+  editBenificiary(name: any) {
+    this.Openpopup(name, 'Add Benificiary details', DependantComponent);
+  }
+
+  removeBenificiary(name: string) {
+    console.log("before removing Benificiary ", this.benificiaryData.data);
+    this.benificiaryData.data = this.benificiaryData.data.filter((u: Benificiary) => {
+      console.log("removed item name Benificiary ", u.name);
+      u.name !== name;
+    });
+    console.log("after removing  ", this.benificiaryData.data);
+  }
+
+  showThis(title: any, subtitle: any) {
+    Swal.fire({
+      icon: 'info',
+      title: 'Data Set',
+      text: JSON.stringify(title),
+      footer: `<a href="">${JSON.stringify(subtitle)}</a>`
+    });
   }
 }

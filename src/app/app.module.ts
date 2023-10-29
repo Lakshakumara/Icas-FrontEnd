@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { MatFormFieldModule} from '@angular/material/form-field';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -24,20 +23,12 @@ import { HospitalComponent } from './pop/hospital/hospital.component';
 import { SchemePlanComponent } from './admin/scheme-plan/scheme-plan.component';
 import { LoadingSpinnerComponent } from './decorator/loading-spinner/loading-spinner.component';
 import { MyNavyComponent } from './my-navyBar/my-nav.component';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatButtonModule } from '@angular/material/button';
-import { MatSidenavModule } from '@angular/material/sidenav';
-import { MatIconModule } from '@angular/material/icon';
-import { MatListModule } from '@angular/material/list';
-import { TableComponent } from './table/table.component';
-import { MatTableModule } from '@angular/material/table';
-import { MatPaginatorModule } from '@angular/material/paginator';
-import { MatSortModule } from '@angular/material/sort';
-import { MydashboardComponent } from './mydashboard/mydashboard.component';
-import { MatGridListModule } from '@angular/material/grid-list';
-import { MatCardModule } from '@angular/material/card';
-import { MatMenuModule } from '@angular/material/menu';
 
+import { MydashboardComponent } from './mydashboard/mydashboard.component';
+import { BenificiaryComponent } from './register/benificiary/benificiary/benificiary.component';
+
+import { TableComponent } from './table/table.component';
+import { MAT_DATE_LOCALE } from '@angular/material/core';
 
 @NgModule({
   declarations: [
@@ -58,7 +49,8 @@ import { MatMenuModule } from '@angular/material/menu';
     LoadingSpinnerComponent,
     MyNavyComponent,
     TableComponent,
-    MydashboardComponent
+    MydashboardComponent,
+    BenificiaryComponent
   ],
   imports: [
     BrowserModule,
@@ -69,21 +61,9 @@ import { MatMenuModule } from '@angular/material/menu';
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,
-    RoutingModule,
-    MatFormFieldModule,
-    MatToolbarModule,
-    MatButtonModule,
-    MatSidenavModule,
-    MatIconModule,
-    MatListModule,
-    MatTableModule,
-    MatPaginatorModule,
-    MatSortModule,
-    MatGridListModule,
-    MatCardModule,
-    MatMenuModule
+    RoutingModule
   ],
-  providers: [],
+  providers: [{provide: MAT_DATE_LOCALE, useValue: 'en-GB'},],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

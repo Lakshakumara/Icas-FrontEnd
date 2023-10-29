@@ -19,9 +19,13 @@ import { MatDialogModule} from '@angular/material/dialog';
 import { MatTableModule } from '@angular/material/table';
 import {MatPaginatorModule} from '@angular/material/paginator';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
-
+import { MatSortModule } from '@angular/material/sort';
+import { MatGridListModule } from '@angular/material/grid-list';
+import { MatMenuModule } from '@angular/material/menu';
 const materialComponent = [
   FlexLayoutModule,
+  MatGridListModule,
+  MatMenuModule,
   MatFormFieldModule,
   MatInputModule,
   MatCheckboxModule,

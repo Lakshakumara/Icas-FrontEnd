@@ -1,11 +1,3 @@
-/*
-private Integer id;
-    private String idText;
-private String tile;
-    private double memberFees;
-    private double familyFees;
-    private double amount;
-    */
 export interface Scheme {
   isSelected: boolean;
   id: number;

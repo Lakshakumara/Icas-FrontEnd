@@ -1,8 +1,7 @@
 export interface Dependant{
-    id: string;
-    name:string;
-    nic:string;
-    dob:Date;
-    relationship:string;
-
+    id: any;
+    name: string;
+    nic: string;
+    dob: any;
+    relationship: string;
 }
