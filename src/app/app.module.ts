@@ -29,6 +29,10 @@ import { BenificiaryComponent } from './register/benificiary/benificiary/benific
 
 import { TableComponent } from './table/table.component';
 import { MAT_DATE_LOCALE } from '@angular/material/core';
+import { UserOPDComponent } from './tableFactory/user-opd/user-opd.component';
+import { MatTableModule } from '@angular/material/table';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatSortModule } from '@angular/material/sort';
 
 @NgModule({
   declarations: [
@@ -50,7 +54,8 @@ import { MAT_DATE_LOCALE } from '@angular/material/core';
     MyNavyComponent,
     TableComponent,
     MydashboardComponent,
-    BenificiaryComponent
+    BenificiaryComponent,
+    UserOPDComponent
   ],
   imports: [
     BrowserModule,
@@ -61,7 +66,10 @@ import { MAT_DATE_LOCALE } from '@angular/material/core';
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,
-    RoutingModule
+    RoutingModule,
+    MatTableModule,
+    MatPaginatorModule,
+    MatSortModule
   ],
   providers: [{provide: MAT_DATE_LOCALE, useValue: 'en-GB'},],
   bootstrap: [AppComponent]

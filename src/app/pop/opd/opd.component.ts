@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { FormBuilder, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ClaimOPD } from 'src/app/Model/claimOPD';
 import { Test } from 'src/app/Model/test';
@@ -18,12 +18,12 @@ export class OpdComponent implements OnInit {
 
   constructor(@Inject(MAT_DIALOG_DATA) public data: any,
     private ref: MatDialogRef<OpdComponent>,
-    private buildr: FormBuilder, private auth:AuthServiceService) {
-      this.inputdata = this.data;
+    private buildr: FormBuilder, private auth: AuthServiceService) {
+    this.inputdata = this.data;
   }
   dForm = this.buildr.group({
-    id:this.buildr.control(''),
-    memberId: this.buildr.control(''),
+    id: this.buildr.control(''),
+    memberId: new FormControl(),
     /**
      * OPD or SHE(Surgical &Hospital Expenses)
      */
@@ -48,17 +48,73 @@ export class OpdComponent implements OnInit {
   });
   ngOnInit() {
   }
-  addOpdData(){
+  addOpdData() {
     this.dForm.patchValue({
+      memberId: 1,
       category: "OPD",
       claimDate: Utils.today,
       claimStatus: "pending",
     });
 
-    Swal.fire(JSON.stringify(this.dForm.value));
-    
-    //this.auth.saveOPD(this.dForm.value);
+    //test
+/*
+    Swal.fire({
+      title: 'Place a OPD claim',
+      text: "Confirm",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Save',
+      showLoaderOnConfirm: true,
+      preConfirm: () => {
+        return fetch(`//claim/opd`)
+          .then(response => {
+            if (!response.ok) {
+              throw new Error(response.statusText)
+            }
+            return response.json()
+          })
+          .catch(error => {
+            Swal.showValidationMessage(
+              `Request failed: ${error}`
+            )
+          })
+      },
+      allowOutsideClick: () => !Swal.isLoading()
+    })
+    .then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire({
+          title: `${result.value.login}'s avatar`,
+          imageUrl: result.value.avatar_url
+        })
+      }
+    })
+*/
+
+    //end test
+    console.log("opd data submit ", this.dForm.value)
+    Swal.fire({
+      title: 'Place a OPD claim',
+      text: "Confirm",
+      icon: 'warning',
+      //footer: JSON.stringify(this.dForm.value),
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, Save'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.auth.saveOPD(this.dForm.value).subscribe(d => {
+          Swal.fire(
+            'Saved',
+            `Your reference number ${d}`,
+            'success'
+          );
+        });
+      }
+    })
   }
+
   closePopup() {
     this.ref.close(this.dForm.value);
   }

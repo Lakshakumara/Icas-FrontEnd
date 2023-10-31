@@ -6,8 +6,10 @@ import { MatInputModule} from '@angular/material/input';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatButtonModule} from '@angular/material/button';
 import { MatRadioModule} from '@angular/material/radio';
+import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import { MatListModule } from '@angular/material/list';
 import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 
 import { MatCardModule} from '@angular/material/card';
 import { MatToolbarModule} from '@angular/material/toolbar';
@@ -30,6 +32,7 @@ const materialComponent = [
   MatInputModule,
   MatCheckboxModule,
   MatButtonModule,
+  MatAutocompleteModule,
   MatCardModule,
   MatToolbarModule,
   MatSelectModule,
@@ -43,7 +46,7 @@ const materialComponent = [
   MatTableModule,
   MatPaginatorModule,
   MatProgressBarModule,
-  
+  MatProgressSpinnerModule,
   ]
 @NgModule({
   imports: [materialComponent],

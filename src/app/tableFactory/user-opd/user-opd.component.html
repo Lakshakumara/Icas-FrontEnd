@@ -1,0 +1,45 @@
+<div class="mat-elevation-z8">
+  <div class="spinner-container" *ngIf="dataSource.loading$ | async">
+    <mat-progress-bar></mat-progress-bar>
+  </div>
+
+  <table mat-table class="full-width-table" [dataSource]="dataSource" matSort matSortActive="id"
+    matSortDirection="asc" matSortDisableClear>
+    <!-- Id Column -->
+    <ng-container matColumnDef="id">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Reference No</th>
+      <td mat-cell *matCellDef="let claimOPD">{{claimOPD.id}}</td>
+    </ng-container>
+
+    <!-- Name Column -->
+    <ng-container matColumnDef="category">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Category</th>
+      <td mat-cell *matCellDef="let claimOPD">{{claimOPD.category}}</td>
+    </ng-container>
+
+    <!-- Request For Column -->
+    <ng-container matColumnDef="requestFor">
+      <th mat-header-cell *matHeaderCellDef>Request For</th>
+      <td mat-cell *matCellDef="let claimOPD">{{claimOPD.requestFor}}</td>
+    </ng-container>
+
+    <!-- Date Column -->
+    <ng-container matColumnDef="claimDate">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Date</th>
+      <td mat-cell *matCellDef="let claimOPD">{{claimOPD.claimDate}}</td>
+    </ng-container>
+
+    <!-- Status Column -->
+    <ng-container matColumnDef="claimStatus">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+      <td mat-cell *matCellDef="let claimOPD">{{claimOPD.claimStatus}}</td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let claimOPD; columns: displayedColumns;"></tr>
+  </table>
+
+  <mat-paginator #paginator [length]="1" [pageIndex]="0" [pageSize]="3" [pageSizeOptions]="[1,5, 10, 20]"
+    aria-label="Select page">
+  </mat-paginator>
+</div>

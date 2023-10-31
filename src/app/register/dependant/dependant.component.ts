@@ -12,10 +12,11 @@ import { Utils } from 'src/app/util/utils';
   styleUrls: ['./dependant.component.css']
 })
 export class DependantComponent implements OnInit {
-
   today = Utils.today;
   inputdata: any;
   editdata: Dependant[];
+  relationshipOptions: string[] = [];
+
   constructor(@Inject(MAT_DIALOG_DATA) public data: any,
     private ref: MatDialogRef<DependantComponent>,
     private buildr: FormBuilder, private authService: AuthServiceService) {
@@ -32,10 +33,12 @@ export class DependantComponent implements OnInit {
   });
 
   ngOnInit() {
-    console.log("received  to dependent inputdata ", this.inputdata);
-    // if (this.inputdata.length != 0) {
+
+    this.authService.getRelationShip('').subscribe((rs) => {
+      this.relationshipOptions = rs;
+    });
+
     this.editdata.forEach(d => {
-      console.log("data patching.. for editing ", d.name);
       this.dForm.patchValue({
         id: d.id,
         name: d.name,
@@ -43,10 +46,7 @@ export class DependantComponent implements OnInit {
         dob: d.dob,
         relationship: d.relationship,
       });
-    })
-    // } else {
-    //  console.log("no editing dep ");
-    //}
+    });
   }
 
   /*setpopupdata(id: FormGroup) {

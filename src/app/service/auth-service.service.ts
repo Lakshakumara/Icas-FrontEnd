@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http'
+import { HttpClient, HttpParams } from '@angular/common/http'
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment.development';
 import { LoaderService } from './loader.service';
@@ -12,24 +12,63 @@ import { ClaimOPD } from '../Model/claimOPD';
   providedIn: 'root'
 })
 export class AuthServiceService {
+  
+  getClaims(claimType: string, year: number, empNo: string, claimStatus: string, 
+    filter: string, sortDirection: string, pageIndex: number, pageSize: number) {
+      return this.http.get(`${this.API_URL}/claim/get`, {
+        params: new HttpParams()
+          .set('claimType', claimType)
+          .set('year', year)
+          .set('empNo', empNo)
+          .set('claimStatus', claimStatus)
+          .set('filter', filter)
+          .set('sortOrder', sortDirection)
+          .set('pageNumber', pageIndex.toString())
+          .set('pageSize', pageSize.toString())
+      }).pipe<ClaimOPD[]>(map(
+        (res: any) => res)); 
+  }
   private API_URL = environment.baseUrl;
 
   constructor(private http: HttpClient) { }
 
-  saveOPD(claimOPD: any) {
-    this.http.post(`${this.API_URL}/claim/opd`, claimOPD)
-      //.pipe<Map<string, Object>>(map((data: any) => data))
-      .subscribe(
-        (response: any) => {
-          console.log(response);
-        }
-      );
+  getOPD(empNo: any, filter = '', sortOrder = 'asc',
+    pageNumber = 0, pageSize = 3): Observable<ClaimOPD[]> {
+    return this.http.get(`${this.API_URL}/claim/get`, {
+      params: new HttpParams()
+        .set('type', "opd")
+        .set('empNo', empNo)
+        .set('filter', filter)
+        .set('sortOrder', sortOrder)
+        .set('pageNumber', pageNumber.toString())
+        .set('pageSize', pageSize.toString())
+    }).pipe<ClaimOPD[]>(map(
+      (res: any) => res)); //res["payload"]
+  }
+  /*
+    getOPD(empNo: any): Observable<ClaimOPD[]> {
+      return this.http
+        .get(`${this.API_URL}/claim/opd/get/${empNo}`)
+        .pipe<ClaimOPD[]>(map((data: any) => data));
+    }*/
+  saveOPD(claimOPD: any): Observable<number> {
+    return this.http.post(`${this.API_URL}/claim/opd`, claimOPD)
+      .pipe<number>(map((data: any) => data));
+  }
+  saveOPDtest(claimOPD: any) {
+    return this.http.post(`${this.API_URL}/claim/opd`, claimOPD);
   }
 
   isGuest(year: any, empNo: any): Observable<Map<String, Object>> {
     return this.http
       .get(`${this.API_URL}/guest/${year}/${empNo}`)
       .pipe<Map<string, Object>>(map((data: any) => data));
+  }
+
+  getRelationShip(rs: string): Observable<string[]> {
+    return this.http
+      .get(`${this.API_URL}/member/relationship/${rs}`)
+      .pipe<string[]>(map((data: any) => data));
   }
 
   getMember(empNo: any): Observable<Member> {
