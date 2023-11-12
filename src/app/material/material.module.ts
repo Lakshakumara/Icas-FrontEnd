@@ -24,6 +24,9 @@ import {MatProgressBarModule} from '@angular/material/progress-bar';
 import { MatSortModule } from '@angular/material/sort';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatBadgeModule} from '@angular/material/badge';
+import {MatExpansionModule} from '@angular/material/expansion';
+
 const materialComponent = [
   FlexLayoutModule,
   MatGridListModule,
@@ -45,8 +48,14 @@ const materialComponent = [
   MatDialogModule,
   MatTableModule,
   MatPaginatorModule,
+  MatSortModule,
   MatProgressBarModule,
   MatProgressSpinnerModule,
+  MatInputModule,
+  MatToolbarModule,
+  MatSidenavModule,
+  MatBadgeModule,
+  MatExpansionModule
   ]
 @NgModule({
   imports: [materialComponent],

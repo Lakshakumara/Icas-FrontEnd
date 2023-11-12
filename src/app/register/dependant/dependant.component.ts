@@ -4,6 +4,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Dependant } from 'src/app/Model/dependant';
 import { AuthServiceService } from 'src/app/service/auth-service.service';
 import { Utils } from 'src/app/util/utils';
+import Swal from 'sweetalert2';
 
 
 @Component({
@@ -34,7 +35,7 @@ export class DependantComponent implements OnInit {
 
   ngOnInit() {
 
-    this.authService.getRelationShip('').subscribe((rs) => {
+    this.authService.getRelationShip("%").subscribe((rs) => {
       this.relationshipOptions = rs;
     });
 
@@ -69,19 +70,24 @@ export class DependantComponent implements OnInit {
 
   addDependentDetails() {
     if (this.dForm.invalid) return;
-    this.authService.getDependant(this.dForm.value.name).subscribe(
-      {
+    this.authService.getDependant(this.dForm.value.name).subscribe({
         next: dep => {
-          if (dep == null) {
+          if (dep.name == null) {
             this.ref.close(this.dForm);
           } else {
-            console.log("exists dep" + dep);
+            console.log("exists dep" + JSON.stringify(dep));
             dep.relationship = this.dForm.value.relationship;
+            this.dForm.patchValue({
+              id: dep.id,
+              name: dep.name,
+              nic: dep.nic,
+              dob: dep.dob}
+            )
             this.ref.close(dep);
           }
         },
         error: error => {
-          console.log("Error  dep sesrch like " + error);
+          console.log("Error  dep search like " + error);
         }
       })
   }

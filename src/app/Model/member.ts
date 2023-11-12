@@ -24,3 +24,36 @@ export interface Member {
     dependants: Dependant[];
     beneficiaries: Benificiary[];
 }
+
+export const Member_Column_Accept = [
+    {
+      key: 'isSelected',
+      type: 'boolean',
+      label: '',
+    },
+    {
+      key: 'id',
+      type: 'text',
+      label: 'ID',
+    },
+    {
+      key: 'empNo',
+      type: 'number',
+      label: 'Employee No',
+    },
+    {
+      key: 'name',
+      type: 'text',
+      label: 'Employee Name',
+    },
+    {
+      key: 'mDate',
+      type: 'date',
+      label: 'Reg Date',
+    },
+    {
+      key: 'status',
+      type: 'text',
+      label: 'Status',
+    }
+  ];

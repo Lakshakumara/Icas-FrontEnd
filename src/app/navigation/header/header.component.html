@@ -10,13 +10,13 @@
     <div fxFlex fxLayout fxLayoutAlign="end" fxHide.xs>
         <ul fxLayout fxLayoutGap="15px" class="navigation-items">
             <li>
-                <a routerLink="/dd">Sign in</a>
+                <a routerLink="/signin">Sign in</a>
             </li>
             <li>
                 <a routerLink="/c_history">Claim History</a>
             </li>
             <li>
-                <a routerLink="/signout">Sign Out</a>
+                <a routerLink="/admin/gad">GADxx</a>
             </li>
             <li>
                 <a routerLink="/admin">Admin</a>
@@ -25,5 +25,21 @@
                 <a routerLink="/test">Profile</a>
             </li>
         </ul>
+        <button mat-button matBadgeColor="accent"
+            [matMenuTriggerFor]="admin">GAD</button>
+        <mat-menu #admin="matMenu">
+            <button mat-menu-item [matMenuTriggerFor]="registration">Subject</button>
+            <button mat-menu-item [matMenuTriggerFor]="mec">MEC</button>
+        </mat-menu>
+
+        <mat-menu #registration="matMenu">
+            <button routerLink="admin/gad/subject/reg" mat-menu-item>Registration</button>
+            <button routerLink="admin/gad/subject/claimupdate" mat-menu-item>Claims</button>
+        </mat-menu>
+
+        <mat-menu #mec="matMenu">
+            <button routerLink="admin/mec/opd" mat-menu-item>OPD Claims</button>
+            <button routerLink="admin/mec/hs" mat-menu-item>H&S Claims</button>
+        </mat-menu>
     </div>
 </mat-toolbar>

@@ -1,17 +1,27 @@
-<div class="mat-elevation-z8">
+<div class="claim">
+
   <div class="spinner-container" *ngIf="dataSource.loading$ | async">
-    <mat-progress-bar></mat-progress-bar>
+    <mat-progress-bar >Loading </mat-progress-bar>
   </div>
 
-  <table mat-table class="full-width-table" [dataSource]="dataSource" matSort matSortActive="id"
+  <table mat-table class="claim-table mat-elevation-z8" [dataSource]="dataSource" matSort matSortActive="id"
     matSortDirection="asc" matSortDisableClear>
+
+<!--
+  <ng-container [matColumnDef]="col" *ngFor="let col of displayedColumns; let i = index">
+        <th *matHeaderCellDef> {{displayedFields[i].name}}</th>
+        <td mat-cell *matCellDef="let element" [align]="col === 'AMOUNT' ? 'right' : ''"> {{ element[col] }} </td>
+      </ng-container> 
+
+-->
+
     <!-- Id Column -->
     <ng-container matColumnDef="id">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Reference No</th>
       <td mat-cell *matCellDef="let claimOPD">{{claimOPD.id}}</td>
     </ng-container>
 
-    <!-- Name Column -->
+    <!-- Category Column -->
     <ng-container matColumnDef="category">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Category</th>
       <td mat-cell *matCellDef="let claimOPD">{{claimOPD.category}}</td>
@@ -25,21 +35,28 @@
 
     <!-- Date Column -->
     <ng-container matColumnDef="claimDate">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Date</th>
+      <th mat-header-cell *matHeaderCellDef>Date</th>
       <td mat-cell *matCellDef="let claimOPD">{{claimOPD.claimDate}}</td>
     </ng-container>
 
     <!-- Status Column -->
     <ng-container matColumnDef="claimStatus">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+      <th mat-header-cell *matHeaderCellDef>Status</th>
       <td mat-cell *matCellDef="let claimOPD">{{claimOPD.claimStatus}}</td>
     </ng-container>
 
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let claimOPD; columns: displayedColumns;"></tr>
+    <!-- Request Amount Column -->
+    <ng-container matColumnDef="requestAmount">
+      <th mat-header-cell *matHeaderCellDef>Amount</th>
+      <td mat-cell *matCellDef="let claimOPD">{{claimOPD.requestAmount | currency : "Rs. "}}</td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky:true"></tr>
+    <tr mat-row *matRowDef="let claimOPD; columns: displayedColumns;" (click)="onRowClicked(claimOPD)"></tr>
   </table>
 
-  <mat-paginator #paginator [length]="1" [pageIndex]="0" [pageSize]="3" [pageSizeOptions]="[1,5, 10, 20]"
+  <mat-paginator class="mat-elevation-z8"
+   #paginator [length]="10" [pageIndex]="0" [pageSize]="3" [pageSizeOptions]="[1,5, 10, 20]"
     aria-label="Select page">
   </mat-paginator>
 </div>

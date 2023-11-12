@@ -12,9 +12,33 @@ import { ClaimOPD } from '../Model/claimOPD';
   providedIn: 'root'
 })
 export class AuthServiceService {
-  
+  getMembers(memberStatus: string, filter: string, sortDirection: string, pageIndex: number, pageSize: number) {
+    return this.http.get(`${this.API_URL}/member/get`, {
+      params: new HttpParams()
+        .set('empNo', "")
+        .set('memberStatus', memberStatus)
+        .set('filter', filter)
+        .set('sortOrder', sortDirection)
+        .set('pageNumber', pageIndex.toString())
+        .set('pageSize', pageSize.toString())
+    }).pipe<Member[]>(map(
+      (res: any) => res)); 
+  }
+  /**
+   * 
+   * @param claimType 
+   * @param year 
+   * @param empNo 
+   * @param claimStatus 
+   * @param filter 
+   * @param sortDirection 
+   * @param pageIndex 
+   * @param pageSize 
+   * @returns 
+   */
   getClaims(claimType: string, year: number, empNo: string, claimStatus: string, 
     filter: string, sortDirection: string, pageIndex: number, pageSize: number) {
+      console.log("getClaims calls claimType= ", claimType);
       return this.http.get(`${this.API_URL}/claim/get`, {
         params: new HttpParams()
           .set('claimType', claimType)
@@ -28,6 +52,10 @@ export class AuthServiceService {
       }).pipe<ClaimOPD[]>(map(
         (res: any) => res)); 
   }
+  getPendingOPDClaims(filter: string, sortDirection: string, pageIndex: number, pageSize: number) {
+      return this.getClaims("opd", 0, '','Pending', filter, sortDirection, pageIndex, pageSize);
+  }
+
   private API_URL = environment.baseUrl;
 
   constructor(private http: HttpClient) { }
@@ -55,11 +83,13 @@ export class AuthServiceService {
     return this.http.post(`${this.API_URL}/claim/opd`, claimOPD)
       .pipe<number>(map((data: any) => data));
   }
-  saveOPDtest(claimOPD: any) {
+  /*updateClaim(claimOPD: any) {
+    console.log('put');
     return this.http.post(`${this.API_URL}/claim/opd`, claimOPD);
-  }
+  }*/
 
   isGuest(year: any, empNo: any): Observable<Map<String, Object>> {
+    console.log("empNo; ",empNo);
     return this.http
       .get(`${this.API_URL}/guest/${year}/${empNo}`)
       .pipe<Map<string, Object>>(map((data: any) => data));
@@ -79,7 +109,6 @@ export class AuthServiceService {
   }
 
   getHRDetails(empNo: any): Observable<any> {
-    //return this.http.get(`${this.API_URL}/member/details`, data);
     return this.http.get(`${this.API_URL}/hr/${empNo}`);
 
   }
@@ -104,7 +133,6 @@ export class AuthServiceService {
   }*/
 
   register(data: any) {
-    console.log("call Register method in auth service");
     this.http.post(`${this.API_URL}/member/signup`, data, { responseType: 'blob' }).subscribe(
       (response: any) => {
         console.log(response.fileNme);

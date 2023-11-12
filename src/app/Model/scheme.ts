@@ -30,7 +30,7 @@ export const SchemeColumns = [
   },
   {
     key: 'description',
-    type: 'string',
+    type: 'text',
     label: 'Description',
     required: true,
   },
@@ -41,7 +41,7 @@ export const SchemeColumns = [
   },
   {
     key: 'unit',
-    type: 'string',
+    type: 'text',
     label: 'Unit',
   },
   {

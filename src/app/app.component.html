@@ -1,19 +1,18 @@
 <div *ngIf="isMenuShow">
   <mat-sidenav-container>
     <mat-sidenav #sidenav role="navigation">
-     <!-- this is a place for us to add side-nav code-->
+      <!-- this is a place for us to add side-nav code-->
       <app-sidenav-list (sidenavClose)="sidenav.close()"></app-sidenav-list>
     </mat-sidenav>
-    <mat-sidenav-content>
-      <!--in here all the content must reside. We will add a navigation header as well-->
-      <app-header (sidenavToggle)="sidenav.toggle()"></app-header>
-    </mat-sidenav-content>
-  </mat-sidenav-container>
-</div>
 
-<main>
-  <router-outlet></router-outlet>
-  <div *ngIf="myLoader | async as showLoading">
-    <app-loading-spinner *ngIf="showLoading"></app-loading-spinner>
-  </div>
-</main>
+    <mat-sidenav-content>
+      <app-header (sidenavToggle)="sidenav.toggle()"></app-header>
+<div *ngIf="myLoader | async as showLoading">
+  <app-loading-spinner *ngIf="showLoading"></app-loading-spinner>
+</div>
+<!--in here all the content must reside. We will add a navigation header as well-->
+
+<router-outlet></router-outlet>
+</mat-sidenav-content>
+</mat-sidenav-container>
+</div>

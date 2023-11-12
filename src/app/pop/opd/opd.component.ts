@@ -4,6 +4,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ClaimOPD } from 'src/app/Model/claimOPD';
 import { Test } from 'src/app/Model/test';
 import { AuthServiceService } from 'src/app/service/auth-service.service';
+import { Constants } from 'src/app/util/constants';
 import { Utils } from 'src/app/util/utils';
 import Swal from 'sweetalert2';
 
@@ -15,7 +16,9 @@ import Swal from 'sweetalert2';
 export class OpdComponent implements OnInit {
   inputdata: any;
   claimTypes: any = ['Outdoor', 'Spectacles', 'Covid Test'];
-
+  schemeTitles: any = ['title 1', 'title 2', 'title 3'];
+  today = Utils.today;
+  beforeThreeMonth = Utils.threeMonthbeforetoday;
   constructor(@Inject(MAT_DIALOG_DATA) public data: any,
     private ref: MatDialogRef<OpdComponent>,
     private buildr: FormBuilder, private auth: AuthServiceService) {
@@ -32,7 +35,8 @@ export class OpdComponent implements OnInit {
      * Outdoor, Spectacles, covid test etc..
      */
     requestFor: this.buildr.control(''),
-    startDate: this.buildr.control(''),
+    schemeTitle: this.buildr.control(''),
+    startDate: this.buildr.control('', Validators.required),
     endDate: this.buildr.control(''),
     claimDate: this.buildr.control(new Date, Validators.required),
     applyDate: this.buildr.control(''),
@@ -53,43 +57,42 @@ export class OpdComponent implements OnInit {
       memberId: 1,
       category: "OPD",
       claimDate: Utils.today,
-      claimStatus: "pending",
+      claimStatus: "Pending",
     });
 
     //test
-/*
-    Swal.fire({
-      title: 'Place a OPD claim',
-      text: "Confirm",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Save',
-      showLoaderOnConfirm: true,
-      preConfirm: () => {
-        return fetch(`//claim/opd`)
-          .then(response => {
-            if (!response.ok) {
-              throw new Error(response.statusText)
-            }
-            return response.json()
-          })
-          .catch(error => {
-            Swal.showValidationMessage(
-              `Request failed: ${error}`
-            )
-          })
-      },
-      allowOutsideClick: () => !Swal.isLoading()
-    })
-    .then((result) => {
-      if (result.isConfirmed) {
+    /*
         Swal.fire({
-          title: `${result.value.login}'s avatar`,
-          imageUrl: result.value.avatar_url
+          title: 'Place a OPD claim',
+          text: "Confirm",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Save',
+          showLoaderOnConfirm: true,
+          preConfirm: () => {
+            return fetch(`//claim/opd`)
+              .then(response => {
+                if (!response.ok) {
+                  throw new Error(response.statusText)
+                }
+                return response.json()
+              })
+              .catch(error => {
+                Swal.showValidationMessage(
+                  `Request failed: ${error}`
+                )
+              })
+          },
+          allowOutsideClick: () => !Swal.isLoading()})
+        .then((result) => {
+          if (result.isConfirmed) {
+            Swal.fire({
+              title: `${result.value.login}'s avatar`,
+              imageUrl: result.value.avatar_url
+            })
+          }
         })
-      }
-    })
-*/
+    */
 
     //end test
     console.log("opd data submit ", this.dForm.value)
@@ -108,14 +111,15 @@ export class OpdComponent implements OnInit {
           Swal.fire(
             'Saved',
             `Your reference number ${d}`,
-            'success'
-          );
+            'success');
+          this.closePopup();
         });
       }
-    })
+    });
   }
 
   closePopup() {
+    console.log('cancel pressed');
     this.ref.close(this.dForm.value);
   }
 }

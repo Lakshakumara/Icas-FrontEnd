@@ -1,16 +1,11 @@
 <article class="table-header">
   <div>
-    <button va-mat-table-column-sorter>
-      Columns
-   </button>
+    <button class="button-remove-rows" mat-button (click)="removeSelectedRows()">Remove Rows</button>
+    <button class="button-add-row" mat-button (click)="addRow()">Add Row</button>
+    <span class="example-fill-remaining-space"></span>
+  <button va-mat-table-column-sorter>Columns</button>
   </div>
-  <div>
-    <button class="button-remove-rows" mat-button (click)="removeSelectedRows()">Remove Rows
-    </button>
-    <button class="button-add-row" mat-button (click)="addRow()">
-      Add Row
-    </button>
-  </div>
+
 </article>
 <table mat-table [dataSource]="dataSource">
   <ng-container [matColumnDef]="col.key" *ngFor="let col of columnsSchema">
@@ -20,9 +15,8 @@
           [indeterminate]="!isAllSelected() && isAnySelected()"></mat-checkbox>
       </span>
       <span *ngSwitchDefault>{{ col.label }}</span>
-      
     </th>
-    
+
 
     <td mat-cell *matCellDef="let element">
       <div [ngSwitch]="col.type" *ngIf="!element.isEdit">
@@ -64,7 +58,7 @@
   </ng-container>
   <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
   <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-  
+
 </table>
 <mat-paginator>
   <mat-paginator [pageSizeOptions]="[5, 10, 20]"></mat-paginator>

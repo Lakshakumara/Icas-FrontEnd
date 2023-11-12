@@ -1,4 +1,4 @@
-import { Scheme, SchemeColumns } from './../../Model/scheme';
+import { Scheme, SchemeColumns } from '../../../Model/scheme';
 import { Component, OnInit } from '@angular/core'
 import { MatDialog } from '@angular/material/dialog'
 import { MatTableDataSource } from '@angular/material/table'
@@ -44,6 +44,7 @@ export class SchemePlanComponent implements OnInit {
   addRow() {
     this.loader.hideLoader();
     const newRow: Scheme = {
+      isSelected: false,
       id: 0,
       idText: '',
       title: '',
@@ -51,8 +52,7 @@ export class SchemePlanComponent implements OnInit {
       amount: 0,
       unit:'',
       rate:0,
-      isEdit: true,
-      isSelected: false,
+      isEdit: true
     }
     this.dataSource.data = [newRow, ...this.dataSource.data]
   }

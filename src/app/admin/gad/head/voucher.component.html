@@ -1,0 +1,9 @@
+<mat-card>
+    <mat-card-content>
+        <app-my-table  [enableCheckbox]="true" [allowMultiSelect]="true"
+        [rowData]="rowData" 
+            (getSelectedRows)="onNotifySelected($event)" [sqPaginationConfig]="tablePaginationSettings"
+            [sqColumnDefinition]="columnDefinition">
+        </app-my-table>
+    </mat-card-content>
+</mat-card>
