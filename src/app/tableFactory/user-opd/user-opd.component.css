@@ -1,3 +1,51 @@
-.full-width-table {
+.claim {
+  text-align: center;
   width: 100%;
+  margin: 40px auto;
+}
+
+.spinner-container {
+  height: 360px;
+  width: 390px;
+  position: fixed;
+}
+
+.claim-table {
+margin-top: 10px;
+width: 400px;
+margin-left: auto;
+margin-right: auto;
+}
+tr.mat-mdc-row:hover {
+  background-color: rgb(183, 174, 223);
+  cursor: pointer;
+}
+.mat-mdc-table .mdc-data-table__row:hover{
+  background-color: rgba(236, 236, 236, 0.514) !important;
+  }
+
+mat-paginator {
+width: 100%;
+padding-bottom: 10px;
+margin-bottom: auto;
+}
+
+.spinner-container mat-spinner {
+  margin: 130px auto 0 auto;
+}
+
+.mat-column-id {
+width: 32px;
+border-right: 1px solid black;
+padding-right: 24px;
+text-align: center;
+}
+
+.mat-column-claimStatus {
+font-style: italic;
+}
+.mat-column-requestAmount {
+  padding-right:20px;
+  text-align: right;
+  content: ",";
 }

@@ -17,7 +17,7 @@ export class UserOPDComponent implements OnInit, AfterViewInit {
 
   claimOPD !: ClaimOPD;
   dataSource!: UserOPDDataSource;
-  displayedColumns = ["id", "category", "requestFor", "claimDate", "claimStatus"];
+  displayedColumns = ["id", "category", "requestFor", "claimDate", "claimStatus", "requestAmount"];
 
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -27,20 +27,13 @@ export class UserOPDComponent implements OnInit, AfterViewInit {
 
   ngOnInit() {
     this.claimOPD = this.route.snapshot.data["claimOPD"];
-
+console.log("claimOPD ", this.claimOPD);
     this.dataSource = new UserOPDDataSource(this.auth);
     this.dataSource.loadClaims("opd", 2023, "100", "pending");
   }
 
   ngAfterViewInit() {
-    /*this.paginator.page
-      .pipe(
-        tap(() => this.loadClaimPage())
-      )
-      .subscribe();
-*/
-      this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
-        
+      this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);   
         merge(this.sort.sortChange, this.paginator.page)
             .pipe(
                 tap(() => this.loadClaimPage())
@@ -59,6 +52,9 @@ export class UserOPDComponent implements OnInit, AfterViewInit {
       this.sort.direction,
       this.paginator.pageIndex,
       this.paginator.pageSize);
+  }
+  onRowClicked(claimOPD:ClaimOPD){
+    console.log(claimOPD);
   }
 }
 

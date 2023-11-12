@@ -9,7 +9,8 @@ const routes: Routes = [
   {path: '', pathMatch: 'full', redirectTo: 'signin' },
   {path:'dd', component:MydashboardComponent},
   {path:'nn', component:MyNavyComponent},
-  {path:'tt', component:UserOPDComponent}
+  {path:'tt', component:UserOPDComponent},
+  {path:'admin', component:MyNavyComponent},
 ];
 
 @NgModule({

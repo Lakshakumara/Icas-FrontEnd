@@ -22,4 +22,41 @@ export interface ClaimOPD{
     nature: string,
     incident: string,
     claimStatus: string,
+
+    claimCount:number,
 }
+
+export const UserColumns = [
+    {
+      key: 'id',
+      type: 'number',
+      label: 'ID',
+    },
+    {
+      key: 'category',
+      type: 'text',
+      label: 'Category',
+      required: true,
+    },
+    {
+      key: 'requestFor',
+      type: 'text',
+      label: 'Request',
+    },
+    {
+      key: 'startDate',
+      type: 'string',
+      label: 'Date',
+      required: true,
+    },
+    {
+      key: 'birthDate',
+      type: 'date',
+      label: 'Date of Birth',
+    },
+    {
+      key: 'isEdit',
+      type: 'isEdit',
+      label: '',
+    },
+  ];
