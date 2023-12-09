@@ -3,7 +3,9 @@ export interface Scheme {
   id: number;
   idText: string;
   title: string;
-  description: string,
+  descriptionen: string,
+  descriptionsi: string,
+  descriptionta: string,
   amount: number;
   unit: string,
   rate: number,
@@ -29,9 +31,20 @@ export const SchemeColumns = [
     required: true,
   },
   {
-    key: 'description',
+    key: 'descriptionen',
     type: 'text',
-    label: 'Description',
+    label: 'Description English',
+    required: true,
+  },
+  {
+    key: 'descriptionsi',
+    type: 'text',
+    label: 'Description Sinhala',
+    required: true,
+  },{
+    key: 'descriptionta',
+    type: 'text',
+    label: 'Description Samil',
     required: true,
   },
   {

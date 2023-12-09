@@ -1,6 +1,7 @@
 import { Registration } from './registration';
 import { Dependant } from "./dependant";
-import { Benificiary } from './benificiary';
+import { Beneficiary } from './benificiary';
+import { Role } from './role';
 
 export interface Member {
     id: number;
@@ -18,11 +19,13 @@ export interface Member {
     password: string;
     mDate: Date;
     status: string;
-    role: string;
+    roles: Role[];
+    scheme: string;
     deleted: boolean;
-    registrations: Registration[];
+    currentRegistration: Registration;
+    memberRegistrations: Registration[];
     dependants: Dependant[];
-    beneficiaries: Benificiary[];
+    beneficiaries: Beneficiary[];
 }
 
 export const Member_Column_Accept = [
@@ -32,28 +35,13 @@ export const Member_Column_Accept = [
       label: '',
     },
     {
-      key: 'id',
-      type: 'text',
-      label: 'ID',
-    },
-    {
       key: 'empNo',
       type: 'number',
-      label: 'Employee No',
+      label: 'EmNo',
     },
     {
       key: 'name',
       type: 'text',
       label: 'Employee Name',
-    },
-    {
-      key: 'mDate',
-      type: 'date',
-      label: 'Reg Date',
-    },
-    {
-      key: 'status',
-      type: 'text',
-      label: 'Status',
     }
   ];

@@ -7,4 +7,8 @@ import { Component } from '@angular/core';
 })
 export class GadComponent {
 
+  applyFilter(event: Event) {
+    const filterValue = (event.target as HTMLInputElement).value;
+    console.log(filterValue);
+}
 }

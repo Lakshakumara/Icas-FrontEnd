@@ -1,6 +1,7 @@
-<div class="topClass">
-    <h1>OPD Claims</h1>
-    <div>
+
+<mat-card class="mat-elevation-z4">
+    <h1>Claims</h1>
+</mat-card>
         <mat-card>
             <mat-card-content>
                 <mat-form-field appearance="outline" class="full-width">
@@ -9,10 +10,10 @@
                 </mat-form-field>
             </mat-card-content>
 
-            <div *ngIf="selectedData">
+            <div *ngIf="selectedMember">
                 <fieldset>
                     <legend>Selected Member</legend>
-                    <li *ngFor="let m of selectedData">Employee Deitals
+                    <li *ngFor="let m of selectedMember">Employee Deitals
                         <a>EmpNo: {{m.empNo}}</a>
                         <a>Name: {{m.name}}</a>
                         <span>NIC: {{m.nic}}</span>
@@ -21,8 +22,7 @@
                 </fieldset>
             </div>
         </mat-card>
-    </div>
-
+<mat-card class="mat-elevation-z4" fxFlex="40%" fxFlex.xs="100%" fxFlex.sm="100%">
     <table mat-table class="topClass-table mat-elevation-z8" [dataSource]="dataSource" matSort matSortActive="id"
         matSortDirection="asc" matSortDisableClear>
 
@@ -36,9 +36,12 @@
         <tr mat-row *matRowDef="let claimOpd; columns: displayedColumn;" (click)="onRowClicked(claimOpd)"></tr>
 
 
-        
+
     </table>
     <mat-paginator class="mat-elevation-z8" #paginator [length]="10" [pageIndex]="0" [pageSize]="3"
         [pageSizeOptions]="[1,5, 10, 20]" aria-label="Select page">
     </mat-paginator>
-</div>
+</mat-card>
+<mat-card class="mat-elevation-z4" fxFlex="60%" fxFlex.xs="100%" fxFlex.sm="100%">
+<h4>Content</h4>
+</mat-card>

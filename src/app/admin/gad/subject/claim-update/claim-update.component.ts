@@ -42,8 +42,6 @@ export class ClaimUpdateComponent  implements OnInit {
         tap(() => this.loadClaimPage())
       )
       .subscribe();
-
-
   }
 
   applyFilter(event: Event) {

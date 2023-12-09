@@ -1,0 +1,53 @@
+<mat-accordion>
+    <mat-expansion-panel display="flex" (opened)="panelOpenState = true" (closed)="panelOpenState = false">
+        <mat-expansion-panel-header>
+            <mat-panel-title>
+                Member Application
+            </mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <form class="login-form" fxLayoutAlign="stretch" fxLayout="row" [formGroup]="appForm">
+
+            <mat-form-field class="app_dld">
+                <mat-label>Employee Number</mat-label>
+                <input matInput placeholder="Search..." formControlName="empNo">
+            </mat-form-field>
+
+            <mat-form-field class="app_dld">
+                <mat-label>Application Year</mat-label>
+                <input matInput placeholder="Year" formControlName = "year">
+            </mat-form-field>
+
+            <button mat-raised-button color="accent" (click)="membershipApplication()">Download</button>
+        </form>
+    </mat-expansion-panel>
+
+    <mat-expansion-panel (opened)="panelOpenState = true" (closed)="panelOpenState = false">
+        <mat-expansion-panel-header>
+            <mat-panel-title>
+                Claim Form
+            </mat-panel-title>
+        </mat-expansion-panel-header>
+        <button mat-raised-button color="accent" (onclick)="claimApplication()">Download Last Claim Application</button>
+    </mat-expansion-panel>
+
+    <mat-expansion-panel (opened)="panelOpenState = true" (closed)="panelOpenState = false">
+        <mat-expansion-panel-header>
+            <mat-panel-title>
+                Welfare Scheme Documents
+            </mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <button mat-raised-button color="accent" (click)="schemeRegulation()">Download Scheme Regulation</button>
+    </mat-expansion-panel>
+    <!--
+    <mat-expansion-panel (opened)="panelOpenState = true" (closed)="panelOpenState = false">
+        <mat-expansion-panel-header>
+            <mat-panel-title>
+                Voucher Generation
+            </mat-panel-title>
+        </mat-expansion-panel-header>
+    </mat-expansion-panel>
+-->
+
+</mat-accordion>

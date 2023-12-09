@@ -35,13 +35,21 @@ export class MemberDataSource extends DataSource<Member> {
         this.loadingSubject.complete();
     }
 
-
-    loadMember(memberStatus: string,
+/**
+ * 
+ * @param searchFor 
+ * @param searchText 
+ * @param filter 
+ * @param sortDirection 
+ * @param pageIndex 
+ * @param pageSize 
+ */
+    loadMember(searchFor: string, searchText:string, 
         filter = '', sortDirection = 'asc', pageIndex = 0, pageSize = 10) {
 
         this.loadingSubject.next(true);
 
-        this.auth.getMembers(memberStatus, filter, sortDirection, pageIndex, pageSize)
+        this.auth.getMembers(searchFor, searchText, filter, sortDirection, pageIndex, pageSize)
             .pipe(
                 catchError(() => of([])),
                 finalize(() => this.loadingSubject.next(false))

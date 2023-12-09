@@ -65,10 +65,10 @@ export class TableComponent implements OnInit, AfterViewInit, OnChanges {
     @Output() getSelectedRows = new EventEmitter();
 
     ngAfterViewInit() {
-        //this.dataSource.sort != this.sort;
-        //this.dataSource.paginator != this.paginator;
-        this.myDataSource.sort != this.sort;
-        this.myDataSource.paginator != this.paginator;
+        this.dataSource.sort != this.sort;
+        this.dataSource.paginator != this.paginator;
+        /*this.myDataSource.sort != this.sort;
+        this.myDataSource.paginator != this.paginator;*/
 
     }
     /**
@@ -78,12 +78,12 @@ export class TableComponent implements OnInit, AfterViewInit, OnChanges {
      * Lifecycle hook that is called when any data-bound property of a datasource changes.
      */
     ngOnChanges() {
-        //this.dataSource = new MatTableDataSource(this.rowData);
-       // this.dataSource.sort = this.sort;
-        //this.dataSource.paginator = this.paginator;
+        this.dataSource = new MatTableDataSource(this.rowData);
+        this.dataSource.sort = this.sort;
+        this.dataSource.paginator = this.paginator;
 
-        this.myDataSource.sort = this.sort;
-        this.myDataSource.paginator = this.paginator;
+        //this.myDataSource.sort = this.sort;
+        //this.myDataSource.paginator = this.paginator;
     }
 
     /** Whether the number of selected elements matches the total number of rows. */
@@ -97,9 +97,9 @@ export class TableComponent implements OnInit, AfterViewInit, OnChanges {
     masterToggle() {
         this.isAllSelected() ?
             this.selection.clear() :
-            //this.dataSource.data.forEach(row => this.selection.select(row));
+            this.dataSource.data.forEach(row => this.selection.select(row));
             
-            this.myDataSource.data?.forEach(row => this.selection.select(row));
+            //this.myDataSource.data?.forEach(row => this.selection.select(row));
         this.getSelectedRows.emit(this.selection.selected);
 
     }

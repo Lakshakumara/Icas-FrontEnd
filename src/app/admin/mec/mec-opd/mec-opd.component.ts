@@ -1,8 +1,7 @@
 import { Component, ViewChild, OnInit } from '@angular/core';
 import { AuthServiceService } from 'src/app/service/auth-service.service';
 import { MECDataSource } from '../mec-dataSource';
-import 'ace-builds/src-noconflict/ace';
-import { ClaimOPD, OPD_MEC_Column_Accept } from 'src/app/Model/claimOPD';
+import { Claim, MEC_Column_Accept } from 'src/app/Model/claim';
 import Swal from 'sweetalert2';
 import { Member } from 'src/app/Model/member';
 import { MatPaginator } from '@angular/material/paginator';
@@ -17,13 +16,13 @@ import { merge, tap } from 'rxjs';
 })
 export class MecOpdComponent implements OnInit{
 
-  claimOpd !: ClaimOPD;
-  selectedClaimOpd !: ClaimOPD;
+  claim !: Claim;
+  selectedClaim !: Claim;
   dataSource!: MECDataSource;
-  displayedColumn: string[] = OPD_MEC_Column_Accept.map((col) => col.key);
-  columnsSchema: any = OPD_MEC_Column_Accept;
+  displayedColumn: string[] = MEC_Column_Accept.map((col) => col.key);
+  columnsSchema: any = MEC_Column_Accept;
 
-  selectedData!: Member[];
+  selectedMember!: Member[];
   search: any;
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -31,9 +30,9 @@ export class MecOpdComponent implements OnInit{
   constructor(private auth: AuthServiceService, private route: ActivatedRoute) { }
 
   ngOnInit() {
-    this.claimOpd = this.route.snapshot.data["claimOpd"];
+    this.claim = this.route.snapshot.data["claim"];
     this.dataSource = new MECDataSource(this.auth);
-    this.dataSource.requestData("mec");
+    this.dataSource.requestData('%', "mec");
   }
   ngAfterViewInit() {
     this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
@@ -42,8 +41,6 @@ export class MecOpdComponent implements OnInit{
         tap(() => this.loadClaimPage())
       )
       .subscribe();
-
-
   }
 
   applyFilter(event: Event) {
@@ -53,23 +50,24 @@ export class MecOpdComponent implements OnInit{
   }
 
   loadClaimPage() {
-    this.dataSource.requestData("mec");
+    this.dataSource.requestData('%', "mec");
   }
-  onRowClicked(claimOPD: ClaimOPD) {
-    this.selectedData = [claimOPD.member];
-    this.selectedClaimOpd = claimOPD;
+  onRowClicked(claim: Claim) {
+    this.selectedMember = [claim.member];
+    this.selectedClaim = claim;
+    console.log("member", claim.member);
   }
   acceptClaim(){
-    this.selectedClaimOpd.acceptedDate = new Date();
-    this.selectedClaimOpd.claimStatus = "accepted";
-    this.auth.saveOPD(this.selectedClaimOpd).subscribe(d => {
+   /* this.selectedClaim.acceptedDate = new Date();
+    this.selectedClaim.claimStatus = "accepted";
+    this.auth.saveOPD(this.selectedClaim).subscribe(d => {
       this.loadClaimPage();
       Swal.fire(
         'Updated',
         `Reference number ${d}`,
         'success'
       );
-      this.selectedData.pop;
-    });
+      this.selectedMember.pop;
+    });*/
   }
 }

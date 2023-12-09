@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Dependant } from 'src/app/Model/dependant';
 import { AuthServiceService } from 'src/app/service/auth-service.service';
+import { Constants } from 'src/app/util/constants';
 import { Utils } from 'src/app/util/utils';
 import Swal from 'sweetalert2';
 
@@ -16,7 +17,7 @@ export class DependantComponent implements OnInit {
   today = Utils.today;
   inputdata: any;
   editdata: Dependant[];
-  relationshipOptions: string[] = [];
+  relationshipOptions: string[] = Constants.relationShip;
 
   constructor(@Inject(MAT_DIALOG_DATA) public data: any,
     private ref: MatDialogRef<DependantComponent>,
@@ -34,10 +35,10 @@ export class DependantComponent implements OnInit {
   });
 
   ngOnInit() {
-
+/*
     this.authService.getRelationShip("%").subscribe((rs) => {
       this.relationshipOptions = rs;
-    });
+    });*/
 
     this.editdata.forEach(d => {
       this.dForm.patchValue({
@@ -83,7 +84,7 @@ export class DependantComponent implements OnInit {
               nic: dep.nic,
               dob: dep.dob}
             )
-            this.ref.close(dep);
+            this.ref.close(this.dForm);
           }
         },
         error: error => {

@@ -36,12 +36,12 @@ export class MECDataSource extends DataSource<ClaimOPD> {
         this.loadingSubject.complete();
     }
 
-    requestData(claimStatus: string,
+    requestData(claimType:string, claimStatus: string,
         filter = '', sortDirection = 'asc', pageIndex = 0, pageSize = 10) {
 
         this.loadingSubject.next(true);
         console.log("send claimStatus ", claimStatus)
-        this.auth.getClaims("%", 0, '', claimStatus, filter, sortDirection, pageIndex, pageSize)
+        this.auth.getAllClaims(claimType, 0, '', claimStatus, filter, sortDirection, pageIndex, pageSize)
             .pipe(
                 catchError(() => of([])),
                 finalize(() => this.loadingSubject.next(false))

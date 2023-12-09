@@ -55,9 +55,9 @@ export class OpdComponent implements OnInit {
   addOpdData() {
     this.dForm.patchValue({
       memberId: 1,
-      category: "OPD",
+      category: "opd",
       claimDate: Utils.today,
-      claimStatus: "Pending",
+      claimStatus: "pending",
     });
 
     //test

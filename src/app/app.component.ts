@@ -16,7 +16,7 @@ export class AppComponent implements DoCheck{
 
   ngDoCheck(): void {
     let currentUrl = this.router.url;
-    if(currentUrl == '/isValid' || currentUrl == '/signinx'){
+    if(currentUrl == '/isValid' || currentUrl == '/signin'){
         this.isMenuShow = false;
     }else{
       this.isMenuShow = true;

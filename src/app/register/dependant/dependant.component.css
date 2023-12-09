@@ -17,3 +17,6 @@ mat-card{
 .button{
     margin: 2px;
 }
+.example-full-width {
+    width: 98%;
+}

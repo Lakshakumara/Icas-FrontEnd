@@ -7,9 +7,10 @@ import { DependantComponent } from './dependant/dependant.component';
 import { Dependant } from '../Model/dependant';
 import { MatTableDataSource } from '@angular/material/table';
 import { Utils } from '../util/utils';
-import { Benificiary, BenificiaryColumns } from '../Model/benificiary';
+import { Beneficiary, BeneficiaryColumns } from '../Model/benificiary';
 import Swal from 'sweetalert2'
 import { Router } from '@angular/router';
+import { BeneficiaryComponent } from './beneficiary/beneficiary.component';
 
 @Component({
   selector: 'app-register',
@@ -28,15 +29,14 @@ export class RegisterComponent implements OnInit {
   dependantData = new MatTableDataSource<Dependant>();
   displayedColumns: string[] = ["id", "name", "nic", "dob", "relationship", "action"];
 
-  benificiaryData = new MatTableDataSource<Benificiary>();
-  benificiaryColumns: string[] = BenificiaryColumns.map((col) => col.key)
+  beneficiaryData = new MatTableDataSource<Beneficiary>();
+  beneficiaryColumns: string[] = BeneficiaryColumns.map((col) => col.key)
 
   constructor(private fb: FormBuilder, private share: SharedService, private router: Router,
     private authService: AuthServiceService, private dialog: MatDialog) { }
 
   ngOnInit(): void {
     this.member = this.share.getUser();
-    this.initForm();
     if (this.member != null) {
       this.formGroup.patchValue({
         empNo: this.member.empNo,
@@ -49,11 +49,11 @@ export class RegisterComponent implements OnInit {
         sex: this.member.sex,
         dob: this.member.dob,
         designation: this.member.designation,
-        department: this.member.department
-      })
+        department: this.member.department,
+        dependants: this.member.dependant,
+        beneficiaries: this.member.beneficiary
+      });
     }
-  }
-  initForm() {
   }
   formGroup = this.fb.group({
     empNo: new FormControl('', [Validators.required]),
@@ -68,7 +68,8 @@ export class RegisterComponent implements OnInit {
     designation: new FormControl(),
     department: new FormControl(),
     password: new FormControl(),
-
+    scheme: new FormControl(),
+    registrationOpen: new FormControl(),
     roles: this.fb.array([this.fb.group({
       role: new FormControl(),
     })]),
@@ -77,50 +78,41 @@ export class RegisterComponent implements OnInit {
       this.fb.group({
         id: new FormControl(),
         year: new FormControl(),
+        registerDate: new FormControl(),
         acceptedDate: new FormControl(),
         schemeType: new FormControl(),
       })]
     ),
     dependants: this.fb.array([]),
 
-    beneficiaries: this.fb.array([
-      this.fb.group({
-        id: new FormControl(),
-        name: new FormControl('', [Validators.required]),
-        nic: new FormControl(),
-        percent: new FormControl(),
-        relationship: new FormControl(),
-      })
-    ]),
-    mdate: new FormControl(),
+    beneficiaries: this.fb.array([]),
+    mDate: new FormControl(),
     status: new FormControl(),
-    //beneficiaries: this.builder.array([]),
   });
 
   popupDependant() {
-    this.Openpopup('', 'Add Dependants details', DependantComponent);
+    this.Openpopup(1, '', 'Add Dependants details', DependantComponent);
   }
 
-  Openpopup(name: string, title: any, component: any) {
+  Openpopup(forWhat: number, name: string, title: any, component: any) {
     var _popup = this.dialog.open(component, {
       width: '40%',
       enterAnimationDuration: '1000ms',
       exitAnimationDuration: '1000ms',
       data: {
-        dataSet: this.dependantData.data.filter(d => d.name === name),
+        dataSet: forWhat == 1 ? this.dependantData.data.filter(d => d.name === name)
+          : this.beneficiaryData.data.filter(d => d.name === name),
         title: title,
         name: name,
       }
     });
 
     _popup.afterClosed().subscribe((item: FormGroup) => {
+
+      console.log("forWhat ", forWhat)
       if (item === undefined) return;
-      console.log("received from popup ", item.value)
-      if (item.value.name != '') {
-        console.log(`send to newDependant`, item);
-        this.newDependant(item);
-      } else
-        console.log("afterClosed ")
+      if (item.value.name != '')
+        forWhat == 1 ? this.newDependant(item) : this.newBeneficiary(item);
     })
   }
 
@@ -132,18 +124,23 @@ export class RegisterComponent implements OnInit {
       dob: data.value.dob,
       relationship: data.value.relationship
     }
-
     this.dependantData.data = [newRow, ...this.dependantData.data];
-    console.log(`this.dependantData after depArray`, this.dependantData);
     return data;
   }
 
-  private setDEp() {
+  private setDep() {
     //TODO when register click populate the dependane unnesessarily
     const userCtrl = this.formGroup.get('dependants') as FormArray;
     this.dependantData.data.forEach((user) => {
+      userCtrl.push(this.setDepFormArray(user));
+    });
+  }
 
-      userCtrl.push(this.setUsersFormArray(user))
+  private setBen() {
+    //TODO when register click populate the dependane unnesessarily
+    const userCtrlBen = this.formGroup.get('beneficiaries') as FormArray;
+    this.beneficiaryData.data.forEach((user) => {
+      userCtrlBen.push(this.setBenFormArray(user));
     });
   }
 
@@ -157,29 +154,53 @@ export class RegisterComponent implements OnInit {
       confirmButtonText: 'Yes, Submit!'
     }).then((result) => {
       if (result.isConfirmed) {
-        this.setDEp();
+        this.setDep();
+        this.setBen();
         this.formGroup.patchValue({
-          roles: [{ role: "USER" }],
-          registrations: [{ id: null, year: Utils.currentYear, acceptedDate: "Pending", schemeType: this.schemeType }],
-          mdate: new Date(),
-          status: "Pending",
+          roles: [{ role: "user" }],
+          registrations: [{ id: null, year: Utils.currentYear, schemeType: this.schemeType }],
+          mDate: new Date(),
+          registrationOpen: 0,
+          status: "pending",
+          scheme: this.schemeType,
         });
         console.log("form generated values ", this.formGroup.value);
-        this.authService.register(this.formGroup.value);
-        
+        this.authService.register(this.formGroup.value).subscribe(
+          (response: any) => {
+            console.log(response.fileNme);
+            let dataType = response.type;
+            let binaryData = [];
+            binaryData.push(response);
+            let downloadLink = document.createElement('a');
+            downloadLink.href = window.URL.createObjectURL(new Blob(binaryData, { type: dataType }));
+            downloadLink.setAttribute('download', "Application.pdf");
+            document.body.appendChild(downloadLink);
+            console.log(downloadLink)
+            downloadLink.click();
+          }
+        );
+
         this.authService.getMember(this.formGroup.value.empNo).subscribe(m => {
           this.share.setUser(m);
           this.formGroup.reset();
           this.router.navigate(["/home"]);
         })
-
-
       }
     });
-
   }
 
-  private setUsersFormArray(x: any) {
+  private setBenFormArray(x: any) {
+    return this.fb.group({
+      id: this.fb.control(x.id),
+      name: this.fb.control(x.name),
+      nic: this.fb.control(x.nic),
+      registerDate: this.fb.control(new Date()),
+      percent: new FormControl(x.percent),
+      relationship: this.fb.control(x.relationship)
+    });
+  }
+
+  private setDepFormArray(x: any) {
     return this.fb.group({
       id: this.fb.control(x.id),
       name: this.fb.control(x.name),
@@ -188,17 +209,8 @@ export class RegisterComponent implements OnInit {
       relationship: this.fb.control(x.relationship)
     });
   }
-  /* depAsArray(x: Dependant): FormGroup {
-     return this.fb.group({
-       id: this.fb.control(x.id),
-       name: this.fb.control(x.name),
-       nic: this.fb.control(x.nic),
-       dob: this.fb.control(x.dob),
-       relationship: this.fb.control(x.relationship)
-     });
-   }*/
   editDependant(name: string) {
-    this.Openpopup(name, 'Add Dependants details', DependantComponent);
+    this.Openpopup(1, name, 'Add Dependants details', DependantComponent);
     this.dependantData.data = this.dependantData.data.filter((u: Dependant) => {
       return u.name !== name;
     });
@@ -271,19 +283,30 @@ export class RegisterComponent implements OnInit {
   }
 
   popupBenificiary() {
-    this.Openpopup("", 'Add Dependants details', DependantComponent);
+    this.Openpopup(2, "", 'Add Beneficiary details', BeneficiaryComponent);
+  }
+  private newBeneficiary(data: FormGroup): FormGroup {
+    const newRow: Beneficiary = {
+      id: data.value.id,
+      name: data.value.name,
+      nic: data.value.nic,
+      registerDate: data.value.registerDate,
+      relationship: data.value.relationship,
+      percent: data.value.percent
+    }
+    this.beneficiaryData.data = [newRow, ...this.beneficiaryData.data];
+    return data;
   }
   editBenificiary(name: any) {
-    this.Openpopup(name, 'Add Benificiary details', DependantComponent);
+    this.Openpopup(2, name, 'Add Benificiary details', BeneficiaryComponent);
   }
 
   removeBenificiary(name: string) {
-    console.log("before removing Benificiary ", this.benificiaryData.data);
-    this.benificiaryData.data = this.benificiaryData.data.filter((u: Benificiary) => {
-      console.log("removed item name Benificiary ", u.name);
+    console.log("before removing Benificiary ", this.beneficiaryData.data);
+    this.beneficiaryData.data = this.beneficiaryData.data.filter((u: Beneficiary) => {
       u.name !== name;
     });
-    console.log("after removing  ", this.benificiaryData.data);
+    console.log("after removing  ", this.beneficiaryData.data);
   }
 
   showThis(title: any, subtitle: any) {

@@ -1,11 +1,12 @@
-export interface Benificiary {
-    id: number;
-    name: string;
-    nic: string;
-    relationship: string;
-    percent: number;
+export interface Beneficiary {
+    id: any,
+    name: string,
+    nic: string,
+    relationship: string,
+    registerDate:any,
+    percent: any,
 }
-export const BenificiaryColumns = [
+export const BeneficiaryColumns = [
     {
         key: 'id',
         type: 'number',

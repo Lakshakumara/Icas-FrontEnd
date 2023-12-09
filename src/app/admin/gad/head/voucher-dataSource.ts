@@ -5,13 +5,13 @@ import { catchError, finalize, map } from 'rxjs/operators';
 import { Observable, BehaviorSubject, of } from 'rxjs';
 import { AuthServiceService } from 'src/app/service/auth-service.service';
 import { ClaimOPD } from 'src/app/Model/claimOPD';
+import { Claim } from 'src/app/Model/claim';
 
-export class VoucherDataSource extends DataSource<ClaimOPD> {
-    data: ClaimOPD[] | undefined;
+export class VoucherDataSource extends DataSource<Claim> {
     paginator: MatPaginator | undefined;
     sort: MatSort | undefined;
 
-    private dataSetSubject = new BehaviorSubject<ClaimOPD[]>([]);
+    private dataSetSubject = new BehaviorSubject<Claim[]>([]);
     private loadingSubject = new BehaviorSubject<boolean>(false);
     public loading$ = this.loadingSubject.asObservable();
 
@@ -22,7 +22,7 @@ export class VoucherDataSource extends DataSource<ClaimOPD> {
      * the returned stream emits new items.
      * @returns A stream of the items to be rendered.
      */
-    connect(collectionViewer: CollectionViewer): Observable<ClaimOPD[]> {
+    connect(collectionViewer: CollectionViewer): Observable<Claim[]> {
         return this.dataSetSubject.asObservable();
     }
 
@@ -35,17 +35,31 @@ export class VoucherDataSource extends DataSource<ClaimOPD> {
         this.loadingSubject.complete();
     }
 
-    requestData(claimStatus: string,
+    /*requestData(claimStatus: string,
         filter = '', sortDirection = 'asc', pageIndex = 0, pageSize = 10) {
-
+            console.log("send in voucher");
         this.loadingSubject.next(true);
 
-        this.auth.getPendingOPDClaims(filter, sortDirection, pageIndex, pageSize)
+        this.auth.getAllClaims('%', 0, '', claimStatus, filter, sortDirection, pageIndex, pageSize)
             .pipe(
                 catchError(() => of([])),
                 finalize(() => this.loadingSubject.next(false))
             )
             .subscribe((receiveData: any) => this.dataSetSubject.next(receiveData));
         console.log("fetch data set ", this.dataSetSubject)
+    }*/
+/**
+ * 
+ * @param claimStatus  String pattern
+ * @param filter  '' to ignor
+ * @param sortDirection  default asc
+ * @param pageIndex  default 0
+ * @param pageSize default 10
+ * @returns 
+ */
+    requestAllData(claimStatus: string,
+        filter = '', sortDirection = 'asc', pageIndex = 0, pageSize = 10) {
+        this.loadingSubject.next(true);
+             return this.auth.getAllClaims('%', 0, '', claimStatus, filter, sortDirection, pageIndex, pageSize);   
     }
 }

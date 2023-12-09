@@ -1,4 +1,7 @@
 export interface Registration{
     id: number,
-    year:number
+    year: number,
+    schemeType: string,
+    acceptedDate: Date,
+    acceptedBy: number
 }

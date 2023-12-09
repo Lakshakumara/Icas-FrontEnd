@@ -6,5 +6,8 @@ import { Component } from '@angular/core';
   styleUrls: ['./access.component.css']
 })
 export class AccessComponent {
+  showFiller = true;
 
+  filterResults(text: string) {
+  }
 }
