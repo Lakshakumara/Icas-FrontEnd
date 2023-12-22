@@ -178,8 +178,6 @@ const x = this.roleGroup.value as Array<Role>
   console.log("r ", );
   //console.log("r ", r);
 
-
-
     this.auth.updateMember('role', this.roleGroup.value).subscribe(data => {
       Swal.fire({
         icon: 'info',
@@ -207,5 +205,4 @@ const x = this.roleGroup.value as Array<Role>
       });
     });
   }
-
 }
