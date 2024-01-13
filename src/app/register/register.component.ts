@@ -33,7 +33,9 @@ export class RegisterComponent implements OnInit {
   beneficiaryColumns: string[] = BeneficiaryColumns.map((col) => col.key)
 
   constructor(private fb: FormBuilder, private share: SharedService, private router: Router,
-    private authService: AuthServiceService, private dialog: MatDialog) { }
+    private authService: AuthServiceService, private dialog: MatDialog) { 
+      
+    }
 
   ngOnInit(): void {
     this.member = this.share.getUser();
@@ -53,28 +55,30 @@ export class RegisterComponent implements OnInit {
         dependants: this.member.dependant,
         beneficiaries: this.member.beneficiary
       });
+    }else {
+      this.router.navigate(["/signin"]);
     }
   }
   formGroup = this.fb.group({
     empNo: new FormControl('', [Validators.required]),
     name: new FormControl('', [Validators.required]),
-    address: new FormControl(),
+    address: new FormControl('', [Validators.required]),
     email: new FormControl(),
     contactNo: new FormControl(),
-    civilStatus: new FormControl(),
-    nic: new FormControl(),
-    sex: new FormControl(),
-    dob: new FormControl(),
-    designation: new FormControl(),
-    department: new FormControl(),
+    civilStatus: new FormControl('', [Validators.required]),
+    nic: new FormControl('', [Validators.required]),
+    sex: new FormControl('', [Validators.required]),
+    dob: new FormControl('', [Validators.required]),
+    designation: new FormControl('', [Validators.required]),
+    department: new FormControl('', [Validators.required]),
     password: new FormControl(),
-    scheme: new FormControl(),
+    scheme: new FormControl('', [Validators.required]),
     registrationOpen: new FormControl(),
     roles: this.fb.array([this.fb.group({
       role: new FormControl(),
     })]),
 
-    registrations: this.fb.array([
+    memberRegistrations: this.fb.array([
       this.fb.group({
         id: new FormControl(),
         year: new FormControl(),
@@ -96,7 +100,7 @@ export class RegisterComponent implements OnInit {
 
   Openpopup(forWhat: number, name: string, title: any, component: any) {
     var _popup = this.dialog.open(component, {
-      width: '40%',
+      //width: '40%',
       enterAnimationDuration: '1000ms',
       exitAnimationDuration: '1000ms',
       data: {
@@ -144,7 +148,57 @@ export class RegisterComponent implements OnInit {
     });
   }
 
+
   registerProcess() {
+    Swal.fire({
+      title: `Confirm to submit Data ?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Submit!',
+      showLoaderOnConfirm: true,
+      preConfirm: async () => {
+        try {
+          this.setDep();
+        this.setBen();
+        this.formGroup.patchValue({
+          roles: [{ role: "user" }],
+          memberRegistrations: [{ id: null, year: Utils.currentYear, schemeType: this.schemeType }],
+          mDate: Utils.today,
+          registrationOpen: 0,
+          status: "pending",
+          password:"user",
+          scheme: this.schemeType,
+        });
+
+        this.authService.register(this.formGroup.value).subscribe(
+          (response: any) => {
+            console.log(response)
+            if (response == "ok") {
+              return Swal.showValidationMessage(`Registered..`);
+            }else
+            return Swal.showValidationMessage(`Error occured ..`);
+            });
+        } catch (error) {
+          Swal.showValidationMessage(`Request failed: ${error}`);
+        }
+      },
+      allowOutsideClick: () => !Swal.isLoading()
+    }).then((result) => {
+      if (result.isConfirmed) {
+        console.log('result confirm')
+        if(this.formGroup.value.empNo == null || this.formGroup.value.empNo === ""){
+          this.authService.getMember(this.formGroup.value.empNo).subscribe(m => {
+            this.share.setUser(m);
+            this.downloadMembershipApplication(Utils.currentYear, m.empNo);
+            this.formGroup.reset();
+            this.router.navigate(["/home"]);
+          });
+        }
+      }
+    });
+
+/*
+
     Swal.fire({
       title: `Confirm to submit Data ?`,
       icon: 'warning',
@@ -158,16 +212,17 @@ export class RegisterComponent implements OnInit {
         this.setBen();
         this.formGroup.patchValue({
           roles: [{ role: "user" }],
-          registrations: [{ id: null, year: Utils.currentYear, schemeType: this.schemeType }],
-          mDate: new Date(),
+          memberRegistrations: [{ id: null, year: Utils.currentYear, schemeType: this.schemeType }],
+          mDate: Utils.today,
           registrationOpen: 0,
           status: "pending",
+          password:"user",
           scheme: this.schemeType,
         });
+
         console.log("form generated values ", this.formGroup.value);
         this.authService.register(this.formGroup.value).subscribe(
           (response: any) => {
-            console.log(response.fileNme);
             let dataType = response.type;
             let binaryData = [];
             binaryData.push(response);
@@ -179,15 +234,73 @@ export class RegisterComponent implements OnInit {
             downloadLink.click();
           }
         );
-
-        this.authService.getMember(this.formGroup.value.empNo).subscribe(m => {
-          this.share.setUser(m);
-          this.formGroup.reset();
-          this.router.navigate(["/home"]);
-        })
       }
+    });*/
+  }
+  downloadMembershipApplication(year:number, empNo:string){
+    this.authService.download(1, year, empNo)
+    .subscribe((response: any) => {
+      console.log(response.fileNme);
+      let dataType = response.type;
+      let binaryData = [];
+      binaryData.push(response);
+      //let fname = response.get("file name").ToString();
+      //console.log(fname);
+      let downloadLink = document.createElement('a');
+      downloadLink.href = window.URL.createObjectURL(new Blob(binaryData, { type: dataType }));
+      downloadLink.setAttribute('download', "Application.pdf");
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
     });
   }
+  /*registerProcess old() {
+    Swal.fire({
+      title: `Confirm to submit Data ?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, Submit!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.setDep();
+        this.setBen();
+        this.formGroup.patchValue({
+          roles: [{ role: "user" }],
+          memberRegistrations: [{ id: null, year: Utils.currentYear, schemeType: this.schemeType }],
+          mDate: Utils.today,
+          registrationOpen: 0,
+          status: "pending",
+          password:"user",
+          scheme: this.schemeType,
+        });
+        console.log("form generated values ", this.formGroup.value);
+        this.authService.register(this.formGroup.value).subscribe(
+          (response: any) => {
+            let dataType = response.type;
+            let binaryData = [];
+            binaryData.push(response);
+            let downloadLink = document.createElement('a');
+            downloadLink.href = window.URL.createObjectURL(new Blob(binaryData, { type: dataType }));
+            downloadLink.setAttribute('download', "Application.pdf");
+            document.body.appendChild(downloadLink);
+            console.log(downloadLink)
+            downloadLink.click();
+
+            this.authService.getMember(this.formGroup.value.empNo).subscribe(m => {
+              this.share.setUser(m);
+              this.formGroup.reset();
+              this.router.navigate(["/home"]);
+            })
+
+          }
+        );
+
+        
+      }
+      
+    });
+  }*/
 
   private setBenFormArray(x: any) {
     return this.fb.group({
@@ -317,4 +430,6 @@ export class RegisterComponent implements OnInit {
       footer: `<a href="">${JSON.stringify(subtitle)}</a>`
     });
   }
+
+  
 }

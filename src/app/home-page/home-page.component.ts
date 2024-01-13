@@ -1,10 +1,12 @@
 import { Component } from '@angular/core';
 import { OpdComponent } from '../pop/opd/opd.component';
 import { AuthServiceService } from '../service/auth-service.service';
+import { SharedService } from '../shared/shared.service';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { HospitalComponent } from '../pop/hospital/hospital.component';
 import { ClaimFormComponent } from '../pop/claim-form/claim-form.component';
+import { Member } from '../Model/member';
 
 @Component({
   selector: 'app-home-page',
@@ -12,9 +14,24 @@ import { ClaimFormComponent } from '../pop/claim-form/claim-form.component';
   styleUrls: ['./home-page.component.css']
 })
 export class HomePageComponent {
-  constructor( private router: Router,
+  member !: Member;
+  isAdmin: boolean = false;
+  isUser: boolean = false;
+  constructor( private router: Router, private share: SharedService,
     private authService: AuthServiceService, private dialog: MatDialog) {
-
+      this.member = this.share.getUser();
+      if (this.member != null) {
+        this.member.roles.forEach((val, key) => {
+          //this.roles.push(val.role)
+          switch(val.role) {
+            case "admin": this.isAdmin = true;break;
+            case "user": this.isUser = true;break;
+          }
+      });
+        
+      }else{
+        this.router.navigate(["/signin"]);
+      }
   }
 
   newClaim(){

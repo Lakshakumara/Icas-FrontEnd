@@ -24,7 +24,7 @@ import { OpdComponent } from './pop/opd/opd.component';
 import { HospitalComponent } from './pop/hospital/hospital.component';
 import { SchemePlanComponent } from './admin/super/scheme-plan/scheme-plan.component';
 import { LoadingSpinnerComponent } from './decorator/loading-spinner/loading-spinner.component';
-import { MyNavyComponent } from './my-navyBar/my-nav.component';
+//import { MyNavyComponent } from './my-navyBar/my-nav.component';
 
 import { MydashboardComponent } from './mydashboard/mydashboard.component';
 
@@ -51,9 +51,11 @@ import { ClaimFormComponent } from './pop/claim-form/claim-form.component';
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 import { ProfileComponent } from './login-v1/profile/profile.component';
 
+import {OnlyNumberDirective} from './util/only-number.directive'
 
 @NgModule({
   declarations: [
+    OnlyNumberDirective,
     AppComponent,
     LoginComponent,
     RegisterComponent,
@@ -68,7 +70,7 @@ import { ProfileComponent } from './login-v1/profile/profile.component';
     HospitalComponent,
     SchemePlanComponent,
     LoadingSpinnerComponent,
-    MyNavyComponent,
+    //MyNavyComponent,
     TableComponent,
     MydashboardComponent,
     UserOPDComponent,

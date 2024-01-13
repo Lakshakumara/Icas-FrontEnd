@@ -8,23 +8,32 @@
         <a routerLink="/home">Home</a>
     </div>
     <div fxFlex fxLayout fxLayoutAlign="end" fxHide.xs>
-        
         <ul fxLayout fxLayoutGap="15px" class="navigation-items">
             <li>
-                <a routerLink="/signin">Sign in</a>
+                <button mat-button [matMenuTriggerFor]="switch">Roles</button>
+            </li>
+
+            <li>
+                <button mat-button matBadgeColor="accent" routerLink="/signin">Sign in</button>
             </li>
             <li>
-                <a routerLink="/c_history">Claim History</a>
+                <button *ngIf="isUser" mat-button matBadgeColor="accent" routerLink="/c_history">Claim History</button>
             </li>
             <li>
-                <a routerLink="/download">Download</a>
+                <button *ngIf="isUser" mat-button matBadgeColor="accent" routerLink="/download">Download</button>
             </li>
             <li>
-                <a routerLink="/profile">Profile</a>
+                <button mat-button matBadgeColor="accent" routerLink="/profile">Profile</button>
+            </li>
+            <li>
+                <button *ngIf="isAdmin" mat-button matBadgeColor="accent" [matMenuTriggerFor]="admin">Admin</button>
             </li>
         </ul>
-        <button mat-button matBadgeColor="accent"
-            [matMenuTriggerFor]="admin">Admin</button>
+        <mat-menu #switch="matMenu">
+           
+            <button *ngFor="let role of roles" mat-menu-item>{{role}}</button>
+        </mat-menu>
+
         <mat-menu #admin="matMenu">
             <button mat-menu-item [matMenuTriggerFor]="dep_head">Department Head</button>
             <button mat-menu-item [matMenuTriggerFor]="subject_cleark">Claim Management</button>
@@ -32,8 +41,9 @@
             <button mat-menu-item [matMenuTriggerFor]="super_admin">Super Admin</button>
         </mat-menu>
         <mat-menu #dep_head="matMenu">
-            <button routerLink="admin/head/member" mat-menu-item>Membership Acceptance</button>
-            <button routerLink="admin/head/claim" mat-menu-item>Claims Acceptance</button>
+            <button *ngIf="isDepHead" routerLink="admin/head/member" mat-menu-item>Membership Acceptance</button>
+            <button *ngIf="isDepHead" routerLink="admin/head/claim" mat-menu-item>Claims Acceptance</button>
+            <button *ngIf="!isDepHead"  mat-menu-item>No Access</button>
         </mat-menu>
 
         <mat-menu #subject_cleark="matMenu">
@@ -53,3 +63,12 @@
         </mat-menu>
     </div>
 </mat-toolbar>
+<!-- logic && operator 
+<div *ngIf="isLoggedIn && !isNewUser">
+    Welcome back, friend.
+  </div>-->
+  
+  <!-- logic OR operator 
+  <div *ngIf="isLoggedIn || isNewUser">
+    Welcome!
+  </div>-->

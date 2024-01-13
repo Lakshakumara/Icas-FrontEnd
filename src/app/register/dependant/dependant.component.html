@@ -14,7 +14,7 @@
             <mat-label>Date of Birth</mat-label>
             <input matInput [matDatepicker]="picker" [max]="today" placeholder="DOB" formControlName="dob">
             <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-            <mat-datepicker #picker></mat-datepicker>
+            <mat-datepicker #picker disabled="false" startView="multi-year" ></mat-datepicker>
             <mat-hint>dd/mm/yyyy</mat-hint>
         </mat-form-field>
 
@@ -29,7 +29,7 @@
 
     </div>
     <div mat-dialog-actions>
-        <button mat-raised-button color="primary" (click)="addDependentDetails()">Save</button>
+        <button mat-raised-button color="primary" [disabled]="!dForm.valid" (click)="addDependentDetails()">Save</button>
         <button mat-raised-button color="warn" (click)="closePopup()">Close</button>
     </div>
 </form>

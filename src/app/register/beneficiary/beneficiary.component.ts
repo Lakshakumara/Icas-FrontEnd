@@ -30,7 +30,7 @@ export class BeneficiaryComponent implements OnInit {
     name: this.buildr.control('', Validators.required),
     nic: this.buildr.control(''),
     relationship: this.buildr.control('', Validators.required),
-    percent: this.buildr.control(null, Validators.required)
+    percent: this.buildr.control('', [Validators.required, Validators.maxLength(2)])
   });
 
   ngOnInit() {
@@ -51,6 +51,7 @@ export class BeneficiaryComponent implements OnInit {
 
   addBeneficiaryDetails() {
     if (this.dForm.invalid) return;
+    if (this.dForm.value.percent) return;
     this.authService.getDependant(this.dForm.value.name).subscribe({
         next: dep => {
           if (dep.name == null) {

@@ -57,7 +57,7 @@ export class LoginV1Component implements OnInit {
     this.authService.isGuest(Utils.currentYear, this.empNoForm.value.empNo).subscribe({
       next: (user: any) => {
         if (user.isMember == false) {
-          console.log("Member not in Memeber table look at HR");
+          console.log("Member not in Registered look at HR");
           this.authService.getHRDetails(this.empNoForm.value.empNo).subscribe({
             next: user => {
               if (user == null) {
@@ -124,4 +124,3 @@ export class LoginV1Component implements OnInit {
     })
   }
 }
-

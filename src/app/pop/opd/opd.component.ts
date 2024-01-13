@@ -7,6 +7,7 @@ import { AuthServiceService } from 'src/app/service/auth-service.service';
 import { Constants } from 'src/app/util/constants';
 import { Utils } from 'src/app/util/utils';
 import Swal from 'sweetalert2';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-opd',
@@ -19,9 +20,10 @@ export class OpdComponent implements OnInit {
   schemeTitles: any = ['title 1', 'title 2', 'title 3'];
   today = Utils.today;
   beforeThreeMonth = Utils.threeMonthbeforetoday;
+  
   constructor(@Inject(MAT_DIALOG_DATA) public data: any,
     private ref: MatDialogRef<OpdComponent>,
-    private buildr: FormBuilder, private auth: AuthServiceService) {
+    private buildr: FormBuilder, private auth: AuthServiceService, private router: Router) {
     this.inputdata = this.data;
   }
   dForm = this.buildr.group({

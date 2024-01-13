@@ -1,7 +1,5 @@
 import { Component, Input, AfterViewInit, ViewChild, OnInit, OnChanges, Output, EventEmitter } from '@angular/core';
-import { ThemePalette } from '@angular/material/core';
-import { DataSource } from "@angular/cdk/collections";
-import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { SelectionModel } from '@angular/cdk/collections';

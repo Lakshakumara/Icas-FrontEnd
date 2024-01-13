@@ -4,6 +4,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { AuthServiceService } from '../service/auth-service.service';
 import { Member } from '../Model/member';
 import { SharedService } from '../shared/shared.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-download',
@@ -21,20 +22,24 @@ export class DownloadComponent implements OnInit {
     year: new FormControl()
   });
   selectedYear: number = Utils.currentYear;
-  constructor(private share: SharedService, private auth:AuthServiceService) { }
+  constructor(private share: SharedService, private auth:AuthServiceService, private router: Router) { }
 
   ngOnInit() {
     this.member = this.share.getUser();
-    if(this.member != null)
-    this.appForm = new FormGroup({
+    if(this.member != null){
+      this.appForm = new FormGroup({
       empNo: new FormControl(this.member.empNo, [Validators.required]),
       year: new FormControl('', [Validators.required])
     });
+    }else{
+      this.router.navigate(["/signin"]);
+    }
+    
   }
   public onSidenavClose = () => {
     this.sidenavClose.emit();
   }
-  membershipApplication(){
+  downloadMembershipApplication(){
     console.log('download year', this.appForm.value.year);
     this.auth.download(1, this.appForm.value.year, this.appForm.value.empNo)
     .subscribe((response: any) => {

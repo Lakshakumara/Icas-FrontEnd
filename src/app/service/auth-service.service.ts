@@ -45,7 +45,7 @@ export class AuthServiceService {
   }
 
   getMember(empNo: any): Observable<Member> {
-    return this.http
+   return this.http
       .get(`${this.API_URL}/member/${empNo}`)
       .pipe<Member>(map((data: any) => data));
   }
@@ -60,7 +60,7 @@ export class AuthServiceService {
   }
 
   register(data: any) {
-    return this.http.post(`${this.API_URL}/member/signup`, data, { responseType: 'blob' })
+    return this.http.post(`${this.API_URL}/member/signup`, data)
   }
  
   getUser(data: any): Observable<any> {

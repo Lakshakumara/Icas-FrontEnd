@@ -1,50 +1,19 @@
-<!--<div>
-  <label>Scheme Category </label>
+<div>
+  <h1>Member Registration</h1>
   <label>
-    <input [value]="1" [(ngModel)]="schemeType" name="schemeType" type="radio" [checked]="isInvividual" > Individual
+    <input [value]="'Individual'" [(ngModel)]="schemeType" name="schemeType" type="radio"
+      [checked]="schemeType=='Individual'"> Individual
   </label>
-    <input [value]="0" [(ngModel)]="schemeType" name="schemeType" type="radio" [checked]="!isInvividual" > Family
-</div>
-<div>
-  <input
-    id="male"
-    type="radio"
-    value="male"
-    name="gender"
-    formControlName="gender"
-  />
-  <label class="custom-control-label" for="male">Male</label>
-</div>
-<div>
-  <input
-    id="female"
-    type="radio"
-    value="female"
-    name="gender"
-    formControlName="gender"
-  />
-  <label class="custom-control-label" for="female">Female</label>
-</div>
--->
-
-<div>
-  <span>
-    <h1>Member Registration</h1>
-    <label>
-      <input [value]="'Individual'" [(ngModel)]="schemeType" name="schemeType" type="radio"
-        [checked]="schemeType=='Individual'"> Individual
-    </label>
-    <label>
+  <label>
     <input [value]="'Family'" [(ngModel)]="schemeType" name="schemeType" type="radio" [checked]="schemeType=='Family'">
     Family
   </label>
-  </span>
 </div>
 <form class="register-form" [formGroup]="formGroup">
   <div fxLayout="row wrap" fxLayoutAlign="space-between" fxLayoutGap="8dp">
     <mat-card class="mat-elevation-z4" fxFlex="40%" fxFlex.xs="100%" fxFlex.sm="100%">
       <mat-card-header>
-
+        <mat-card-title>HR Details</mat-card-title>
       </mat-card-header>
       <mat-card-content>
         <!--
@@ -134,18 +103,14 @@
       </mat-card> -->
 
     <!--Beneficiary data-->
-    <mat-card class="mat-elevation-z8" fxFlex="60%" fxFlex.xs="100%" fxFlex.sm="100%">
+    <mat-card fxFlex="60%" fxFlex.xs="100%" fxFlex.sm="100%">
       <mat-card-header>
-        <mat-card-title fxLayout="row">
-          <div display="flex">
-          <span >Beneficiary Details</span>
-          <button class="btn" mat-raised-button (click)="popupBenificiary()" color="primary">Add Benificiary(+)</button>
-        </div>
-        </mat-card-title>
+        <mat-card-title>Beneficiary Details</mat-card-title>
+        <div fxFlex></div>
+        <button class="btn" mat-raised-button (click)="popupBenificiary()" color="primary">Add</button>
       </mat-card-header>
       <mat-card-content>
         <ng-container>
-
           <table mat-table class="mat-elevation-z8" [dataSource]="beneficiaryData">
             <ng-container matColumnDef="id">
               <th mat-header-cell *matHeaderCellDef>ID</th>
@@ -190,9 +155,11 @@
       <mat-card *ngIf="schemeType == 'Family'">
         <mat-card-header>
           <mat-card-title>Dependant Details</mat-card-title>
+          <div fxFlex></div>
+          <button mat-raised-button (click)="popupDependant()" color="primary">Add</button>
         </mat-card-header>
         <mat-card-content>
-          <ng-container formArrayName="registrations">
+          <ng-container formArrayName="memberRegistrations">
 
             <table mat-table class="mat-elevation-z8" [dataSource]="dependantData">
 
@@ -234,11 +201,8 @@
             </table>
           </ng-container>
         </mat-card-content>
-        <mat-card-actions>
-          <button mat-raised-button (click)="popupDependant()" color="primary">Add Dependant(+)</button>
-        </mat-card-actions>
       </mat-card>
-
+   
       <mat-card-actions>
         <div fxLayout="row" style="margin:2%;text-align:right;">
           <button mat-raised-button color="accent" class="btn-block" (click)="registerProcess()">Register</button>
