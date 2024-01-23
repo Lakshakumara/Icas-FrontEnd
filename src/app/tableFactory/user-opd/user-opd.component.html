@@ -1,5 +1,19 @@
 <div class="claim">
+  <div>
+    <mat-form-field class="example-full-width" appearance="outline" >
+      <mat-label>Claim Status</mat-label>
+      <mat-select [(ngModel)]="selectedStatus">
+        <mat-option [value]="cStatus"  *ngFor="let cStatus of claimStatus">{{cStatus}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
 
+    <mat-form-field class="example-full-width" appearance="outline">
+      <mat-label>Year</mat-label>
+      <input type="text" onlyNumber matInput [(ngModel)]="year">
+  </mat-form-field>
+  <button mat-raised-button color="accent" (click)="search()">Search</button>
+  </div>
   <div class="spinner-container" *ngIf="dataSource.loading$ | async">
     <mat-progress-bar >Loading </mat-progress-bar>
   </div>

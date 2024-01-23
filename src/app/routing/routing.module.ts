@@ -7,7 +7,7 @@ import { LoginV1Component } from '../login-v1/login-v1.component';
 import { TestComponent } from '../test/test.component';
 import { SchemePlanComponent } from '../admin/super/scheme-plan/scheme-plan.component';
 import { SubjectComponent } from '../admin/gad/subject/subject.component';
-import { ClaimUpdateComponent } from '../admin/gad/subject/claim-update/claim-update.component';
+import { ClaimUpdateComponent } from '../admin/dep-head/claim-update/claim-update.component';
 import { MecOpdComponent } from '../admin/mec/mec-opd/mec-opd.component';
 import { MecHsComponent } from '../admin/mec/mec-hs/mec-hs.component';
 import { VoucherComponent } from '../admin/gad/head/voucher.component';
@@ -38,7 +38,7 @@ const routes: Routes = [
   {path:'admin/gad/subject', component:SubjectComponent},
 
   {path:'admin/gad/subject/reg', component:RegistrationComponent},
-  {path:'admin/gad/subject/claimupdate', component:ClaimUpdateComponent},
+  //{path:'admin/gad/subject/claimupdate', component:ClaimUpdateComponent},
   {path:'admin/gad/subject/voucher', component:VoucherComponent},
 
   {path:'admin/mec/opd', component:MecOpdComponent},

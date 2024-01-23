@@ -30,7 +30,7 @@ import { MydashboardComponent } from './mydashboard/mydashboard.component';
 
 import { TableComponent } from './table/table.component';
 import { UserOPDComponent } from './tableFactory/user-opd/user-opd.component';
-import { ClaimUpdateComponent } from './admin/gad/subject/claim-update/claim-update.component';
+import { ClaimUpdateComponent } from './admin/dep-head/claim-update/claim-update.component';
 import { SubjectComponent } from './admin/gad/subject/subject.component';
 import { AdminPanelComponent } from './admin/admin-panel/admin-panel.component';
 import { VoucherComponent } from './admin/gad/head/voucher.component';
@@ -106,7 +106,8 @@ import {OnlyNumberDirective} from './util/only-number.directive'
     MyTableModule,
     AngularSplitModule,
     NgxJsonViewerModule,
-    NgMultiSelectDropDownModule
+    NgMultiSelectDropDownModule,
+
   ],
   providers: [{ provide: MAT_DATE_LOCALE, useValue: 'en-GB' },],
   bootstrap: [AppComponent]

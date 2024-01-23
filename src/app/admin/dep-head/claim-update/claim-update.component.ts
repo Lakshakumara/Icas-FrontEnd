@@ -6,7 +6,6 @@ import { MatSort } from '@angular/material/sort';
 import { AuthServiceService } from 'src/app/service/auth-service.service';
 import { ActivatedRoute } from '@angular/router';
 import { merge, tap } from 'rxjs';
-import { MatSelectChange } from '@angular/material/select';
 import { Member } from 'src/app/Model/member';
 import Swal from 'sweetalert2';
 

@@ -10,7 +10,7 @@ import Swal from 'sweetalert2';
 @Component({
   selector: 'app-beneficiary',
   templateUrl: './beneficiary.component.html',
-  styleUrls: ['./beneficiary.component.css']
+  styleUrls: ['./beneficiary.component.css'],
 })
 export class BeneficiaryComponent implements OnInit {
   today = Utils.today;
@@ -18,9 +18,12 @@ export class BeneficiaryComponent implements OnInit {
   editdata: Beneficiary[];
   relationshipOptions: string[] = Constants.relationShip;
 
-  constructor(@Inject(MAT_DIALOG_DATA) public data: any,
+  constructor(
+    @Inject(MAT_DIALOG_DATA) public data: any,
     private ref: MatDialogRef<BeneficiaryComponent>,
-    private buildr: FormBuilder, private authService: AuthServiceService) {
+    private buildr: FormBuilder,
+    private authService: AuthServiceService
+  ) {
     this.inputdata = data;
     this.editdata = data.dataSet;
   }
@@ -30,15 +33,18 @@ export class BeneficiaryComponent implements OnInit {
     name: this.buildr.control('', Validators.required),
     nic: this.buildr.control(''),
     relationship: this.buildr.control('', Validators.required),
-    percent: this.buildr.control('', [Validators.required, Validators.maxLength(2)])
+    percent: this.buildr.control(null, [
+      Validators.required,
+      Validators.max(100),
+    ]),
   });
 
   ngOnInit() {
-   /* this.authService.getRelationShip("%").subscribe((rs) => {
+    /* this.authService.getRelationShip("%").subscribe((rs) => {
       this.relationshipOptions = rs;
     });*/
 
-    this.editdata.forEach(d => {
+    this.editdata.forEach((d) => {
       this.dForm.patchValue({
         id: d.id,
         name: d.name,
@@ -50,27 +56,27 @@ export class BeneficiaryComponent implements OnInit {
   }
 
   addBeneficiaryDetails() {
-    if (this.dForm.invalid) return;
-    if (this.dForm.value.percent) return;
+    //if (this.dForm.value.percent) return;
+    console.log('addBeneficiaryDetails');
     this.authService.getDependant(this.dForm.value.name).subscribe({
-        next: dep => {
-          if (dep.name == null) {
-            this.ref.close(this.dForm);
-          } else {
-            console.log("exists beneficiary" + JSON.stringify(dep));
-            dep.relationship = this.dForm.value.relationship;
-            this.dForm.patchValue({
-              id: dep.id,
-              name: dep.name,
-              nic: dep.nic}
-            )
-            this.ref.close(this.dForm);
-          }
-        },
-        error: error => {
-          console.log("Error  beneficiary search like " + error);
+      next: (dep) => {
+        if (dep.name == null) {
+          this.ref.close(this.dForm);
+        } else {
+          console.log('exists beneficiary' + JSON.stringify(dep));
+          dep.relationship = this.dForm.value.relationship;
+          this.dForm.patchValue({
+            id: dep.id,
+            name: dep.name,
+            nic: dep.nic,
+          });
+          this.ref.close(this.dForm);
         }
-      })
+      },
+      error: (error) => {
+        console.log('Error  beneficiary search like ' + error);
+      },
+    });
   }
 
   closePopup() {

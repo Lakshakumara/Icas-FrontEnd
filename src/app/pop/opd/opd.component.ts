@@ -121,7 +121,6 @@ export class OpdComponent implements OnInit {
   }
 
   closePopup() {
-    console.log('cancel pressed');
     this.ref.close(this.dForm.value);
   }
 }

@@ -24,7 +24,15 @@ export class HeaderComponent implements OnInit {
     this.roles.forEach((val) => {
       this.roles.push(val);
       switch(val) {
-        case "admin": this.isAdmin = true;break;
+        case "admin": {
+          this.isAdmin = true;
+          this.isGADHead = true;
+          this.isDepHead = true;
+          this.isMo = true;
+          this.isMec = true;
+          this.isSuperAdmin = true;
+          break;
+        }
         case "GADHead": this.isGADHead = true;break;
         case "DepHead": this.isDepHead = true;break;
         case "mo": this.isMo = true; this.isUser = false;break;

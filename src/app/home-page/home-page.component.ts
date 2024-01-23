@@ -11,34 +11,40 @@ import { Member } from '../Model/member';
 @Component({
   selector: 'app-home-page',
   templateUrl: './home-page.component.html',
-  styleUrls: ['./home-page.component.css']
+  styleUrls: ['./home-page.component.css'],
 })
 export class HomePageComponent {
-  member !: Member;
+  member!: Member;
   isAdmin: boolean = false;
   isUser: boolean = false;
-  constructor( private router: Router, private share: SharedService,
-    private authService: AuthServiceService, private dialog: MatDialog) {
-      this.member = this.share.getUser();
-      if (this.member != null) {
-        this.member.roles.forEach((val, key) => {
-          //this.roles.push(val.role)
-          switch(val.role) {
-            case "admin": this.isAdmin = true;break;
-            case "user": this.isUser = true;break;
-          }
-      });
-        
-      }else{
-        this.router.navigate(["/signin"]);
-      }
+  constructor(
+    private router: Router,
+    private share: SharedService,
+    private dialog: MatDialog
+  ) {
+    this.member = this.share.getUser();
+    if (this.member != undefined) {
+     /* this.member.roles.forEach((val, key) => {
+        //this.roles.push(val.role)
+        switch (val.role) {
+          case 'admin':
+            this.isAdmin = true;
+            break;
+          case 'user':
+            this.isUser = true;
+            break;
+        }
+      });*/
+    } else {
+      this.router.navigate(['/signin']);
+    }
   }
 
-  newClaim(){
+  newClaim() {
     this.Openpopup(0, 'New Claims', ClaimFormComponent, HomePageComponent);
   }
 
-  opdClaim(){
+  opdClaim() {
     this.Openpopup(0, 'New OPD Reimbursement', OpdComponent, HomePageComponent);
   }
   Openpopup(id: any, title: any, component: any, parent: any) {
@@ -49,16 +55,21 @@ export class HomePageComponent {
       data: {
         title: title,
         id: id,
-      }
+      },
     });
 
-    _popup.afterClosed().subscribe(item => {
+    _popup.afterClosed().subscribe((item) => {
       //item.id = this.dependantData.length + 1;
       //this.addDependant(item);
-    })
+    });
   }
 
-  hospitalClaim(){
-    this.Openpopup(1, 'Surgical & Hospital Expenses', HospitalComponent, HomePageComponent);
+  hospitalClaim() {
+    this.Openpopup(
+      1,
+      'Surgical & Hospital Expenses',
+      HospitalComponent,
+      HomePageComponent
+    );
   }
 }
