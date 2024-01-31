@@ -23,9 +23,6 @@ import { OpdComponent } from './pop/opd/opd.component';
 import { HospitalComponent } from './pop/hospital/hospital.component';
 import { SchemePlanComponent } from './admin/super/scheme-plan/scheme-plan.component';
 import { LoadingSpinnerComponent } from './decorator/loading-spinner/loading-spinner.component';
-//import { MyNavyComponent } from './my-navyBar/my-nav.component';
-
-import { MydashboardComponent } from './mydashboard/mydashboard.component';
 
 import { TableComponent } from './table/table.component';
 import { UserOPDComponent } from './tableFactory/user-opd/user-opd.component';
@@ -40,16 +37,14 @@ import { BeneficiaryComponent } from './register/beneficiary/beneficiary.compone
 import { DownloadComponent } from './download/download.component';
 import { MemberComponent } from './admin/dep-head/staff-member/member.component';
 import { RegistrationComponent } from './admin/gad/subject/registration/registration.component';
-import { MysplitterComponent } from './mysplitter/mysplitter.component';
 
 import { AngularSplitModule } from 'angular-split';
 import { ClaimFormComponent } from './pop/claim-form/claim-form.component';
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 import { ProfileComponent } from './login-v1/profile/profile.component';
 
-import {OnlyNumberDirective} from './util/only-number.directive';
-import { ClaimManageComponent } from './admin/gad/subject/claim-manage/claim-manage.component'
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { OnlyNumberDirective } from './util/only-number.directive';
+import { ClaimManageComponent } from './admin/gad/subject/claim-manage/claim-manage.component';
 
 @NgModule({
   declarations: [
@@ -68,7 +63,6 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
     SchemePlanComponent,
     LoadingSpinnerComponent,
     TableComponent,
-    MydashboardComponent,
     UserOPDComponent,
     ClaimUpdateComponent,
     AdminPanelComponent,
@@ -82,10 +76,9 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
     MemberComponent,
     RegistrationComponent,
     MemberComponent,
-    MysplitterComponent,
     ClaimFormComponent,
     ProfileComponent,
-    ClaimManageComponent
+    ClaimManageComponent,
   ],
   imports: [
     BrowserModule,
@@ -101,10 +94,8 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
     AngularSplitModule,
     NgxJsonViewerModule,
     NgMultiSelectDropDownModule,
-
   ],
-  providers: [{ provide: MAT_DATE_LOCALE, useValue: 'en-GB' },],
+  providers: [{ provide: MAT_DATE_LOCALE, useValue: 'en-GB' }],
   bootstrap: [AppComponent],
-  
 })
-export class AppModule { }
+export class AppModule {}

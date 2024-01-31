@@ -5,7 +5,11 @@
   </mat-sidenav>
 
   <mat-sidenav-content>
-    <app-header [roles]=roles *ngIf="isMenuShow" (sidenavToggle)="sidenav.toggle()"></app-header>
+    <app-header
+      [member]="member"
+      *ngIf="isMenuShow"
+      (sidenavToggle)="sidenav.toggle()"
+    ></app-header>
     <div *ngIf="myLoader | async as showLoading">
       <app-loading-spinner *ngIf="showLoading"></app-loading-spinner>
     </div>

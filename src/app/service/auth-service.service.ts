@@ -178,7 +178,7 @@ export class AuthServiceService {
 
   private API_URL = environment.baseUrl;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   getOPD(
     empNo: any,
@@ -206,20 +206,12 @@ export class AuthServiceService {
       .pipe<number>(map((data: any) => data));
   }
   updateClaim(claim: any) {
-    console.log('put');
-    return this.http.put(`${this.API_URL}/claim/update`, claim)
-    .pipe<Number>(map((data: any) => data));
-  }
-  /*update(criteria: string, data: any): Observable<Number> {
-    console.log('reg Update ', data);
-    const x = this.http
-      .put(`${this.API_URL}/member/update/${criteria}`, data)
+    return this.http
+      .put(`${this.API_URL}/claim/update`, claim)
       .pipe<Number>(map((data: any) => data));
+  }
 
-    return x;
-  }*/
   isGuest(year: any, empNo: any): Observable<Map<String, Object>> {
-    console.log('empNo; ', empNo);
     return this.http
       .get(`${this.API_URL}/guest/${year}/${empNo}`)
       .pipe<Map<string, Object>>(map((data: any) => data));
@@ -241,4 +233,12 @@ export class AuthServiceService {
       { responseType: 'blob' }
     );
   }
+  /*update(criteria: string, data: any): Observable<Number> {
+    console.log('reg Update ', data);
+    const x = this.http
+      .put(`${this.API_URL}/member/update/${criteria}`, data)
+      .pipe<Number>(map((data: any) => data));
+
+    return x;
+  }*/
 }

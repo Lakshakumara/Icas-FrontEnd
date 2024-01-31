@@ -24,17 +24,6 @@ export class HomePageComponent {
   ) {
     this.member = this.share.getUser();
     if (this.member != undefined) {
-     /* this.member.roles.forEach((val, key) => {
-        //this.roles.push(val.role)
-        switch (val.role) {
-          case 'admin':
-            this.isAdmin = true;
-            break;
-          case 'user':
-            this.isUser = true;
-            break;
-        }
-      });*/
     } else {
       this.router.navigate(['/signin']);
     }

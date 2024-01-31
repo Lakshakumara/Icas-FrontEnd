@@ -17,6 +17,7 @@ import { Beneficiary, BeneficiaryColumns } from '../Model/benificiary';
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
 import { BeneficiaryComponent } from './beneficiary/beneficiary.component';
+import { Member } from '../Model/member';
 
 @Component({
   selector: 'app-register',
@@ -24,9 +25,8 @@ import { BeneficiaryComponent } from './beneficiary/beneficiary.component';
   styleUrls: ['./register.component.css'],
 })
 export class RegisterComponent implements OnInit {
-  isInvividual: boolean = true;
   schemeType: string = 'Individual';
-  member!: any;
+  member!: Member;
   data!: any;
   Roles: any = [
     'SUPER_ADMIN',
@@ -61,26 +61,26 @@ export class RegisterComponent implements OnInit {
 
   ngOnInit(): void {
     this.member = this.share.getUser();
-    if (this.member != null) {
-      this.formGroup.patchValue({
-        empNo: this.member.empNo,
-        name: this.member.name,
-        address: this.member.address,
-        email: this.member.email,
-        contactNo: this.member.contactNo,
-        civilStatus: this.member.civilStatus,
-        nic: this.member.nic,
-        sex: this.member.sex,
-        dob: this.member.dob,
-        designation: this.member.designation,
-        department: this.member.department,
-        dependants: this.member.dependant,
-        beneficiaries: this.member.beneficiary,
+    if (this.member) {
+      /**
+       * TODO add Sweetalert stepper here
+       */
+      this.member.beneficiaries.forEach((b) => {
+        this.beneficiaryData.data = [b, ...this.beneficiaryData.data];
       });
-    } else {
-      this.router.navigate(['/signin']);
-    }
+      if (
+        this.member.memberRegistrations.find((r) => {
+          return r.year == Utils.currentYear - 1 && r.schemeType == 'Family';
+        })
+      ) {
+        this.schemeType = 'Family';
+        this.member.dependants.forEach((d) => {
+          this.dependantData.data = [d, ...this.dependantData.data];
+        });
+      }
+    } else this.router.navigate(['/signin']);
   }
+
   formGroup = this.fb.group({
     empNo: new FormControl('', [Validators.required]),
     name: new FormControl('', [Validators.required]),
@@ -112,7 +112,6 @@ export class RegisterComponent implements OnInit {
       }),
     ]),
     dependants: this.fb.array([]),
-
     beneficiaries: this.fb.array([]),
     mDate: new FormControl(),
     status: new FormControl(),

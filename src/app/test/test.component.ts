@@ -1,13 +1,13 @@
-import {Component, OnInit} from '@angular/core';
-import {FormBuilder} from '@angular/forms';
-import {Observable} from 'rxjs';
-import {startWith, map} from 'rxjs/operators';
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder } from '@angular/forms';
+import { Observable } from 'rxjs';
+import { startWith, map } from 'rxjs/operators';
 import { SchemeTitles } from '../Model/scheme';
 import { SchemeService } from '../service/scheme.service';
 
 export const _filter = (opt: string[], value: string): string[] => {
   const filterValue = value.toLowerCase();
-  return opt.filter(item => item.toLowerCase().includes(filterValue));
+  return opt.filter((item) => item.toLowerCase().includes(filterValue));
 };
 
 /**
@@ -17,14 +17,14 @@ export const _filter = (opt: string[], value: string): string[] => {
 @Component({
   selector: 'app-test',
   templateUrl: './test.component.html',
-  styleUrls: ['./test.component.css']
+  styleUrls: ['./test.component.css'],
 })
 export class TestComponent implements OnInit {
   stateForm = this._formBuilder.group({
     stateGroup: '',
   });
-  stateGroups!: SchemeTitles[]; 
- /* stateGroups: SchemeTitles[] = [
+  stateGroups!: SchemeTitles[];
+  /* stateGroups: SchemeTitles[] = [
     {
       letter: 'A',
       names: ['Alabama', 'Alaska', 'Arizona', 'Arkansas'],
@@ -123,29 +123,17 @@ export class TestComponent implements OnInit {
 
   stateGroupOptions!: Observable<SchemeTitles[]>;
 
-  constructor(private _formBuilder: FormBuilder,  private schemeService: SchemeService) {}
+  constructor(
+    private _formBuilder: FormBuilder,
+    private schemeService: SchemeService
+  ) {}
 
-  ngOnInit() {
-    this.schemeService.getSchemeTitle().subscribe((titles: any) => {
-      this.stateGroups = titles;
-      console.log("All Data in database ", this.stateGroups);
-    });
-    
-    this.stateGroupOptions = this.stateForm.get('stateGroup')!.valueChanges.pipe(
-      startWith(''),
-      map(value => this._filterGroup(value || '')),
-    );
-  }
+  ngOnInit() {}
 
   private _filterGroup(value: string): SchemeTitles[] {
-    if (value) {
-      return this.stateGroups
-        .map(group => ({id: group.id, idText: _filter(group.idText, value)}))
-        .filter(group => group.idText.length > 0);
-    }
     return this.stateGroups;
   }
-  click(){
-    console.log("selected", this.stateForm.value);
+  click() {
+    console.log('selected', this.stateForm.value);
   }
 }

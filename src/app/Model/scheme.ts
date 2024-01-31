@@ -3,17 +3,18 @@ export interface Scheme {
   id: number;
   idText: string;
   title: string;
-  descriptionen: string,
-  descriptionsi: string,
-  descriptionta: string,
+  descriptionen: string;
+  descriptionsi: string;
+  descriptionta: string;
   amount: number;
-  unit: string,
-  rate: number,
+  unit: string;
+  rate: number;
   isEdit: boolean;
 }
 export interface SchemeTitles {
   id: string;
   idText: string[];
+  description: string;
 }
 export const SchemeColumns = [
   {
@@ -44,7 +45,8 @@ export const SchemeColumns = [
     type: 'text',
     label: 'Description Sinhala',
     required: true,
-  },{
+  },
+  {
     key: 'descriptionta',
     type: 'text',
     label: 'Description Samil',

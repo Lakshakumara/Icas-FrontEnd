@@ -1,12 +1,32 @@
 <mat-card>
-    <mat-card-title>
-        <a>Vaoucher Generation</a>
-    </mat-card-title>
-    <mat-card-content>
-        <app-my-table  [enableCheckbox]="true" [allowMultiSelect]="true"
-        [rowData]="rowData" 
-            (getSelectedRows)="onNotifySelected($event)" [sqPaginationConfig]="tablePaginationSettings"
-            [sqColumnDefinition]="columnDefinition">
-        </app-my-table>
-    </mat-card-content>
+  <mat-card-title>
+    <a>Voucher Generation</a>
+  </mat-card-title>
+  <mat-card-content>
+    <app-my-table
+      [enableCheckbox]="true"
+      [allowMultiSelect]="true"
+      [rowData]="rowData"
+      (getSelectedRows)="onNotifySelected($event)"
+      [sqPaginationConfig]="tablePaginationSettings"
+      [sqColumnDefinition]="columnDefinition"
+    >
+    </app-my-table>
+    <mat-card-footer class="btn">
+      <button mat-raised-button color="accent" (click)="reload()">
+        Reload
+      </button>
+      <button
+        mat-raised-button
+        color="accent"
+        class="btn"
+        (click)="setPaidAmount()"
+      >
+        Set Paid Amount
+      </button>
+      <button mat-raised-button color="accent" (click)="voucherGenerate()">
+        Voucher Generate
+      </button>
+    </mat-card-footer>
+  </mat-card-content>
 </mat-card>

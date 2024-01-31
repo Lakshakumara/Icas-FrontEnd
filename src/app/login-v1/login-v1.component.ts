@@ -7,8 +7,6 @@ import { LoaderService } from '../service/loader.service';
 import { Utils } from '../util/utils';
 import { Registration } from '../Model/registration';
 import Swal from 'sweetalert2';
-import { timer } from 'rxjs';
-import { take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-login-v1',
@@ -23,13 +21,12 @@ export class LoginV1Component implements OnInit {
     private share: SharedService,
     private loader: LoaderService
   ) {
-    console.log('cons call');
     this.share.setUser(null);
-    console.log(this.share.getUser());
   }
 
   ngOnInit(): void {
     this.initForm();
+    //this.authService.getMember;
   }
   initForm() {
     this.empNoForm = new FormGroup({
@@ -39,22 +36,21 @@ export class LoginV1Component implements OnInit {
 
   getDetails() {
     if (this.empNoForm.valid) {
-      this.authService.getMember(this.empNoForm.value.empNo).subscribe({
+      /* this.authService.getMember(this.empNoForm.value.empNo).subscribe({
         next: (member) => {
-          if (member.status == 'new') {
+          //member.memberRegistrations.
+          if (member.status == 'pending') {
             console.log('new User redirected to user Sign up');
             this.router.navigate(['/signup']);
           } else alert(member.status);
         },
         error: (error) => {
-          console.log('Error like ' + error);
+          Swal.fire('Error' + `${error.Reason}`, 'error');
         },
-      });
+      });*/
     }
   }
-  home() {
-    console.log('In Home');
-  }
+
   isMember() {
     /*Swal.fire({
       title: `Download pdf`,
@@ -128,7 +124,6 @@ export class LoginV1Component implements OnInit {
       .subscribe({
         next: (user: any) => {
           if (user.isMember == false) {
-            console.log('Member not in Registered look at HR');
             this.authService
               .getHRDetails(this.empNoForm.value.empNo)
               .subscribe({
@@ -147,19 +142,29 @@ export class LoginV1Component implements OnInit {
                   }
                 },
                 error: (error) => {
-                  Swal.fire('Error like ' + JSON.stringify(error));
+                  Swal.fire('Error' + `${error.Reason}`, 'error');
                 },
               });
           } else {
-            //Is a Valid Staff Member
+            //Is a Valid Staff Member check for current year registration
 
-            this.share.setUser(user.member);
-            const reg = user.member.registration as Registration[];
-            this.router.navigate(['/home']);
+            this.authService
+              .getMember(this.empNoForm.value.empNo)
+              .subscribe((member) => {
+                this.share.setUser(member);
+                const reg = member.memberRegistrations.find((r) => {
+                  return r.year == Utils.currentYear && r.acceptedDate != null;
+                });
+                if (reg !== undefined) {
+                  this.router.navigate(['/home']);
+                } else {
+                  this.router.navigate(['/signup']);
+                }
+              });
           }
         },
         error: (error) => {
-          console.log('Error like ' + error);
+          Swal.fire('Error', `${error.Reason}`, 'error');
         },
       });
     this.loader.hideLoader();
