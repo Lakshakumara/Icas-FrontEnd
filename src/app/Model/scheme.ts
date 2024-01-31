@@ -11,7 +11,10 @@ export interface Scheme {
   rate: number,
   isEdit: boolean;
 }
-
+export interface SchemeTitles {
+  id: string;
+  idText: string[];
+}
 export const SchemeColumns = [
   {
     key: 'isSelected',

@@ -4,15 +4,15 @@ import { MatSort } from '@angular/material/sort';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { Observable, BehaviorSubject, of } from 'rxjs';
 import { AuthServiceService } from 'src/app/service/auth-service.service';
-import { ClaimOPD } from 'src/app/Model/claimOPD';
+import { Claim } from 'src/app/Model/claim';
 
-export class OPDDataSource extends DataSource<ClaimOPD> {
-    data: ClaimOPD[] | undefined;
+export class ClaimDataSource extends DataSource<Claim> {
+    data: Claim[] | undefined;
     paginator: MatPaginator | undefined;
     sort: MatSort | undefined;
     
 
-    private claimSubject = new BehaviorSubject<ClaimOPD[]>([]);
+    private claimSubject = new BehaviorSubject<Claim[]>([]);
     private loadingSubject = new BehaviorSubject<boolean>(false);
     public loading$ = this.loadingSubject.asObservable();
 
@@ -23,7 +23,7 @@ export class OPDDataSource extends DataSource<ClaimOPD> {
      * the returned stream emits new items.
      * @returns A stream of the items to be rendered.
      */
-    connect(collectionViewer: CollectionViewer): Observable<ClaimOPD[]> {
+    connect(collectionViewer: CollectionViewer): Observable<Claim[]> {
         return this.claimSubject.asObservable();
     }
 
@@ -41,7 +41,7 @@ export class OPDDataSource extends DataSource<ClaimOPD> {
 
         this.loadingSubject.next(true);
 
-        this.auth.getPendingOPDClaims(filter, sortDirection, pageIndex, pageSize)
+        this.auth.getAllClaims('%', 0, '',claimStatus, filter, sortDirection, pageIndex, pageSize)
             .pipe(
                 catchError(() => of([])),
                 finalize(() => this.loadingSubject.next(false))

@@ -1,62 +1,151 @@
-import { Dependant } from './../Model/dependant';
-import { Component } from '@angular/core';
-import {DataSource} from '@angular/cdk/collections';
-import {Observable, ReplaySubject} from 'rxjs';
+import {Component, OnInit} from '@angular/core';
+import {FormBuilder} from '@angular/forms';
+import {Observable} from 'rxjs';
+import {startWith, map} from 'rxjs/operators';
+import { SchemeTitles } from '../Model/scheme';
+import { SchemeService } from '../service/scheme.service';
 
-const ELEMENT_DATA: Dependant[] = [
-  {id: 1, name: "Hydrogen", nic: "773661227v", dob:new Date(), relationship:"father"},
-];
+export const _filter = (opt: string[], value: string): string[] => {
+  const filterValue = value.toLowerCase();
+  return opt.filter(item => item.toLowerCase().includes(filterValue));
+};
 
 /**
  * @title Adding and removing data when using an observable-based datasource.
  */
-/*
-@Component({
-  selector: 'table-dynamic-observable-data-example',
-  styleUrls: ['table-dynamic-observable-data-example.css'],
-  templateUrl: 'table-dynamic-observable-data-example.html',
-  standalone: true,
-  imports: [MatButtonModule, MatTableModule],
-})*/
+
 @Component({
   selector: 'app-test',
   templateUrl: './test.component.html',
   styleUrls: ['./test.component.css']
 })
-export class TestComponent {
-  displayedColumns: string[] = ['id', 'Name', 'NIC', 'DOB'];
-  dataToDisplay = [...ELEMENT_DATA];
+export class TestComponent implements OnInit {
+  stateForm = this._formBuilder.group({
+    stateGroup: '',
+  });
+  stateGroups!: SchemeTitles[]; 
+ /* stateGroups: SchemeTitles[] = [
+    {
+      letter: 'A',
+      names: ['Alabama', 'Alaska', 'Arizona', 'Arkansas'],
+    },
+    {
+      letter: 'C',
+      names: ['California', 'Colorado', 'Connecticut'],
+    },
+    {
+      letter: 'D',
+      names: ['Delaware'],
+    },
+    {
+      letter: 'F',
+      names: ['Florida'],
+    },
+    {
+      letter: 'G',
+      names: ['Georgia'],
+    },
+    {
+      letter: 'H',
+      names: ['Hawaii'],
+    },
+    {
+      letter: 'I',
+      names: ['Idaho', 'Illinois', 'Indiana', 'Iowa'],
+    },
+    {
+      letter: 'K',
+      names: ['Kansas', 'Kentucky'],
+    },
+    {
+      letter: 'L',
+      names: ['Louisiana'],
+    },
+    {
+      letter: 'M',
+      names: [
+        'Maine',
+        'Maryland',
+        'Massachusetts',
+        'Michigan',
+        'Minnesota',
+        'Mississippi',
+        'Missouri',
+        'Montana',
+      ],
+    },
+    {
+      letter: 'N',
+      names: [
+        'Nebraska',
+        'Nevada',
+        'New Hampshire',
+        'New Jersey',
+        'New Mexico',
+        'New York',
+        'North Carolina',
+        'North Dakota',
+      ],
+    },
+    {
+      letter: 'O',
+      names: ['Ohio', 'Oklahoma', 'Oregon'],
+    },
+    {
+      letter: 'P',
+      names: ['Pennsylvania'],
+    },
+    {
+      letter: 'R',
+      names: ['Rhode Island'],
+    },
+    {
+      letter: 'S',
+      names: ['South Carolina', 'South Dakota'],
+    },
+    {
+      letter: 'T',
+      names: ['Tennessee', 'Texas'],
+    },
+    {
+      letter: 'U',
+      names: ['Utah'],
+    },
+    {
+      letter: 'V',
+      names: ['Vermont', 'Virginia'],
+    },
+    {
+      letter: 'W',
+      names: ['Washington', 'West Virginia', 'Wisconsin', 'Wyoming'],
+    },
+  ];*/
 
-  dataSource = new ExampleDataSource(this.dataToDisplay);
+  stateGroupOptions!: Observable<SchemeTitles[]>;
 
-  addData() {
-    const randomElementIndex = Math.floor(Math.random() * ELEMENT_DATA.length);
-    this.dataToDisplay = [...this.dataToDisplay, ELEMENT_DATA[randomElementIndex]];
-    //this.dataSource = [...this.dataToDisplay, null];
-    this.dataSource.setData(this.dataToDisplay);
+  constructor(private _formBuilder: FormBuilder,  private schemeService: SchemeService) {}
+
+  ngOnInit() {
+    this.schemeService.getSchemeTitle().subscribe((titles: any) => {
+      this.stateGroups = titles;
+      console.log("All Data in database ", this.stateGroups);
+    });
+    
+    this.stateGroupOptions = this.stateForm.get('stateGroup')!.valueChanges.pipe(
+      startWith(''),
+      map(value => this._filterGroup(value || '')),
+    );
   }
 
-  removeData() {
-    this.dataToDisplay = this.dataToDisplay.slice(0, -1);
-    this.dataSource.setData(this.dataToDisplay);
+  private _filterGroup(value: string): SchemeTitles[] {
+    if (value) {
+      return this.stateGroups
+        .map(group => ({id: group.id, idText: _filter(group.idText, value)}))
+        .filter(group => group.idText.length > 0);
+    }
+    return this.stateGroups;
   }
-}
-
-class ExampleDataSource extends DataSource<Dependant> {
-  private _dataStream = new ReplaySubject<Dependant[]>();
-
-  constructor(initialData: Dependant[]) {
-    super();
-    this.setData(initialData);
-  }
-
-  connect(): Observable<Dependant[]> {
-    return this._dataStream;
-  }
-
-  disconnect() {}
-
-  setData(data: Dependant[]) {
-    this._dataStream.next(data);
+  click(){
+    console.log("selected", this.stateForm.value);
   }
 }

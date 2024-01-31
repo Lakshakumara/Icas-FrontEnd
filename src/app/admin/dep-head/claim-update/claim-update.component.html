@@ -45,7 +45,7 @@
     </ng-container>
 
     <tr mat-header-row *matHeaderRowDef="displayedColumn; sticky:true"></tr>
-    <tr mat-row *matRowDef="let claimOpd; columns: displayedColumn;" (click)="onRowClicked(claimOpd)"></tr>
+    <tr mat-row *matRowDef="let claim; columns: displayedColumn;" (click)="onRowClicked(claim)"></tr>
 
   </table>
   <mat-paginator class="mat-elevation-z8" #paginator [length]="10" [pageIndex]="0" [pageSize]="3"

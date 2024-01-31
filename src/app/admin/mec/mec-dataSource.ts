@@ -10,7 +10,7 @@ export class MECDataSource extends DataSource<ClaimOPD> {
     data: ClaimOPD[] | undefined;
     paginator: MatPaginator | undefined;
     sort: MatSort | undefined;
-    
+    filter: string ="";
 
     private claimSubject = new BehaviorSubject<ClaimOPD[]>([]);
     private loadingSubject = new BehaviorSubject<boolean>(false);
@@ -37,7 +37,7 @@ export class MECDataSource extends DataSource<ClaimOPD> {
     }
 
     requestData(claimType:string, claimStatus: string,
-        filter = '', sortDirection = 'asc', pageIndex = 0, pageSize = 10) {
+        filter= this.filter, sortDirection = 'asc', pageIndex = this.paginator?.pageIndex, pageSize = this.paginator?.pageSize) {
 
         this.loadingSubject.next(true);
         console.log("send claimStatus ", claimStatus)

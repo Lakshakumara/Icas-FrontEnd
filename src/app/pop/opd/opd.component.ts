@@ -1,13 +1,12 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { ClaimOPD } from 'src/app/Model/claimOPD';
-import { Test } from 'src/app/Model/test';
 import { AuthServiceService } from 'src/app/service/auth-service.service';
-import { Constants } from 'src/app/util/constants';
 import { Utils } from 'src/app/util/utils';
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
+import { SharedService } from 'src/app/shared/shared.service';
+import { Member } from 'src/app/Model/member';
 
 @Component({
   selector: 'app-opd',
@@ -15,6 +14,7 @@ import { Router } from '@angular/router';
   styleUrls: ['./opd.component.css']
 })
 export class OpdComponent implements OnInit {
+  member!: Member;
   inputdata: any;
   claimTypes: any = ['Outdoor', 'Spectacles', 'Covid Test'];
   schemeTitles: any = ['title 1', 'title 2', 'title 3'];
@@ -23,7 +23,8 @@ export class OpdComponent implements OnInit {
   
   constructor(@Inject(MAT_DIALOG_DATA) public data: any,
     private ref: MatDialogRef<OpdComponent>,
-    private buildr: FormBuilder, private auth: AuthServiceService, private router: Router) {
+    private buildr: FormBuilder, private auth: AuthServiceService, private router: Router,
+    private share: SharedService) {
     this.inputdata = this.data;
   }
   dForm = this.buildr.group({
@@ -53,10 +54,14 @@ export class OpdComponent implements OnInit {
     claimStatus: this.buildr.control(''),
   });
   ngOnInit() {
+    this.member = this.share.getUser();
+    if (this.member == null) {
+      this.router.navigate(['/signin']);
+    } 
   }
   addOpdData() {
     this.dForm.patchValue({
-      memberId: 1,
+      memberId: this.member.id,
       category: "opd",
       claimDate: Utils.today,
       claimStatus: "pending",

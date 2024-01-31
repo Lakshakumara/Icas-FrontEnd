@@ -38,7 +38,6 @@ export class MemberComponent implements OnInit, AfterViewInit {
 
   constructor(
     private auth: AuthServiceService,
-    private route: ActivatedRoute,
     private share: SharedService,
     private router: Router
   ) {}
@@ -46,8 +45,7 @@ export class MemberComponent implements OnInit, AfterViewInit {
   ngOnInit() {
     this.loggeduser = this.share.getUser();
     if (this.loggeduser == null) this.router.navigate(['/signin']);
-    this.member = this.route.snapshot.data['playload'];
-    console.log('member ', this.member);
+    //this.member = this.route.snapshot.data['playload'];
     this.dataSource = new MemberDataSource(this.auth);
     this.dataSource.loadMember('notAccept');
   }

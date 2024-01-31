@@ -9,7 +9,6 @@ import { MAT_DATE_LOCALE } from '@angular/material/core';
 import { NgxJsonViewerModule } from 'ngx-json-viewer';
 
 import { ToastrModule } from 'ngx-toastr';
-import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 import { HomePageComponent } from './home-page/home-page.component';
 import { RoutingModule } from './routing/routing.module';
@@ -31,15 +30,12 @@ import { MydashboardComponent } from './mydashboard/mydashboard.component';
 import { TableComponent } from './table/table.component';
 import { UserOPDComponent } from './tableFactory/user-opd/user-opd.component';
 import { ClaimUpdateComponent } from './admin/dep-head/claim-update/claim-update.component';
-import { SubjectComponent } from './admin/gad/subject/subject.component';
 import { AdminPanelComponent } from './admin/admin-panel/admin-panel.component';
 import { VoucherComponent } from './admin/gad/head/voucher.component';
 import { MyTableModule } from './tableFactory/tableModel/table.module';
 import { AccessComponent } from './admin/super/access/access/access.component';
-import { GadComponent } from './admin/gad/gad.component';
 import { MecOpdComponent } from './admin/mec/mec-opd/mec-opd.component';
 import { MecHsComponent } from './admin/mec/mec-hs/mec-hs.component';
-import { DepHeadComponent } from './admin/dep-head/dep-head/dep-head.component';
 import { BeneficiaryComponent } from './register/beneficiary/beneficiary.component';
 import { DownloadComponent } from './download/download.component';
 import { MemberComponent } from './admin/dep-head/staff-member/member.component';
@@ -51,13 +47,14 @@ import { ClaimFormComponent } from './pop/claim-form/claim-form.component';
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 import { ProfileComponent } from './login-v1/profile/profile.component';
 
-import {OnlyNumberDirective} from './util/only-number.directive'
+import {OnlyNumberDirective} from './util/only-number.directive';
+import { ClaimManageComponent } from './admin/gad/subject/claim-manage/claim-manage.component'
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 @NgModule({
   declarations: [
     OnlyNumberDirective,
     AppComponent,
-    LoginComponent,
     RegisterComponent,
     HomePageComponent,
     HeaderComponent,
@@ -70,20 +67,16 @@ import {OnlyNumberDirective} from './util/only-number.directive'
     HospitalComponent,
     SchemePlanComponent,
     LoadingSpinnerComponent,
-    //MyNavyComponent,
     TableComponent,
     MydashboardComponent,
     UserOPDComponent,
     ClaimUpdateComponent,
-    SubjectComponent,
     AdminPanelComponent,
     TableComponent,
     VoucherComponent,
     AccessComponent,
-    GadComponent,
     MecOpdComponent,
     MecHsComponent,
-    DepHeadComponent,
     BeneficiaryComponent,
     DownloadComponent,
     MemberComponent,
@@ -91,7 +84,8 @@ import {OnlyNumberDirective} from './util/only-number.directive'
     MemberComponent,
     MysplitterComponent,
     ClaimFormComponent,
-    ProfileComponent
+    ProfileComponent,
+    ClaimManageComponent
   ],
   imports: [
     BrowserModule,
@@ -110,6 +104,7 @@ import {OnlyNumberDirective} from './util/only-number.directive'
 
   ],
   providers: [{ provide: MAT_DATE_LOCALE, useValue: 'en-GB' },],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+  
 })
 export class AppModule { }

@@ -28,43 +28,7 @@ export interface ClaimOPD{
 
     claimCount:number,
 }
-export const OPD_Column_Accept = [
-  {
-    key: 'id',
-    type: 'number',
-    label: 'ID',
-  },
-  {
-    key: 'member:empNo',
-    type: 'text',
-    label: 'Emp NO',
-  },
-  {
-    key: 'category',
-    type: 'text',
-    label: 'Category',
-  },
-  {
-    key: 'requestFor',
-    type: 'text',
-    label: 'Request',
-  },
-  {
-    key: 'startDate',
-    type: 'string',
-    label: 'Date',
-  },
-  {
-    key: 'requestAmount',
-    type: 'number',
-    label: 'Request Amount',
-  },
-  {
-    key: 'acceptedDate',
-    type: 'date',
-    label: 'Accepted',
-  },
-];
+
 export const OPD_MEC_Column_Accept = [
   {
     key: 'id',

@@ -7,15 +7,15 @@ import { merge, tap } from 'rxjs';
 import { Member } from 'src/app/Model/member';
 import Swal from 'sweetalert2';
 import { Claim, Claim_Head_Accept } from 'src/app/Model/claim';
-import { ClaimDataSource } from './claim-dataSource';
 import { SharedService } from 'src/app/shared/shared.service';
+import { ClaimDataSource } from 'src/app/admin/dep-head/claim-update/claim-dataSource';
 
 @Component({
-  selector: 'app-claim-update',
-  templateUrl: './claim-update.component.html',
-  styleUrls: ['./claim-update.component.css']
+  selector: 'app-claim-manage',
+  templateUrl: './claim-manage.component.html',
+  styleUrls: ['./claim-manage.component.css']
 })
-export class ClaimUpdateComponent  implements OnInit {
+export class ClaimManageComponent {
   loggeduser: any;
   claim !: Claim;
   selectedClaim !: Claim;
@@ -24,6 +24,8 @@ export class ClaimUpdateComponent  implements OnInit {
   displayedColumn: string[] = Claim_Head_Accept.map((col) => col.key);
   columnsSchema: any = Claim_Head_Accept;
 
+  claimViewOptions :string[] = ["All", "Pending", "Head Approved", "MEC"];
+  claimViewOptionSelected: string = "All";
   selectedData!: Member[];
   search: any;
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -37,7 +39,7 @@ export class ClaimUpdateComponent  implements OnInit {
     this.loggeduser = this.share.getUser();
     if (this.loggeduser == null) this.router.navigate(['/signin']);
     this.dataSource = new ClaimDataSource(this.auth);
-    this.dataSource.requestData("pending");
+    this.dataSource.requestData("head_approved");
   }
   ngAfterViewInit() {
     this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
@@ -55,19 +57,28 @@ export class ClaimUpdateComponent  implements OnInit {
   }
 
   loadClaimPage() {
-    this.dataSource.requestData("pending");
+    this.dataSource.requestData(this.getSelectedOpion());
+  }
+  getSelectedOpion():string{
+    let sop:string = "";
+    switch(this.claimViewOptionSelected){
+      case "All":sop= ""; break;
+      case "Pending":sop= "pending"; break;
+      case "Head Approved":sop= "head_approved"; break;
+      case "MEC":sop= "mec"; break;
+    }
+    return sop;
   }
   onRowClicked(claim: Claim) {
     this.selectedData = [claim.member];
     this.selectedClaim = claim;
   }
 
-  acceptClaim() {
+  forwordMEC() {
     this.regAcceptData = {
-      criteria:"headaccept",
+      criteria:"forwordmec",
       id:this.selectedClaim.id,
-      claimStatus: "head_approved",
-      acceptedBy : this.loggeduser.id,
+      claimStatus: "mec",
     };
     Swal.fire({
       title: 'Update Details',
@@ -78,7 +89,7 @@ export class ClaimUpdateComponent  implements OnInit {
       preConfirm: async () => {
         const ret = this.auth.updateClaim(this.regAcceptData).subscribe((a) => {
           console.log('a ', a);
-          if (a == 1) {return Swal.showValidationMessage('Updated');}
+          if (a == 1) {this.selectedClaim =<Claim>{}; return Swal.showValidationMessage('Updated');}
           else return Swal.showValidationMessage(' Not Updated Try againg');
         });
 
@@ -91,5 +102,4 @@ export class ClaimUpdateComponent  implements OnInit {
       }
     });
   }
-
 }

@@ -10,7 +10,7 @@
         <a>Name: {{member.name}}</a>
         <a>Department: {{member.department}}</a>
         <a>Designation: {{member.designation}}</a>
-        <span><input type="checkbox" [checked]="regAccept" (change)="regAccept = !regAccept" >Certify working up to now</span>
+        <mat-checkbox [checked]="regAccept" (change)="regAccept = !regAccept" >Certify working up to now</mat-checkbox>
       <button [disabled]="!regAccept"  mat-button color="primary" (click)="acceptRegistration()">Accept Registration</button>
       </li>
     </fieldset>

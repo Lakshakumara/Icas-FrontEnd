@@ -17,9 +17,6 @@ import { Beneficiary, BeneficiaryColumns } from '../Model/benificiary';
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
 import { BeneficiaryComponent } from './beneficiary/beneficiary.component';
-import { timer } from 'rxjs';
-import { take } from 'rxjs/operators';
-import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-register',
@@ -141,14 +138,12 @@ export class RegisterComponent implements OnInit {
     });
 
     _popup.afterClosed().subscribe((item: FormGroup) => {
-      console.log('forWhat ', forWhat);
       if (item === undefined) return;
       if (item.value.name != '')
         if (forWhat == 1) this.newDependant(item);
         else {
           let sum1: number = Number(item.value.percent);
           this.beneficiaryData.data.forEach((a) => (sum1 += Number(a.percent)));
-          console.log('Sum new', sum1);
           if (sum1 > 100) {
             Swal.fire({
               title: `Total percent in ${sum1}% not acceptable`,
@@ -195,8 +190,6 @@ export class RegisterComponent implements OnInit {
     let sum: number = 0;
     this.beneficiaryData.data.forEach((a) => (sum += Number(a.percent)));
 
-    console.log(sum);
-
     let msg = `Confirm to submit Data ?`;
     let btn = 'Yes, Submit!';
     if (sum > 100) {
@@ -212,7 +205,6 @@ export class RegisterComponent implements OnInit {
       btn = `Submit anyway`;
     }
 
-    console.log('after sum check');
     Swal.fire({
       title: msg,
       icon: 'warning',
@@ -276,7 +268,6 @@ export class RegisterComponent implements OnInit {
   }
   downloadMembershipApplication(year: number, empNo: string) {
     this.authService.download(1, year, empNo).subscribe((response: any) => {
-      console.log(response.fileNme);
       let dataType = response.type;
       let binaryData = [];
       binaryData.push(response);
@@ -288,7 +279,6 @@ export class RegisterComponent implements OnInit {
       );
       downloadLink.setAttribute('download', 'Application.pdf');
       document.body.appendChild(downloadLink);
-      console.log(downloadLink);
       downloadLink.click();
     });
   }

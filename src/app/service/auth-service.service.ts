@@ -8,16 +8,12 @@ import { Dependant } from '../Model/dependant';
 import { ClaimOPD } from '../Model/claimOPD';
 import { Claim } from '../Model/claim';
 import { Utils } from '../util/utils';
-import { Scheme } from '../Model/scheme';
+import { Scheme, SchemeTitles } from '../Model/scheme';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthServiceService {
-  getScheme(): Observable<Scheme[]> {
-    return this.http.get(this.API_URL).pipe<Scheme[]>(map((data: any) => data));
-  }
-
   getMembers(
     searchFor: string,
     searchText: string,
@@ -182,7 +178,7 @@ export class AuthServiceService {
 
   private API_URL = environment.baseUrl;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getOPD(
     empNo: any,
@@ -203,12 +199,7 @@ export class AuthServiceService {
       })
       .pipe<ClaimOPD[]>(map((res: any) => res)); //res["payload"]
   }
-  /*
-    getOPD(empNo: any): Observable<ClaimOPD[]> {
-      return this.http
-        .get(`${this.API_URL}/claim/opd/get/${empNo}`)
-        .pipe<ClaimOPD[]>(map((data: any) => data));
-    }*/
+
   saveOPD(claimOPD: any): Observable<number> {
     return this.http
       .post(`${this.API_URL}/claim/opd`, claimOPD)
@@ -216,9 +207,17 @@ export class AuthServiceService {
   }
   updateClaim(claim: any) {
     console.log('put');
-    return this.http.put(`${this.API_URL}/claim/update`, claim);
+    return this.http.put(`${this.API_URL}/claim/update`, claim)
+    .pipe<Number>(map((data: any) => data));
   }
+  /*update(criteria: string, data: any): Observable<Number> {
+    console.log('reg Update ', data);
+    const x = this.http
+      .put(`${this.API_URL}/member/update/${criteria}`, data)
+      .pipe<Number>(map((data: any) => data));
 
+    return x;
+  }*/
   isGuest(year: any, empNo: any): Observable<Map<String, Object>> {
     console.log('empNo; ', empNo);
     return this.http

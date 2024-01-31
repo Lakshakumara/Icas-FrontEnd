@@ -1,9 +1,12 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { Router } from '@angular/router';
+import { Member } from 'src/app/Model/member';
 import { Scheme } from 'src/app/Model/scheme';
 import { AuthServiceService } from 'src/app/service/auth-service.service';
 import { SchemeService } from 'src/app/service/scheme.service';
+import { SharedService } from 'src/app/shared/shared.service';
 import { Utils } from 'src/app/util/utils';
 import Swal from 'sweetalert2';
 
@@ -13,6 +16,7 @@ import Swal from 'sweetalert2';
   styleUrls: ['./claim-form.component.css']
 })
 export class ClaimFormComponent implements OnInit {
+  member!: Member;
   inputdata: any;
   claimTypes: string[] = [];// = Constants.claimTypes;
   schemeTitles: any = ['title 1', 'title 2', 'title 3'];
@@ -24,7 +28,9 @@ export class ClaimFormComponent implements OnInit {
 
   constructor(@Inject(MAT_DIALOG_DATA) public data: any,
     private ref: MatDialogRef<ClaimFormComponent>,
-    private buildr: FormBuilder, private auth: AuthServiceService, private schSetvice: SchemeService) {
+    private buildr: FormBuilder, private auth: AuthServiceService,
+    private schSetvice: SchemeService, private router: Router,
+    private share: SharedService) {
     this.inputdata = this.data;
     this.schSetvice.getScheme().subscribe(data => {
       this.schemeData = data;
@@ -72,13 +78,17 @@ export class ClaimFormComponent implements OnInit {
     claimStatus: this.buildr.control(''),
   });
   ngOnInit() {
+    this.member = this.share.getUser();
+    if (this.member == null) {
+      this.router.navigate(['/signin']);
+    }
   }
   addOpdData() {
     this.dForm.patchValue({
-      memberId: 1,
-      category: "OPD",
+      memberId: this.member.id,
+      category: "opd",
       claimDate: Utils.today,
-      claimStatus: "Pending",
+      claimStatus: "pending",
     });
 
     //test

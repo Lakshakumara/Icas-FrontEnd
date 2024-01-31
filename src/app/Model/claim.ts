@@ -21,6 +21,7 @@ export interface Claim {
     incident: string,
     claimStatus: string,
     acceptedDate: Date,
+    acceptedBy:number,
     mecSendDate: Date,
     mecReturnDate: Date,
     rejectedDate: Date,
@@ -33,6 +34,7 @@ export interface Claim {
     appealRefId: number,
     appealRemarks: string,
 }
+
 export const MEC_Column_Accept = [
     {
       key: 'id',
@@ -45,13 +47,41 @@ export const MEC_Column_Accept = [
       label: 'Emp NO',
     },
     {
-        key: 'name',
-        type: 'text',
-        label: 'Name',
-      },
-    {
       key: 'requestFor',
       type: 'text',
       label: 'Request',
     }
+  ];
+
+  export const Claim_Head_Accept = [
+    {
+      key: 'id',
+      type: 'number',
+      label: 'ID',
+    },
+    {
+      key: 'member.empNo',
+      type: 'text',
+      label: 'Emp NO',
+    },
+    {
+      key: 'category',
+      type: 'text',
+      label: 'Category',
+    },
+    {
+      key: 'startDate',
+      type: 'string',
+      label: 'Date',
+    },
+    {
+      key: 'requestFor',
+      type: 'text',
+      label: 'Request',
+    },
+    {
+      key: 'requestAmount',
+      type: 'number',
+      label: 'Request Amount',
+    },
   ];

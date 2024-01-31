@@ -1,5 +1,14 @@
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
-import { AfterViewInit, Component, ElementRef, EventEmitter, OnInit, Output, ViewChild, inject } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  EventEmitter,
+  OnInit,
+  Output,
+  ViewChild,
+  inject,
+} from '@angular/core';
 import { Member, Member_Column_Accept } from 'src/app/Model/member';
 import { Role, Access_type } from 'src/app/Model/role';
 import { MemberDataSource } from './members-dataSource';
@@ -8,16 +17,30 @@ import { MatSort } from '@angular/material/sort';
 import { AuthServiceService } from 'src/app/service/auth-service.service';
 import { ActivatedRoute } from '@angular/router';
 
-import { debounceTime, distinctUntilChanged, filter, fromEvent, map, merge, startWith, tap } from 'rxjs';
-import { FormBuilder, FormControl, Validators, FormGroup } from '@angular/forms';
+import {
+  debounceTime,
+  distinctUntilChanged,
+  filter,
+  fromEvent,
+  map,
+  merge,
+  startWith,
+  tap,
+} from 'rxjs';
+import {
+  FormBuilder,
+  FormControl,
+  Validators,
+  FormGroup,
+} from '@angular/forms';
 
-import { IDropdownSettings, } from 'ng-multiselect-dropdown';
+import { IDropdownSettings } from 'ng-multiselect-dropdown';
 import { Utils } from 'src/app/util/utils';
 import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-sub_registration',
-  templateUrl: './member-manage.html', //registration.component
+  templateUrl: './member-manage.html', //registration
   styleUrls: ['./registration.component.css'],
 })
 export class RegistrationComponent implements OnInit, AfterViewInit {
@@ -35,16 +58,19 @@ export class RegistrationComponent implements OnInit, AfterViewInit {
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
-  @ViewChild('input') input !: ElementRef;
+  @ViewChild('input') input!: ElementRef;
 
   @Output() sidenavClose = new EventEmitter();
   panelOpenState = false;
 
-  constructor(private auth: AuthServiceService, private route: ActivatedRoute,
-    private buildr: FormBuilder) { }
+  constructor(
+    private auth: AuthServiceService,
+    private route: ActivatedRoute,
+    private buildr: FormBuilder
+  ) {}
 
   ngOnInit() {
-    this.member = this.route.snapshot.data["member"];
+    this.member = this.route.snapshot.data['member'];
     this.dataSource = new MemberDataSource(this.auth);
     this.roleData = [
       { item_id: 1, role: 'user' },
@@ -53,7 +79,7 @@ export class RegistrationComponent implements OnInit, AfterViewInit {
       { item_id: 4, role: 'DepHead' },
       { item_id: 5, role: 'mo' },
       { item_id: 6, role: 'mec' },
-      { item_id: 7, role: 'superAdmin' }
+      { item_id: 7, role: 'superAdmin' },
     ];
 
     this.dropdownSettings = {
@@ -73,53 +99,55 @@ export class RegistrationComponent implements OnInit, AfterViewInit {
           //this.paginator.pageIndex = 0;
           this.loadMemberPage();
         })
-      ).subscribe();
+      )
+      .subscribe();
 
     // reset the paginator after sorting
-    this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
+    this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
 
     // on sort or paginate events, load a new page
-    merge(this.sort.sortChange, this.paginator?.page)
-      .pipe(
-        tap(() => this.loadMemberPage())
-      )
-
+    merge(this.sort.sortChange, this.paginator?.page).pipe(
+      tap(() => this.loadMemberPage())
+    );
   }
 
   loadMemberPage() {
-    this.dataSource.loadMember("name", this.input.nativeElement.value);
+    this.dataSource.loadMember('name', this.input.nativeElement.value);
   }
 
   onRowClicked(member: Member) {
-    //TODO update memberRegistration 
-    //accepted date timestamp
-    // id of accepter
     this.member = member;
 
     const rr: Role[] = this.member.roles;
-    rr.every(r=>{
-      console.log(r.role)
+    rr.every((r) => {
+      console.log(r.role);
       this.selectedItems.pop();
-      if(r.role =='user') this.selectedItems.push({ item_id: 1, role: 'user' })
-      else if(r.role =='admin') this.selectedItems.push({ item_id: 2, role: 'admin' })
-      else if(r.role =='GADHead') this.selectedItems.push({ item_id: 3, role: 'GADHead' })
-      else if(r.role =='DepHead') this.selectedItems.push({ item_id: 4, role: 'DepHead' })
-      else if(r.role =='mo') this.selectedItems.push({ item_id: 5, role: 'mo' })
-      else if(r.role =='mec') this.selectedItems.push({ item_id: 6, role: 'mec' })
-      else if(r.role =='superAdmin') this.selectedItems.push({ item_id: 7, role: 'superAdmin' })
-    })
+      if (r.role == 'user')
+        this.selectedItems.push({ item_id: 1, role: 'user' });
+      else if (r.role == 'admin')
+        this.selectedItems.push({ item_id: 2, role: 'admin' });
+      else if (r.role == 'GADHead')
+        this.selectedItems.push({ item_id: 3, role: 'GADHead' });
+      else if (r.role == 'DepHead')
+        this.selectedItems.push({ item_id: 4, role: 'DepHead' });
+      else if (r.role == 'mo')
+        this.selectedItems.push({ item_id: 5, role: 'mo' });
+      else if (r.role == 'mec')
+        this.selectedItems.push({ item_id: 6, role: 'mec' });
+      else if (r.role == 'superAdmin')
+        this.selectedItems.push({ item_id: 7, role: 'superAdmin' });
+    });
 
     this.roleGroup = this.buildr.group({
-      selectedRoles: [this.selectedItems]
+      selectedRoles: [this.selectedItems],
     });
   }
 
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
     //console.log(filterValue);
-    if (isNaN(+filterValue))
-      this.dataSource.loadMember("name", filterValue);
-    else this.dataSource.loadMember("empNo", filterValue);
+    if (isNaN(+filterValue)) this.dataSource.loadMember('name', filterValue);
+    else this.dataSource.loadMember('empNo', filterValue);
     //this.dataSource.filter = filterValue.trim().toLowerCase();
   }
 
@@ -127,7 +155,7 @@ export class RegistrationComponent implements OnInit, AfterViewInit {
    * adding Role selector
    */
 
- /* roles = this.buildr.group({
+  /* roles = this.buildr.group({
     user: new FormControl(''),
     manager: new FormControl(''),
     head: new FormControl(''),
@@ -159,12 +187,9 @@ export class RegistrationComponent implements OnInit, AfterViewInit {
   registerProcess() {
     this.formGroup.patchValue({
       mDate: new Date(),
-      status: "pending",
+      status: 'pending',
     });
-    this.auth.register(this.formGroup.value).subscribe(
-      (response: any) => {
-      }
-    );
+    this.auth.register(this.formGroup.value).subscribe((response: any) => {});
   }
 
   clearReg() {
@@ -173,36 +198,38 @@ export class RegistrationComponent implements OnInit, AfterViewInit {
 
   roleUpdate() {
     console.log(this.roleGroup.value);
-    
-const x = this.roleGroup.value as Array<Role>
-  console.log("r ", );
-  //console.log("r ", r);
 
-    this.auth.updateMember('role', this.roleGroup.value).subscribe(data => {
+    const x = this.roleGroup.value as Array<Role>;
+    console.log('r ');
+    //console.log("r ", r);
+
+    this.auth.updateMember('role', this.roleGroup.value).subscribe((data) => {
       Swal.fire({
         icon: 'info',
         title: 'Sucess',
-        text: 'Updated '+data+ 'rows'
+        text: 'Updated ' + data + 'rows',
       });
     });
   }
 
   public onSidenavClose = () => {
     this.sidenavClose.emit();
-  }
+  };
 
   registrationOpen() {
-    if (this.reNew.value.selector !== "all") {
+    if (this.reNew.value.selector !== 'all') {
       this.reNew.patchValue({
         selector: this.member?.empNo,
-      })
-    }
-    this.auth.updateMember('registerOpen', this.reNew.value).subscribe(data => {
-      Swal.fire({
-        icon: 'info',
-        title: 'Sucess',
-        text: 'Updated '+data+ 'rows'
       });
-    });
+    }
+    this.auth
+      .updateMember('registerOpen', this.reNew.value)
+      .subscribe((data) => {
+        Swal.fire({
+          icon: 'info',
+          title: 'Sucess',
+          text: 'Updated ' + data + 'rows',
+        });
+      });
   }
 }
