@@ -6,7 +6,7 @@ import { Router } from '@angular/router';
 import { merge, tap } from 'rxjs';
 import { Member } from 'src/app/Model/member';
 import Swal from 'sweetalert2';
-import { Claim, Claim_Head_Accept } from 'src/app/Model/claim';
+import { Claim, Claim_All, Claim_Head_Accept } from 'src/app/Model/claim';
 import { SharedService } from 'src/app/shared/shared.service';
 import { ClaimDataSource } from 'src/app/admin/dep-head/claim-update/claim-dataSource';
 
@@ -16,13 +16,14 @@ import { ClaimDataSource } from 'src/app/admin/dep-head/claim-update/claim-dataS
   styleUrls: ['./claim-manage.component.css'],
 })
 export class ClaimManageComponent {
-  loggeduser: any;
+  loggeduser!: Member;
+  search_year!: number;
   claim!: Claim;
   selectedClaim!: Claim;
   regAcceptData!: any;
   dataSource!: ClaimDataSource;
-  displayedColumn: string[] = Claim_Head_Accept.map((col) => col.key);
-  columnsSchema: any = Claim_Head_Accept;
+  displayedColumn: string[] = Claim_All.map((col) => col.key);
+  columnsSchema: any = Claim_All;
 
   claimViewOptions: string[] = [
     'All',
@@ -34,7 +35,7 @@ export class ClaimManageComponent {
     'Finance',
     'Paid',
   ];
-  claimViewOptionSelected: string = 'All';
+  claimViewOptionSelected: string = 'Head Approved';
   selectedData!: Member[];
   search: any;
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -65,14 +66,20 @@ export class ClaimManageComponent {
     console.log(val);
   }
 
-  loadClaimPage() {
-    this.dataSource.requestData(this.getSelectedOpion());
+  claimStatusChange(){
+    this.selectedData = <Member[]>{};
+    this.selectedClaim = <Claim>{};
+    this.loadClaimPage();
   }
-  getSelectedOpion(): string {
+  loadClaimPage() {
+    this.dataSource.requestData(this.getSelectedClaimStatus());
+    //this.dataSource.requestAllData("%", this.search_year, this.getSelectedClaimStatus());
+  }
+  getSelectedClaimStatus(): string {
     let sop: string = '';
     switch (this.claimViewOptionSelected) {
       case 'All':
-        sop = '';
+        sop = '%';
         break;
       case 'Pending':
         sop = 'pending';
@@ -130,6 +137,7 @@ export class ClaimManageComponent {
     }).then((result) => {
       if (result.isConfirmed) {
         Swal.fire('Saving', '', 'success');
+        this.loadClaimPage();
       }
     });
   }

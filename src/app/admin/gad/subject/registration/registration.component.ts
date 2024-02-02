@@ -203,7 +203,7 @@ export class RegistrationComponent implements OnInit, AfterViewInit {
     console.log('r ');
     //console.log("r ", r);
 
-    this.auth.updateMember('role', this.roleGroup.value).subscribe((data) => {
+    this.auth.update('role', this.roleGroup.value).subscribe((data) => {
       Swal.fire({
         icon: 'info',
         title: 'Sucess',
@@ -223,7 +223,7 @@ export class RegistrationComponent implements OnInit, AfterViewInit {
       });
     }
     this.auth
-      .updateMember('registerOpen', this.reNew.value)
+      .update('registerOpen', this.reNew.value)
       .subscribe((data) => {
         Swal.fire({
           icon: 'info',

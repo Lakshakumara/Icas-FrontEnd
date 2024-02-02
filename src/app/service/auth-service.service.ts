@@ -14,6 +14,10 @@ import { Scheme, SchemeTitles } from '../Model/scheme';
   providedIn: 'root',
 })
 export class AuthServiceService {
+  private API_URL = environment.baseUrl;
+
+  constructor(private http: HttpClient) {}
+
   getMembers(
     searchFor: string,
     searchText: string,
@@ -50,36 +54,41 @@ export class AuthServiceService {
       .pipe<Member>(map((data: any) => data));
   }
 
-  updateMember(criteria: string, data: any) {
-    console.log('updateMember ', criteria, data);
-    const data1 = { title: 'Angular PUT Request Example' };
-    return this.http.post(`${this.API_URL}/member/signup`, data);
-  }
-
   update(criteria: string, data: any): Observable<Number> {
-    console.log('reg Update ', data);
     const x = this.http
       .put(`${this.API_URL}/member/update/${criteria}`, data)
       .pipe<Number>(map((data: any) => data));
-
     return x;
   }
-  /*updateReg(criteria: string, data: any){
-    console.log("reg Update ", data);
-    return this.http.put(`${this.API_URL}/member/update/${criteria}`, data);
-  }*/
+
+  async updateMember(criteria: string, data: any): Promise<Observable<Object>> {
+    return await fetch(`${this.API_URL}/member/update/${criteria}`, {
+       method: 'put',
+       body: JSON.stringify(data), // data can be `string` or {object}!
+       headers:{
+         'Content-Type': 'application/json'
+       }
+     })
+     .then(res => res.json())
+     .then((responseJson) => {
+       //if it worked
+       //this.secondApiCall()
+       console.log('auth res ',responseJson)
+       return responseJson;
+     })
+     .catch(error => console.error('Error:', error))
+  }
 
   login(data: any): Observable<any> {
-    console.log(data);
     return this.http.post(`${this.API_URL}/member/signin`, data);
   }
 
-  register(data: any) {
-    return this.http.post(`${this.API_URL}/member/signup`, data);
+  register(data: any): Observable<any> {
+    return this.http
+      .post(`${this.API_URL}/member/signup`, data)
+      .pipe<any>(map((data: any) => data));
   }
-  registert(data: any) {
-    return this.http.post(`${this.API_URL}/member/signupt`, data);
-  }
+
   getUser(data: any): Observable<any> {
     return this.http.get(`${this.API_URL}/member/data`, data);
   }
@@ -176,10 +185,6 @@ export class AuthServiceService {
     );
   }
 
-  private API_URL = environment.baseUrl;
-
-  constructor(private http: HttpClient) {}
-
   getOPD(
     empNo: any,
     filter = '',
@@ -211,6 +216,12 @@ export class AuthServiceService {
       .pipe<Number>(map((data: any) => data));
   }
 
+  getDashboardData(year: number, empNo: string): any {
+    return this.http
+      .get(`${this.API_URL}/claim/dashboard/${year}/${empNo}`)
+      .pipe<Claim[]>(map((data: any) => data));
+  }
+
   isGuest(year: any, empNo: any): Observable<Map<String, Object>> {
     return this.http
       .get(`${this.API_URL}/guest/${year}/${empNo}`)
@@ -240,5 +251,9 @@ export class AuthServiceService {
       .pipe<Number>(map((data: any) => data));
 
     return x;
+  }*/
+  /* updateMember(criteria: string, data: any) {
+    console.log('updateMember ', criteria, data);
+    return this.http.post(`${this.API_URL}/member/signup`, data);
   }*/
 }

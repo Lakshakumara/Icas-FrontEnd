@@ -28,7 +28,7 @@ const routes: Routes = [
 
   { path:'yy', component:MecHsComponent},
   { path:'zz', component:RegistrationComponent},
-  { path:'xx', component:TestComponent},
+  { path:'tt', component:TestComponent},
   
   { path:'download', component:DownloadComponent},
 

@@ -7,6 +7,8 @@ import { LoaderService } from '../service/loader.service';
 import { Utils } from '../util/utils';
 import { Registration } from '../Model/registration';
 import Swal from 'sweetalert2';
+import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
+import { catchError, finalize, of } from 'rxjs';
 
 @Component({
   selector: 'app-login-v1',
@@ -15,6 +17,7 @@ import Swal from 'sweetalert2';
 })
 export class LoginV1Component implements OnInit {
   empNoForm!: FormGroup;
+
   constructor(
     private authService: AuthServiceService,
     private router: Router,
@@ -26,7 +29,6 @@ export class LoginV1Component implements OnInit {
 
   ngOnInit(): void {
     this.initForm();
-    //this.authService.getMember;
   }
   initForm() {
     this.empNoForm = new FormGroup({
@@ -50,8 +52,102 @@ export class LoginV1Component implements OnInit {
       });*/
     }
   }
-
+  isMember1() {
+    Swal.fire({
+      title: 'Update Details',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Update',
+      showLoaderOnConfirm: true,
+      preConfirm: async () => {
+        let res = await this.authService
+          .updateMember('memberAccept', { name: 'manjula' })
+        console.log('received from backend ', res);
+      },
+      allowOutsideClick: () => !Swal.isLoading(),
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire('Saving', '', 'success');
+        this.loadMemberPage();
+      }
+    });
+  }
+  loadMemberPage() {
+    console.log('finished');
+  }
   isMember() {
+    if (!this.empNoForm.valid) {
+      Swal.fire('Please Enter Employee Number');
+      this.empNoForm.reset();
+      return;
+    }
+    this.authService
+      .isGuest(Utils.currentYear, this.empNoForm.value.empNo)
+      .subscribe({
+        next: (user: any) => {
+          if (user.isMember == false) {
+            this.authService
+              .getHRDetails(this.empNoForm.value.empNo)
+              .subscribe({
+                next: (user) => {
+                  if (user == null) {
+                    Swal.fire({
+                      title: 'Employee Number is Wrong',
+                      icon: 'error',
+                      confirmButtonText: 'Exit',
+                    });
+                    this.empNoForm.reset();
+                    return;
+                  } else {
+                    this.share.setUser(user);
+                    this.router.navigate(['/signup']);
+                  }
+                },
+                error: (error) => {
+                  Swal.fire('Error' + `${error.Reason}`, 'error');
+                },
+              });
+          } else {
+            //Is a Valid Staff Member check for current year registration
+
+            this.authService
+              .getMember(this.empNoForm.value.empNo)
+              .subscribe((member) => {
+                this.share.setUser(member);
+                const reg = member.memberRegistrations.find((r) => {
+                  return r.year == Utils.currentYear && r.acceptedDate != null;
+                });
+                if (reg !== undefined) {
+                  this.router.navigate(['/home']);
+                } else {
+                  Swal.fire(
+                    'Membership is not accepted',
+                    `Contact Department Head`,
+                    'warning'
+                  );
+                  //this.router.navigate(['/signup']);
+                }
+              });
+          }
+        },
+        error: (error) => {
+          Swal.fire('Error', `${error.Reason}`, 'error');
+        },
+      });
+    this.loader.hideLoader();
+  }
+
+  getHrDetails(empNo: string) {
+    this.authService.getHRDetails(empNo).subscribe((result) => {
+      if (result == null) {
+        console.log('not in Hr Details');
+      } else {
+        this.isMember();
+      }
+    });
+  }
+
+  registerProcess() {
     /*Swal.fire({
       title: `Download pdf`,
       icon: 'success',
@@ -114,73 +210,6 @@ export class LoginV1Component implements OnInit {
       }
     });
     console.log('after swal ');*/
-    if (!this.empNoForm.valid) {
-      Swal.fire('Please Enter Employee Number');
-      this.empNoForm.reset();
-      return;
-    }
-    this.authService
-      .isGuest(Utils.currentYear, this.empNoForm.value.empNo)
-      .subscribe({
-        next: (user: any) => {
-          if (user.isMember == false) {
-            this.authService
-              .getHRDetails(this.empNoForm.value.empNo)
-              .subscribe({
-                next: (user) => {
-                  if (user == null) {
-                    Swal.fire({
-                      title: 'Employee Number is Wrong',
-                      icon: 'error',
-                      confirmButtonText: 'Exit',
-                    });
-                    this.empNoForm.reset();
-                    return;
-                  } else {
-                    this.share.setUser(user);
-                    this.router.navigate(['/signup']);
-                  }
-                },
-                error: (error) => {
-                  Swal.fire('Error' + `${error.Reason}`, 'error');
-                },
-              });
-          } else {
-            //Is a Valid Staff Member check for current year registration
-
-            this.authService
-              .getMember(this.empNoForm.value.empNo)
-              .subscribe((member) => {
-                this.share.setUser(member);
-                const reg = member.memberRegistrations.find((r) => {
-                  return r.year == Utils.currentYear && r.acceptedDate != null;
-                });
-                if (reg !== undefined) {
-                  this.router.navigate(['/home']);
-                } else {
-                  this.router.navigate(['/signup']);
-                }
-              });
-          }
-        },
-        error: (error) => {
-          Swal.fire('Error', `${error.Reason}`, 'error');
-        },
-      });
-    this.loader.hideLoader();
-  }
-  getHrDetails(empNo: string) {
-    this.authService.getHRDetails(empNo).subscribe((result) => {
-      console.log(result);
-      if (result == null) {
-        console.log('not in Hr Details');
-      } else {
-        this.isMember();
-      }
-    });
-  }
-
-  registerProcess() {
     /*Swal.fire({
       title: 'Auto close alert!',
       text: 'I will close in 2 seconds.',

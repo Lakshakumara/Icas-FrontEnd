@@ -22,22 +22,12 @@
         </button>
       </li>
       <li>
-        <button
-          *ngIf="isUser"
-          mat-button
-          matBadgeColor="accent"
-          routerLink="/c_history"
-        >
+        <button *ngIf="isUser" mat-button matBadgeColor="accent" routerLink="/c_history">
           Claim History
         </button>
       </li>
       <li>
-        <button
-          *ngIf="isUser"
-          mat-button
-          matBadgeColor="accent"
-          routerLink="/download"
-        >
+        <button *ngIf="isUser" mat-button matBadgeColor="accent" routerLink="/download">
           Download
         </button>
       </li>
@@ -47,12 +37,7 @@
         </button>
       </li>
       <li>
-        <button
-          *ngIf="isAdmin"
-          mat-button
-          matBadgeColor="accent"
-          [matMenuTriggerFor]="admin"
-        >
+        <button *ngIf="isAdmin" mat-button matBadgeColor="accent" [matMenuTriggerFor]="admin">
           Admin
         </button>
       </li>

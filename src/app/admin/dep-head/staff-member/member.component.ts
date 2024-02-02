@@ -82,12 +82,12 @@ export class MemberComponent implements OnInit, AfterViewInit {
     this.member.currentRegistration.acceptedDate = new Date();
     this.member.currentRegistration.acceptedBy = this.loggeduser.id;
     this.regAcceptData = {
-      id:0,//this.member.memberRegistrations,
-      memberId :this.member.id,
-      acceptedBy : this.loggeduser.id,
-      acceptedDate : Utils.today,
-      schemeType:"",
-      year : 0
+      id: 0, //this.member.memberRegistrations,
+      memberId: this.member.id,
+      acceptedBy: this.loggeduser.id,
+      acceptedDate: Utils.today,
+      schemeType: '',
+      year: 0,
     };
     Swal.fire({
       title: 'Update Details',
@@ -96,11 +96,13 @@ export class MemberComponent implements OnInit, AfterViewInit {
       confirmButtonText: 'Update',
       showLoaderOnConfirm: true,
       preConfirm: async () => {
-        const ret = this.auth.update('memberAccept', this.regAcceptData).subscribe((a) => {
-          console.log('a ', a);
-          if (a == 1) return Swal.showValidationMessage('Updated');
-          else return Swal.showValidationMessage(' Not Updated Try againg');
-        });
+        const ret = this.auth
+          .update('memberAccept', this.regAcceptData)
+          .subscribe((a) => {
+            console.log('a ', a);
+            if (a == 1) return Swal.showValidationMessage('Updated');
+            else return Swal.showValidationMessage(' Not Updated Try againg');
+          });
 
         return ret;
       },
@@ -108,6 +110,7 @@ export class MemberComponent implements OnInit, AfterViewInit {
     }).then((result) => {
       if (result.isConfirmed) {
         Swal.fire('Saving', '', 'success');
+        this.loadMemberPage();
       }
     });
   }

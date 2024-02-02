@@ -25,6 +25,7 @@ import { Member } from '../Model/member';
   styleUrls: ['./register.component.css'],
 })
 export class RegisterComponent implements OnInit {
+  formGroup!: FormGroup;
   schemeType: string = 'Individual';
   member!: Member;
   data!: any;
@@ -57,65 +58,75 @@ export class RegisterComponent implements OnInit {
     private router: Router,
     private authService: AuthServiceService,
     private dialog: MatDialog
-  ) {}
+  ) {
+    this.member = this.share.getUser();
+  }
 
   ngOnInit(): void {
-    this.member = this.share.getUser();
     if (this.member) {
       /**
        * TODO add Sweetalert stepper here
        */
-      this.member.beneficiaries.forEach((b) => {
-        this.beneficiaryData.data = [b, ...this.beneficiaryData.data];
-      });
+      if (this.member.beneficiaries)
+        this.member.beneficiaries.forEach((b) => {
+          this.beneficiaryData.data = [b, ...this.beneficiaryData.data];
+        });
+
       if (
+        this.member.memberRegistrations &&
         this.member.memberRegistrations.find((r) => {
           return r.year == Utils.currentYear - 1 && r.schemeType == 'Family';
         })
       ) {
         this.schemeType = 'Family';
-        this.member.dependants.forEach((d) => {
-          this.dependantData.data = [d, ...this.dependantData.data];
-        });
+        if (this.member.dependants)
+          this.member.dependants.forEach((d) => {
+            this.dependantData.data = [d, ...this.dependantData.data];
+          });
       }
+      this.formGroup = this.fb.group({
+        empNo: new FormControl(this.member.empNo, [Validators.required]),
+        name: new FormControl(this.member.name, [Validators.required]),
+        address: new FormControl(this.member.address, [Validators.required]),
+        email: new FormControl(this.member.email),
+        contactNo: new FormControl(this.member.contactNo),
+        civilStatus: new FormControl(this.member.civilStatus, [
+          Validators.required,
+        ]),
+        nic: new FormControl(this.member.nic, [Validators.required]),
+        sex: new FormControl(this.member.sex, [Validators.required]),
+        dob: new FormControl(this.member.dob, [Validators.required]),
+        designation: new FormControl(this.member.designation, [
+          Validators.required,
+        ]),
+        department: new FormControl(this.member.department, [
+          Validators.required,
+        ]),
+        password: new FormControl(),
+        scheme: new FormControl(this.member.scheme, [Validators.required]),
+        registrationOpen: new FormControl(),
+        roles: this.fb.array([
+          this.fb.group({
+            role: new FormControl(),
+          }),
+        ]),
+
+        memberRegistrations: this.fb.array([
+          this.fb.group({
+            id: new FormControl(),
+            year: new FormControl(),
+            registerDate: new FormControl(),
+            acceptedDate: new FormControl(),
+            schemeType: new FormControl(),
+          }),
+        ]),
+        dependants: this.fb.array([]),
+        beneficiaries: this.fb.array([]),
+        mDate: new FormControl(this.member.mDate),
+        status: new FormControl(this.member.status),
+      });
     } else this.router.navigate(['/signin']);
   }
-
-  formGroup = this.fb.group({
-    empNo: new FormControl('', [Validators.required]),
-    name: new FormControl('', [Validators.required]),
-    address: new FormControl('', [Validators.required]),
-    email: new FormControl(),
-    contactNo: new FormControl(),
-    civilStatus: new FormControl('', [Validators.required]),
-    nic: new FormControl('', [Validators.required]),
-    sex: new FormControl('', [Validators.required]),
-    dob: new FormControl('', [Validators.required]),
-    designation: new FormControl('', [Validators.required]),
-    department: new FormControl('', [Validators.required]),
-    password: new FormControl(),
-    scheme: new FormControl('', [Validators.required]),
-    registrationOpen: new FormControl(),
-    roles: this.fb.array([
-      this.fb.group({
-        role: new FormControl(),
-      }),
-    ]),
-
-    memberRegistrations: this.fb.array([
-      this.fb.group({
-        id: new FormControl(),
-        year: new FormControl(),
-        registerDate: new FormControl(),
-        acceptedDate: new FormControl(),
-        schemeType: new FormControl(),
-      }),
-    ]),
-    dependants: this.fb.array([]),
-    beneficiaries: this.fb.array([]),
-    mDate: new FormControl(),
-    status: new FormControl(),
-  });
 
   popupDependant() {
     this.Openpopup(1, '', 'Add Dependants details', DependantComponent);
@@ -228,40 +239,40 @@ export class RegisterComponent implements OnInit {
           password: 'user',
           scheme: this.schemeType,
         });
-        console.log('preConfirm');
-        this.authService.register(this.formGroup.value).subscribe((reg) => {
-          console.log('saved', reg);
-          this.authService
-            .getMember(this.formGroup.value.empNo)
-            .subscribe((m) => {
-              this.share.setUser(m);
-              Swal.fire({
-                title: `Download pdf`,
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'Save',
-                allowOutsideClick: () => false,
-              }).then((result) => {
-                if (result.isConfirmed) {
-                  console.log('result.isConfirmed ');
-                  this.downloadMembershipApplication(
-                    Utils.currentYear,
-                    m.empNo
-                  );
-                } else {
-                  console.log('result.isConfirmed else ');
-                }
+        console.log('tobe insert ', this.formGroup.value);
+        return this.authService
+          .register(this.formGroup.value)
+          .subscribe((reg) => {
+            console.log('saved', reg);
+            return this.authService
+              .getMember(this.formGroup.value.empNo)
+              .subscribe((m) => {
+                this.share.setUser(m);
+                Swal.fire({
+                  title: `Download pdf`,
+                  icon: 'question',
+                  showCancelButton: true,
+                  confirmButtonText: 'Save',
+                  allowOutsideClick: () => false,
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                    this.downloadMembershipApplication(
+                      Utils.currentYear,
+                      m.empNo
+                    );
+                  }
+                  this.router.navigate(['/home']);
+                });
+                this.formGroup.reset();
+                return m;
               });
-
-              this.formGroup.reset();
-              this.router.navigate(['/home']);
-            });
-        });
+          });
       },
       allowOutsideClick: () => !Swal.isLoading(),
     }).then((result) => {
       if (result.isConfirmed) {
-        console.log('result.isConfirmed');
+        console.log('result ', result);
+        console.log('result.value ', result.value);
       }
     });
   }

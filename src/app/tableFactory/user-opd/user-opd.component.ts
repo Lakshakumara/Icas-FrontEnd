@@ -6,7 +6,6 @@ import { AuthServiceService } from 'src/app/service/auth-service.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Member } from 'src/app/Model/member';
 import { ClaimOPD } from 'src/app/Model/claimOPD';
-import { merge, tap } from 'rxjs';
 import { Utils } from 'src/app/util/utils';
 import { SharedService } from 'src/app/shared/shared.service';
 

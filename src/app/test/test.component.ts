@@ -1,9 +1,21 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
+import { COMMA, ENTER } from '@angular/cdk/keycodes';
+import {
+  Component,
+  ElementRef,
+  EventEmitter,
+  OnInit,
+  Output,
+  ViewChild,
+  inject,
+} from '@angular/core';
+import { FormBuilder, FormControl, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { startWith, map } from 'rxjs/operators';
 import { SchemeTitles } from '../Model/scheme';
 import { SchemeService } from '../service/scheme.service';
+import { MatChipInputEvent } from '@angular/material/chips';
+import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { LiveAnnouncer } from '@angular/cdk/a11y';
 
 export const _filter = (opt: string[], value: string): string[] => {
   const filterValue = value.toLowerCase();
@@ -20,120 +32,78 @@ export const _filter = (opt: string[], value: string): string[] => {
   styleUrls: ['./test.component.css'],
 })
 export class TestComponent implements OnInit {
-  stateForm = this._formBuilder.group({
-    stateGroup: '',
+  separatorKeysCodes: number[] = [ENTER, COMMA];
+  allTitles: string[] = [];
+  selectedTitles: string[] = [];
+  titles!: Observable<string[]>;
+
+  formGroup = this.fb.group({
+    schemeTitles: new FormControl('', [Validators.required]),
   });
-  stateGroups!: SchemeTitles[];
-  /* stateGroups: SchemeTitles[] = [
-    {
-      letter: 'A',
-      names: ['Alabama', 'Alaska', 'Arizona', 'Arkansas'],
-    },
-    {
-      letter: 'C',
-      names: ['California', 'Colorado', 'Connecticut'],
-    },
-    {
-      letter: 'D',
-      names: ['Delaware'],
-    },
-    {
-      letter: 'F',
-      names: ['Florida'],
-    },
-    {
-      letter: 'G',
-      names: ['Georgia'],
-    },
-    {
-      letter: 'H',
-      names: ['Hawaii'],
-    },
-    {
-      letter: 'I',
-      names: ['Idaho', 'Illinois', 'Indiana', 'Iowa'],
-    },
-    {
-      letter: 'K',
-      names: ['Kansas', 'Kentucky'],
-    },
-    {
-      letter: 'L',
-      names: ['Louisiana'],
-    },
-    {
-      letter: 'M',
-      names: [
-        'Maine',
-        'Maryland',
-        'Massachusetts',
-        'Michigan',
-        'Minnesota',
-        'Mississippi',
-        'Missouri',
-        'Montana',
-      ],
-    },
-    {
-      letter: 'N',
-      names: [
-        'Nebraska',
-        'Nevada',
-        'New Hampshire',
-        'New Jersey',
-        'New Mexico',
-        'New York',
-        'North Carolina',
-        'North Dakota',
-      ],
-    },
-    {
-      letter: 'O',
-      names: ['Ohio', 'Oklahoma', 'Oregon'],
-    },
-    {
-      letter: 'P',
-      names: ['Pennsylvania'],
-    },
-    {
-      letter: 'R',
-      names: ['Rhode Island'],
-    },
-    {
-      letter: 'S',
-      names: ['South Carolina', 'South Dakota'],
-    },
-    {
-      letter: 'T',
-      names: ['Tennessee', 'Texas'],
-    },
-    {
-      letter: 'U',
-      names: ['Utah'],
-    },
-    {
-      letter: 'V',
-      names: ['Vermont', 'Virginia'],
-    },
-    {
-      letter: 'W',
-      names: ['Washington', 'West Virginia', 'Wisconsin', 'Wyoming'],
-    },
-  ];*/
 
-  stateGroupOptions!: Observable<SchemeTitles[]>;
+  
+  @ViewChild('titleInput') titleInput!: ElementRef<HTMLInputElement>;
 
-  constructor(
-    private _formBuilder: FormBuilder,
-    private schemeService: SchemeService
-  ) {}
+  @Output() getTitles = new EventEmitter();
+  
+  announcer = inject(LiveAnnouncer);
 
-  ngOnInit() {}
-
-  private _filterGroup(value: string): SchemeTitles[] {
-    return this.stateGroups;
+  constructor(private fb: FormBuilder, private schemeService: SchemeService) {
+    this.titles = this.formGroup.get('schemeTitles')!.valueChanges.pipe(
+      startWith(null),
+      map((title: string | null) => (title ? this._filter(title) : this.allTitles.slice())),
+    );
   }
-  click() {
-    console.log('selected', this.stateForm.value);
+
+  ngOnInit() {
+    this.schemeService.getSchemeTitle().subscribe((title: SchemeTitles[]) => {
+      title.forEach((st)=>{
+        st.idText.map((t)=>{
+          this.allTitles.push(t);
+          
+        })
+      });
+    });
+    
+  }
+
+  add(event: MatChipInputEvent): void {
+    const value = (event.value || '').trim();
+
+    // Add our fruit
+    if (this.allTitles.includes(value)) {
+      this.selectedTitles.push(value);
+      this.getTitles.emit(this.selectedTitles)
+    }
+
+    // Clear the input value
+    event.chipInput!.clear();
+
+    this.formGroup.get('schemeTitles')!.setValue(null);
+  }
+
+  remove(title: string): void {
+    const index = this.selectedTitles.indexOf(title);
+
+    if (index >= 0) {
+      this.selectedTitles.splice(index, 1);
+      this.getTitles.emit(this.selectedTitles)
+      this.announcer.announce(`Removed ${title}`);
+    }
+  }
+
+  selected(event: MatAutocompleteSelectedEvent): void {
+    this.selectedTitles.push(event.option.viewValue);
+    this.getTitles.emit(this.selectedTitles)
+    this.titleInput.nativeElement.value = '';
+    this.formGroup.get('schemeTitles')!.setValue(null);
+  }
+
+  private _filter(value: string): string[] {
+    const filterValue = value.toLowerCase();
+
+    return this.allTitles.filter((title) =>
+      title.toLowerCase().includes(filterValue)
+    );
   }
 }

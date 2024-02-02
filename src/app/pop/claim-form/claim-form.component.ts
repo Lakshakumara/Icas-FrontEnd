@@ -64,7 +64,7 @@ export class ClaimFormComponent implements OnInit {
     requestFor: this.buildr.control(''),
     schemeTitle: this.buildr.control(''),
     startDate: this.buildr.control('', Validators.required),
-    endDate: new FormControl<Date | null>(null),
+    endDate: this.buildr.control('', Validators.required),
     claimDate: this.buildr.control(new Date, Validators.required),
     applyDate: this.buildr.control(''),
     acceptedDate: this.buildr.control(''),

@@ -23,6 +23,7 @@ export class VoucherComponent implements OnInit {
 
   rowData!: Claim[];
   selectedClaims!: Claim[];
+  tobeUpdated!: any[];
   onNotifySelected(selectedRows: Claim[]) {
     this.selectedClaims = selectedRows;
   }
@@ -87,7 +88,16 @@ export class VoucherComponent implements OnInit {
   }
 
   voucherGenerate() {
+    this.tobeUpdated = [];
     let selected = this.selectedClaims.map((s) => {
+      this.tobeUpdated.push({
+        criteria: 'forwordfinance',
+        id: s.id,
+        financeSendDate:null,
+        paidAmount:s.paidAmount,
+        claimStatus: 'finance',
+        voucherId: new Date().getMilliseconds(),
+      });
       return s.empNo + '-' + s.paidAmount;
     });
     Swal.fire({
@@ -98,12 +108,12 @@ export class VoucherComponent implements OnInit {
       confirmButtonText: 'Generate',
       showLoaderOnConfirm: true,
       preConfirm: async () => {
-        /*const ret = this.auth.updateClaim(this.updateData).subscribe((a) => {
+        const ret = this.auth.updateClaim(this.tobeUpdated).subscribe((a) => {
             if (a == 1) {
               return Swal.showValidationMessage('Updated');
             } else return Swal.showValidationMessage('Not Updated Try againg');
-          });*/
-        return true;
+          });
+        return ret;
       },
       allowOutsideClick: () => !Swal.isLoading(),
     }).then((result) => {

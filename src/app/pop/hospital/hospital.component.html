@@ -1,46 +1,104 @@
 <form [formGroup]="dForm" (ngSubmit)="addOpdData()">
-  <h1 mat-dialog-title>{{inputdata.title}}</h1>
+  <h1 mat-dialog-title>{{ inputdata.title }}</h1>
   <div mat-dialog-content>
-
+    <app-test (getTitles)="onNotifySelected($event)"></app-test>
     <mat-form-field class="example-full-width">
       <mat-label>Request Claim Amount</mat-label>
-      <input matInput formControlName="amount">
+      <input matInput formControlName="amount" />
     </mat-form-field>
 
     <mat-form-field class="example-full-width">
-      <mat-label>The Name of the Claimer</mat-label>
-      <mat-select formControlName="cType">
-        <mat-option [value]="ctype" *ngFor="let ctype of claimTypes">{{ctype}}
+      <mat-label>The Claim request for</mat-label>
+      <mat-select formControlName="dependant">
+        <mat-option [value]="claimer" *ngFor="let claimer of claimers"
+          >{{ claimer }}
         </mat-option>
       </mat-select>
     </mat-form-field>
 
-    <mat-form-field class="example-full-width">
-      <mat-label>Date of accident/Onset</mat-label>
-      <input matInput [matDatepicker]="picker" placeholder="Date of Incident" formControlName="incidentDate">
-      <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-      <mat-datepicker #picker></mat-datepicker>
-      <mat-hint>yyyy-mm-dd</mat-hint>
-    </mat-form-field>
+    <mat-checkbox #chkEnable>Injury</mat-checkbox>
 
-    <mat-form-field class="example-full-width">
-      <mat-label>Incident Place</mat-label>
-      <input matInput formControlName="place">
+    <ng-container *ngIf="chkEnable.checked; then injuryData"> </ng-container>
+    <ng-template #injuryData>
+      <mat-form-field class="example-full-width">
+        <mat-label>Date of Incident</mat-label>
+        <input
+          matInput
+          [matDatepicker]="picker"
+          [min]="beforeThreeMonth"
+          [max]="today"
+          placeholder="Date of Incident"
+          formControlName="incidentDate"
+        />
+        <mat-datepicker-toggle
+          matIconSuffix
+          [for]="picker"
+        ></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+        <mat-hint>dd/mm/yyyy</mat-hint>
+      </mat-form-field>
+
+      <mat-form-field class="example-full-width">
+        <mat-label>Incident Place</mat-label>
+        <input matInput formControlName="place" />
+      </mat-form-field>
+
+      <mat-form-field class="example-full-width">
+        <mat-label>Precisely how the Accident Occured</mat-label>
+        <input matInput formControlName="injuryOccured" />
+      </mat-form-field>
+    </ng-template>
+    <mat-divider></mat-divider>
+
+    <mat-form-field class="example-full-width" appearance="outline">
+      <mat-label>Period of Hospitalization</mat-label>
+      <mat-date-range-input
+        [rangePicker]="picker"
+        [min]="beforeThreeMonth"
+        [max]="today"
+      >
+        <input
+          matInput
+          matStartDate
+          formControlName="startDate"
+          placeholder="Start date"
+        />
+        <input
+          matInput
+          matEndDate
+          formControlName="endDate"
+          placeholder="End date"
+        />
+      </mat-date-range-input>
+      <mat-hint>dd/mm/yyyy – dd/mm/yyyy</mat-hint>
+      <mat-datepicker-toggle
+        matIconSuffix
+        [for]="picker"
+      ></mat-datepicker-toggle>
+      <mat-date-range-picker #picker></mat-date-range-picker>
+
+      <!--@if (range.controls.start.hasError('matStartDateInvalid')) {
+            <mat-error>Invalid start date</mat-error>
+            }
+            @if (range.controls.end.hasError('matEndDateInvalid')) {
+            <mat-error>Invalid end date</mat-error>
+            }-->
     </mat-form-field>
 
     <mat-form-field class="example-full-width">
       <mat-label>Nature of Description of illness/accident</mat-label>
-      <input matInput formControlName="description">
+      <input matInput formControlName="nature" />
     </mat-form-field>
 
     <mat-form-field class="example-full-width">
       <mat-label>Incident Description</mat-label>
-      <input matInput formControlName="description">
+      <input matInput formControlName="incident" />
     </mat-form-field>
-
   </div>
   <div mat-dialog-actions>
-    <button mat-raised-button color="primary" (click)="closePopup()">Save</button>
+    <button mat-raised-button color="primary" (click)="saveClaim()">
+      Save
+    </button>
     <button mat-raised-button color="warn" (click)="closePopup()">Close</button>
     <!--<button mat-raised-button mat-dialog-close color="accent">Cancel</button>-->
   </div>

@@ -49,4 +49,28 @@ export class ClaimDataSource extends DataSource<Claim> {
             .subscribe((receiveData: any) => this.claimSubject.next(receiveData));
         console.log("fetch data set ", this.claimSubject)
     }
+/**
+ * 
+ * @param claimType 
+ * @param year 
+ * @param empNo  '' for search all
+ * @param claimStatus 
+ * @param filter 
+ * @param sortDirection 
+ * @param pageIndex 
+ * @param pageSize 
+ */
+    requestAllData(claimType: string = "%", year: number = 0, empNo: string ="%", claimStatus: string = "%",
+        filter = '', sortDirection = 'asc', pageIndex = 0, pageSize = 10) {
+
+        this.loadingSubject.next(true);
+
+        this.auth.getAllClaims(claimType, year, empNo,claimStatus, filter, sortDirection, pageIndex, pageSize)
+            .pipe(
+                catchError(() => of([])),
+                finalize(() => this.loadingSubject.next(false))
+            )
+            .subscribe((receiveData: any) => this.claimSubject.next(receiveData));
+        console.log("fetch data set ", this.claimSubject)
+    }
 }

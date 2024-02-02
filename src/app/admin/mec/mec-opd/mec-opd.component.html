@@ -6,18 +6,10 @@
     <mat-accordion>
       <mat-form-field>
         <mat-label>Employee No or Name</mat-label>
-        <input
-          matInput
-          (keyup)="applyFilter($event)"
-          placeholder="Search..."
-          #input
-        />
+        <input matInput (keyup)="applyFilter($event)" placeholder="Search..." #input />
       </mat-form-field>
 
-      <mat-expansion-panel
-        (opened)="panelOpenState = true"
-        (closed)="panelOpenState = false"
-      >
+      <mat-expansion-panel (opened)="panelOpenState = true" (closed)="panelOpenState = false">
         <mat-expansion-panel-header>
           <mat-panel-title> Member Details </mat-panel-title>
         </mat-expansion-panel-header>
@@ -49,44 +41,20 @@
       </mat-expansion-panel>
     </mat-accordion>
     <div>
-      <table
-        mat-table
-        [dataSource]="dataSource"
-        matSort
-        matSortActive="id"
-        matSortDirection="asc"
-        matSortDisableClear
-      >
-        <ng-container
-          [matColumnDef]="col.key"
-          *ngFor="let col of columnsSchema; let i = index"
-        >
+      <table mat-table [dataSource]="dataSource" matSort matSortActive="id" matSortDirection="asc" matSortDisableClear>
+        <ng-container [matColumnDef]="col.key" *ngFor="let col of columnsSchema; let i = index">
           <th *matHeaderCellDef>{{ columnsSchema[i].label }}</th>
-          <td
-            mat-cell
-            *matCellDef="let element"
-            [align]="columnsSchema[i].type == 'number' ? 'right' : 'left'"
-          >
+          <td mat-cell *matCellDef="let element" [align]="columnsSchema[i].type == 'number' ? 'right' : 'left'">
             {{ element[col.key] }}
           </td>
         </ng-container>
 
         <tr mat-header-row *matHeaderRowDef="displayedColumn"></tr>
-        <tr
-          mat-row
-          *matRowDef="let claimOpd; columns: displayedColumn"
-          (click)="onRowClicked(claimOpd)"
-        ></tr>
+        <tr mat-row *matRowDef="let claimOpd; columns: displayedColumn" (click)="onRowClicked(claimOpd)"></tr>
       </table>
     </div>
-    <mat-paginator
-      #paginator
-      [length]="10"
-      [pageIndex]="0"
-      [pageSize]="3"
-      [pageSizeOptions]="[1, 5, 10, 20]"
-      aria-label="Select page"
-    >
+    <mat-paginator #paginator [length]="10" [pageIndex]="0" [pageSize]="3" [pageSizeOptions]="[1, 5, 10, 20]"
+      aria-label="Select page">
     </mat-paginator>
   </div>
   <!--mat-card>
@@ -151,13 +119,7 @@
     <form [formGroup]="formGroup" *ngIf="this.selectedClaim">
       <mat-form-field class="fullWith">
         <mat-label>Select Scheme Title</mat-label>
-        <input
-          type="text"
-          matInput
-          formControlName="stateGroup"
-          required
-          [matAutocomplete]="autoGroup"
-        />
+        <input type="text" matInput formControlName="stateGroup" required [matAutocomplete]="autoGroup" />
         <mat-autocomplete #autoGroup="matAutocomplete">
           <div *ngFor="let group of stateGroupOptions | async">
             <mat-optgroup [label]="group.id">
@@ -176,52 +138,27 @@
 
       <mat-form-field floatLabel="always">
         <mat-label>Deduction Amount</mat-label>
-        <input
-          matInput
-          type="number"
-          class="example-right-align"
-          placeholder="0"
-          formControlName="deductionAmount"
-        />
+        <input matInput type="number" class="example-right-align" placeholder="0" formControlName="deductionAmount" />
         <span matTextSuffix>.00</span>
-        <mat-hint *ngIf="selectedClaim"
-          >Request Amount {{ selectedClaim.requestAmount }}</mat-hint
-        >
+        <mat-hint *ngIf="selectedClaim">Request Amount {{ selectedClaim.requestAmount }}</mat-hint>
       </mat-form-field>
 
-      <mat-checkbox
-        formControlName="rejected"
-        #chkEnable
-        ngModel
-        (change)="disableField(chkEnable.checked)"
-        >Reject because</mat-checkbox
-      >
+      <mat-checkbox formControlName="rejected" #chkEnable ngModel (change)="disableField(chkEnable.checked)">Reject
+        because</mat-checkbox>
 
       <mat-form-field class="fullWith" floatLabel="always">
         <mat-label>Reason for rejection</mat-label>
-        <input
-          [attr.disabled]="true"
-          matInput
-          formControlName="rejectremarks"
-        />
+        <input [attr.disabled]="true" matInput formControlName="rejectremarks" />
       </mat-form-field>
     </form>
-    <button
-      mat-raised-button
-      color="accent"
-      (click)="updateClaim()"
-      [disabled]="!formGroup.valid"
-    >
+    <button mat-raised-button color="accent" (click)="updateClaim()" [disabled]="!formGroup.valid">
       Update Claim Sheet
     </button>
   </mat-card>
 
   <mat-card class="rside">
     <mat-accordion>
-      <mat-expansion-panel
-        (opened)="panelOpenState = true"
-        (closed)="panelOpenState = false"
-      >
+      <mat-expansion-panel (opened)="panelOpenState = true" (closed)="panelOpenState = false">
         <mat-expansion-panel-header>
           <mat-panel-title> Medical History </mat-panel-title>
         </mat-expansion-panel-header>

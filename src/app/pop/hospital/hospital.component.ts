@@ -4,6 +4,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { Member } from 'src/app/Model/member';
 import { SharedService } from 'src/app/shared/shared.service';
+import { Utils } from 'src/app/util/utils';
 
 @Component({
   selector: 'app-hospital',
@@ -13,8 +14,12 @@ import { SharedService } from 'src/app/shared/shared.service';
 export class HospitalComponent implements OnInit {
   member!: Member;
   inputdata: any;
-  claimTypes: any = ['Member', ' TODO put Dpendant Names'];
-
+  claimers: string[] = ['Member'];
+  claimerIds: number[] = [0];
+  schemeTitles!:string[];
+  today = Utils.today;
+  beforeThreeMonth = Utils.threeMonthbeforetoday;
+  
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: any,
     private ref: MatDialogRef<HospitalComponent>,
@@ -26,18 +31,36 @@ export class HospitalComponent implements OnInit {
   }
   dForm = this.buildr.group({
     id: this.buildr.control(''),
-    cType: this.buildr.control(''),
+    dependant: this.buildr.control(''),
     amount: this.buildr.control(''),
-    incidentDate: this.buildr.control(''),
+    startDate: this.buildr.control(''),
+    endDate: this.buildr.control(''),
+    place: this.buildr.control(''),
+    nature: this.buildr.control(''),
+    incident: this.buildr.control(''),
   });
   ngOnInit(): void {
     this.member = this.share.getUser();
-    if (this.member == null) {
+    if (this.member) {
+      this,this.member.beneficiaries.forEach((b)=>{
+        this.claimers.push(b.relationship+"-"+b.name);
+        this.claimerIds.push(b.id);
+      });
+    }else{
       this.router.navigate(['/signin']);
     }
   }
+  onNotifySelected(schemeTitles: string[]) {
+    this.schemeTitles = schemeTitles;
+  }
   addOpdData() {}
+
   closePopup() {
+    this.ref.close(this.dForm.value);
+  }
+  saveClaim() {
+    console.log('scheme ',this.schemeTitles);
+    console.log("To be Save ", this.dForm.value)
     this.ref.close(this.dForm.value);
   }
 }

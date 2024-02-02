@@ -2,6 +2,7 @@ import { Registration } from './registration';
 import { Dependant } from "./dependant";
 import { Beneficiary } from './benificiary';
 import { Role } from './role';
+import { Claim } from './claim';
 
 export interface Member {
     id: number;

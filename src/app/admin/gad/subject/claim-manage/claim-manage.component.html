@@ -3,9 +3,15 @@
     <div>
       <mat-card>
         <mat-card-content>
+
+          <mat-form-field>
+            <mat-label>Year</mat-label>
+            <input matInput placeholder="Year" [(ngModel)]="search_year"/>
+          </mat-form-field>
+
             <mat-form-field >
                 <mat-label>Choose a Claim Status</mat-label>
-                <mat-select [(ngModel)]="claimViewOptionSelected" (selectionChange)="loadClaimPage()">
+                <mat-select [(ngModel)]="claimViewOptionSelected" (selectionChange)="claimStatusChange()">
                   <mat-option [value]="claimViewOption" *ngFor="let claimViewOption of claimViewOptions">{{claimViewOption}}
                   </mat-option>
                 </mat-select>
@@ -17,7 +23,7 @@
           </mat-form-field>
         </mat-card-content>
   
-        <div *ngIf="selectedData">
+        <div *ngIf="claimViewOptionSelected == 'Head Approved' && selectedData">
           <fieldset>
             <legend>Selected Member</legend>
             <li *ngFor="let m of selectedData">
@@ -27,7 +33,6 @@
             </li>
             <button mat-button color="primary" (click)="forwordMEC()">Forward to MEC</button>
           </fieldset>
-          
         </div>
   
       </mat-card>

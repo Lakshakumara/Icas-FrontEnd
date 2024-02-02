@@ -125,7 +125,7 @@ export class MecOpdComponent implements OnInit {
       criteria: 'opdupdate',
       id: this.selectedClaim.id,
       claimStatus: 'mec_approved',
-      idText: scheme[0],
+      idText: scheme[1],
       requestAmount: this.selectedClaim.requestAmount,
       deductionAmount: this.formGroup.value.deductionAmount,
       mecremarks: this.formGroup.value.mecremarks,

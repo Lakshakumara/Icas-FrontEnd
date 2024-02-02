@@ -1,22 +1,28 @@
-<form [formGroup]="stateForm">
-  <mat-form-field>
-    <mat-label>States Group</mat-label>
-    <input type="text"
-           matInput
-           formControlName="stateGroup"
-           required
-           [matAutocomplete]="autoGroup">
-      <mat-autocomplete #autoGroup="matAutocomplete">
-        <div *ngFor="let group of stateGroupOptions | async; track group"> 
-        
-          <mat-optgroup [label]="group.id">
-            <div *ngFor="let idTxt of group.idText; track idText"> 
-        
-              <mat-option [value]="idTxt">{{idTxt}}</mat-option>
-            </div>
-          </mat-optgroup>
-         </div>
+<form [formGroup]="formGroup">
+  <mat-form-field class="example-chip-list">
+    <mat-label>Scheme Titles</mat-label>
+    <mat-chip-grid #chipGrid aria-label="Title selection">
+      <div *ngFor="let title of selectedTitles"> 
+
+        <mat-chip-row (removed)="remove(title)">
+          {{title}}
+          <button matChipRemove [attr.aria-label]="'remove ' + title">
+            <mat-icon>cancel</mat-icon>
+          </button>
+        </mat-chip-row>
+
+      </div>
+    </mat-chip-grid>
+    <input placeholder="New Titles..." #titleInput formControlName="schemeTitles"
+      [matChipInputFor]="chipGrid" [matAutocomplete]="auto"
+      [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+      (matChipInputTokenEnd)="add($event)"/>
+    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
+      <div *ngFor="let title of titles |async;"> 
+  
+        <mat-option [value]="title">{{title}}</mat-option>
+      
+      </div>
     </mat-autocomplete>
   </mat-form-field>
-  <button (click)="click()">save</button>
 </form>

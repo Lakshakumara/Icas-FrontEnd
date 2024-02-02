@@ -22,7 +22,8 @@ export class HeaderComponent implements OnInit {
   constructor() {}
 
   ngOnInit() {
-    if (this.member != null)
+    if (this.member)
+    if(this.member.roles)
       this.member.roles.forEach((val, key) => {
         this.roles.push(val.role);
         switch (val.role) {
