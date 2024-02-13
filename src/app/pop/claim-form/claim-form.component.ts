@@ -138,13 +138,13 @@ export class ClaimFormComponent implements OnInit {
       confirmButtonText: 'Yes, Save'
     }).then((result) => {
       if (result.isConfirmed) {
-        this.auth.saveOPD(this.dForm.value).subscribe(d => {
+        /*this.auth.saveOPD(this.dForm.value).subscribe(d => {
           Swal.fire(
             'Saved',
             `Your reference number ${d}`,
             'success');
           this.closePopup();
-        });
+        });*/
       }
     });
   }

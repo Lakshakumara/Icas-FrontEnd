@@ -20,7 +20,7 @@ export class ClaimManageComponent {
   search_year!: number;
   claim!: Claim;
   selectedClaim!: Claim;
-  regAcceptData!: any;
+  tobeUpdated!: any[];
   dataSource!: ClaimDataSource;
   displayedColumn: string[] = Claim_All.map((col) => col.key);
   columnsSchema: any = Claim_All;
@@ -66,12 +66,9 @@ export class ClaimManageComponent {
     console.log(val);
   }
 
-  claimStatusChange(){
+  loadClaimPage() {
     this.selectedData = <Member[]>{};
     this.selectedClaim = <Claim>{};
-    this.loadClaimPage();
-  }
-  loadClaimPage() {
     this.dataSource.requestData(this.getSelectedClaimStatus());
     //this.dataSource.requestAllData("%", this.search_year, this.getSelectedClaimStatus());
   }
@@ -111,11 +108,12 @@ export class ClaimManageComponent {
   }
 
   forwordMEC() {
-    this.regAcceptData = {
-      criteria: 'forwordmec',
-      id: this.selectedClaim.id,
-      claimStatus: 'mec',
-    };
+    this.tobeUpdated = [];
+      this.tobeUpdated.push({
+        criteria: 'forwordmec',
+        id: this.selectedClaim.id,
+        claimStatus: 'mec',
+      });
     Swal.fire({
       title: 'Update Details',
       icon: 'question',
@@ -123,21 +121,18 @@ export class ClaimManageComponent {
       confirmButtonText: 'Update',
       showLoaderOnConfirm: true,
       preConfirm: async () => {
-        const ret = this.auth.updateClaim(this.regAcceptData).subscribe((a) => {
-          console.log('a ', a);
-          if (a == 1) {
-            this.selectedClaim = <Claim>{};
+        const ret = this.auth.updateClaim(this.tobeUpdated).subscribe((a) => {
+          if (a >= 1) {
+            this.loadClaimPage();
             return Swal.showValidationMessage('Updated');
           } else return Swal.showValidationMessage(' Not Updated Try againg');
         });
-
         return ret;
       },
       allowOutsideClick: () => !Swal.isLoading(),
     }).then((result) => {
       if (result.isConfirmed) {
-        Swal.fire('Saving', '', 'success');
-        this.loadClaimPage();
+        Swal.fire('Saving', '', 'info');
       }
     });
   }

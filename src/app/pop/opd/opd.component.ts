@@ -51,13 +51,87 @@ export class OpdComponent implements OnInit {
     this.member = this.share.getUser();
     if (this.member == null) {
       this.router.navigate(['/signin']);
-    }else console.log('delete', this.member)
+    } else console.log('delete', this.member);
   }
-  addOpdData() {
+  saveClaim() {
     this.dForm.patchValue({
       memberId: this.member.id,
     });
-    console.log('opd data submit ', this.dForm.value);
+    const steps = ['1', '2', '3'];
+    const Queue = Swal.mixin({
+      progressSteps: steps,
+      showCancelButton: true,
+      cancelButtonText: 'Cancel',
+      // optional classes to avoid backdrop blinking between steps
+      showClass: { backdrop: 'swal2-noanimation' },
+      hideClass: { backdrop: 'swal2-noanimation' },
+    });
+
+    (async () => {
+      let result = await Queue.fire({
+        title: 'Save Claim Details',
+        icon: 'warning',
+        currentProgressStep: 0,
+        confirmButtonText: 'Save',
+        showLoaderOnConfirm: true,
+        allowOutsideClick: () => false,
+        preConfirm: async () => {
+          let claimId;
+          try {
+            claimId = await this.auth.saveOPD(this.dForm.value);
+          } catch (error) {
+            return Swal.showValidationMessage(` ${error} `);
+          }
+          return claimId;
+        },
+      });
+
+      if (result.isConfirmed) {
+        console.log('Saved Result ', result);
+        await Queue.fire({
+          title: 'Download Claim Application',
+          text: `Claim Saved ref Number: ${result.value}`,
+          currentProgressStep: 1,
+          confirmButtonText: 'Download',
+          showLoaderOnConfirm: true,
+          allowOutsideClick: () => false,
+          preConfirm: async () => {
+            try {
+              let response: any = await this.auth.downloadClaim(result.value);
+              console.log('received from backend ', response);
+
+              let dataType = response.type;
+              let binaryData = [];
+              binaryData.push(response);
+              let downloadLink = document.createElement('a');
+              downloadLink.href = window.URL.createObjectURL(
+                new Blob(binaryData, { type: dataType })
+              );
+              downloadLink.setAttribute('download', 'Claim form.pdf');
+              document.body.appendChild(downloadLink);
+              downloadLink.click();
+            } catch (error) {
+              Swal.showValidationMessage(` ${error} `);
+            }
+          },
+        });
+      }
+
+      await Queue.fire({
+        title: 'Finish',
+        icon: 'success',
+        showCancelButton: false,
+        currentProgressStep: 2,
+        confirmButtonText: 'OK',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this.closePopup();
+        }
+      });
+    })();
+
+    /*
+
     Swal.fire({
       title: 'Request OPD claim',
       text: 'Confirm',
@@ -73,7 +147,7 @@ export class OpdComponent implements OnInit {
           this.closePopup();
         });
       }
-    });
+    });*/
   }
 
   closePopup() {

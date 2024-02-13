@@ -5,7 +5,7 @@ import {
 } from 'src/app/tableFactory/tableModel/table-settings.model';
 import { VoucherDataSource } from './voucher-dataSource';
 import { AuthServiceService } from 'src/app/service/auth-service.service';
-import { catchError, delay, finalize, of } from 'rxjs';
+import { catchError, of } from 'rxjs';
 import { Claim } from 'src/app/Model/claim';
 import Swal from 'sweetalert2';
 
@@ -19,7 +19,7 @@ export class VoucherComponent implements OnInit {
   columnDefinition: ColumnSettingsModel[] = [];
   tablePaginationSettings: TablePaginationSettingsModel = <
     TablePaginationSettingsModel
-  >{};
+    >{};
 
   rowData!: Claim[];
   selectedClaims!: Claim[];
@@ -93,10 +93,10 @@ export class VoucherComponent implements OnInit {
       this.tobeUpdated.push({
         criteria: 'forwordfinance',
         id: s.id,
-        financeSendDate:null,
-        paidAmount:s.paidAmount,
+        financeSendDate: null,
+        paidAmount: s.paidAmount,
         claimStatus: 'finance',
-        voucherId: new Date().getMilliseconds(),
+        voucherId: 0,
       });
       return s.empNo + '-' + s.paidAmount;
     });
@@ -109,10 +109,12 @@ export class VoucherComponent implements OnInit {
       showLoaderOnConfirm: true,
       preConfirm: async () => {
         const ret = this.auth.updateClaim(this.tobeUpdated).subscribe((a) => {
-            if (a == 1) {
-              return Swal.showValidationMessage('Updated');
-            } else return Swal.showValidationMessage('Not Updated Try againg');
-          });
+          if (a >= 1) {
+            this.selectedClaims = <Claim[]>{};
+            this.reload();
+            return Swal.showValidationMessage('Updated');
+          } else return Swal.showValidationMessage('Not Updated Try againg');
+        });
         return ret;
       },
       allowOutsideClick: () => !Swal.isLoading(),

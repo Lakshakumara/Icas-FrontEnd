@@ -11,18 +11,18 @@ import { Observable, filter, map, merge, startWith, tap } from 'rxjs';
 import { FormBuilder, FormControl, Validators } from '@angular/forms';
 import { SchemeTitles } from 'src/app/Model/scheme';
 import { SchemeService } from 'src/app/service/scheme.service';
-
+import { Constants } from 'src/app/util/constants';
 export const _filter = (opt: string[], value: string): string[] => {
   const filterValue = value.toLowerCase();
   return opt.filter((item) => item.toLowerCase().includes(filterValue));
 };
 
 @Component({
-  selector: 'app-mec-opd',
-  templateUrl: './mec-opd.component.html',
-  styleUrls: ['./mec-opd.component.css'],
+  selector: 'app-mec',
+  templateUrl: './mec.component.html',
+  styleUrls: ['./mec.component.css'],
 })
-export class MecOpdComponent implements OnInit {
+export class MecComponent implements OnInit {
   panelOpenState = false;
   claim!: Claim;
   selectedClaim!: Claim;
@@ -51,16 +51,36 @@ export class MecOpdComponent implements OnInit {
 
   formGroup = this.fb.group({
     stateGroup: new FormControl('', [Validators.required]),
-    deductionAmount: new FormControl(''),
+    deductionAmount: new FormControl(
+      { value: <number>{}, disabled: true },
+      Validators.required
+    ),
     mecremarks: new FormControl('', [Validators.required]),
-    mecreturndate: new FormControl(''),
-    rejected: new FormControl(false),
-    rejecteddate: new FormControl(''),
+    mecreturndate: new FormControl(new Date()),
     rejectremarks: new FormControl(
       { value: '', disabled: true },
       Validators.required
     ),
   });
+
+  onRadioButtonChange(event: any) {
+    switch (event.value) {
+      case 'r':
+        this.formGroup.controls.rejectremarks.enable();
+        //this.formGroup.controls.rejecteddate.value();
+        this.formGroup.controls.deductionAmount.disable();
+        break;
+      case 'd':
+        this.formGroup.controls.deductionAmount.enable();
+        this.formGroup.controls.rejectremarks.disable();
+        break;
+      case 'a':
+        this.formGroup.controls.rejectremarks.disable();
+        this.formGroup.controls.deductionAmount.disable();
+        break;
+    }
+  }
+
   disableField(checked: any) {
     if (!checked) {
       this.formGroup.controls.rejectremarks.disable();
@@ -102,9 +122,12 @@ export class MecOpdComponent implements OnInit {
   }
 
   loadClaimPage() {
-    this.selectedMember=<Member[]>{};
+    this.selectedMember = <Member[]>{};
     this.selectedClaim = <Claim>{};
-    this.dataSource.requestData('%', 'mec');
+    this.dataSource.requestData(
+      '%',
+      Constants.CLAIMSTATUS_MEDICAL_DECISION_PENDING
+    );
     if (this.dataSource.paginator) {
       this.dataSource.paginator.firstPage();
     }
@@ -113,32 +136,35 @@ export class MecOpdComponent implements OnInit {
     this.selectedMember = [claim.member];
     this.selectedClaim = claim;
   }
-  loadMedicalHistory() {
-  
-  }
+  loadMedicalHistory() {}
 
   updateClaim() {
+    //TTTTTTTTTTTTTTTTTTTTTT do
+    //this.stateGroups.includes(this.formGroup.value.stateGroup);
     let scheme = this.formGroup.value.stateGroup?.split('-');
-    if (scheme == null) return;
+    if (scheme != undefined) {
+      //this.stateGroups.filter(s => s.idText == scheme);
+    } else return;
 
     this.tobeUpdated = [];
-      this.tobeUpdated.push({
-        criteria: 'opdupdate',
-        id: this.selectedClaim.id,
-        claimStatus: 'mec_approved',
-        idText: scheme[1],
-        requestAmount: this.selectedClaim.requestAmount,
-        deductionAmount: this.formGroup.value.deductionAmount,
-        mecremarks: this.formGroup.value.mecremarks,
-        mecreturndate: new Date(),
-        rejecteddate: this.formGroup.value.rejected ? new Date() : null,
-        rejectremarks: this.formGroup.value.rejected
-          ? this.formGroup.value.rejectremarks
-          : null,
-      });
+    this.tobeUpdated.push({
+      criteria: this.selectedClaim.category,
+      id: this.selectedClaim.id,
+      claimStatus: Constants.CLAIMSTATUS_MEDICAL_DECISION_APPROVED,
+      idText: scheme[1],
+      requestAmount: this.selectedClaim.requestAmount,
+      deductionAmount: this.formGroup.value.deductionAmount,
+      mecremarks: this.formGroup.value.mecremarks,
+      mecreturndate: this.formGroup.value.mecreturndate,
+      rejecteddate:
+        this.formGroup.value.rejectremarks == undefined
+          ? undefined
+          : new Date(),
+      rejectremarks: this.formGroup.value.rejectremarks,
+    });
 
     console.log(this.tobeUpdated);
-    Swal.fire({
+    /*Swal.fire({
       title: 'Update Details',
       icon: 'question',
       showCancelButton: true,
@@ -158,9 +184,10 @@ export class MecOpdComponent implements OnInit {
       if (result.isConfirmed) {
         Swal.fire('Saving', '', 'info');
       }
-    });
+    });*/
   }
-  
+
+  addClaimTitle() {}
   private _filterGroup(value: string): SchemeTitles[] {
     if (value) {
       return this.stateGroups
@@ -175,5 +202,15 @@ export class MecOpdComponent implements OnInit {
   }
   click() {
     console.log('selected', this.formGroup.value);
+  }
+  onValueChange(evt: any) {
+    var target = evt.target;
+    console.log('target ', target.checked);
+    /*if (target.checked) {
+      doSelected(target);
+      this._prevSelected = target;
+    } else {
+      doUnSelected(this._prevSelected)
+    }*/
   }
 }

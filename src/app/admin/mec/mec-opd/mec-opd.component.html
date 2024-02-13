@@ -108,7 +108,8 @@
         </tr>
         <tr>
           <td>
-            Request Amount: <b>{{ selectedClaim.requestAmount | currency }}</b>
+            Request Amount:
+            <b>{{ selectedClaim.requestAmount | currency : "Rs." }}</b>
           </td>
           <td>
             Designation: <b>{{ selectedClaim.member.designation }}</b>

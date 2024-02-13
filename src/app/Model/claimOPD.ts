@@ -21,9 +21,6 @@ export interface ClaimOPD{
     requestAmount: number,
     deductionAmount: number,
     paidAmount: number,
-    place: string,
-    nature: string,
-    incident: string,
     claimStatus: string,
 
     claimCount:number,

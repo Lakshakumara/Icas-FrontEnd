@@ -45,6 +45,9 @@ import { ProfileComponent } from './login-v1/profile/profile.component';
 
 import { OnlyNumberDirective } from './util/only-number.directive';
 import { ClaimManageComponent } from './admin/gad/subject/claim-manage/claim-manage.component';
+import { MecComponent } from './admin/mec/mec/mec.component';
+import { ChipSelectorComponent } from './util/my/chip-selector/chip-selector.component';
+
 
 @NgModule({
   declarations: [
@@ -79,6 +82,8 @@ import { ClaimManageComponent } from './admin/gad/subject/claim-manage/claim-man
     ClaimFormComponent,
     ProfileComponent,
     ClaimManageComponent,
+    MecComponent,
+    ChipSelectorComponent,
   ],
   imports: [
     BrowserModule,

@@ -45,7 +45,6 @@ export class MemberComponent implements OnInit, AfterViewInit {
   ngOnInit() {
     this.loggeduser = this.share.getUser();
     if (this.loggeduser == null) this.router.navigate(['/signin']);
-    //this.member = this.route.snapshot.data['playload'];
     this.dataSource = new MemberDataSource(this.auth);
     this.dataSource.loadMember('notAccept');
   }
@@ -72,6 +71,8 @@ export class MemberComponent implements OnInit, AfterViewInit {
       .subscribe();
   }
   loadMemberPage() {
+    this.member = <Member>{};
+    this.regAccept = false;
     this.dataSource.loadMember('notAccept'); // this.input.nativeElement.value
   }
   onRowClicked(member: Member) {
@@ -100,7 +101,10 @@ export class MemberComponent implements OnInit, AfterViewInit {
           .update('memberAccept', this.regAcceptData)
           .subscribe((a) => {
             console.log('a ', a);
-            if (a == 1) return Swal.showValidationMessage('Updated');
+            if (a >= 1) {
+              this.loadMemberPage();
+              return Swal.showValidationMessage('Updated');
+            }
             else return Swal.showValidationMessage(' Not Updated Try againg');
           });
 
@@ -110,7 +114,6 @@ export class MemberComponent implements OnInit, AfterViewInit {
     }).then((result) => {
       if (result.isConfirmed) {
         Swal.fire('Saving', '', 'success');
-        this.loadMemberPage();
       }
     });
   }

@@ -59,7 +59,7 @@ export class UserOPDDataSource extends DataSource<ClaimOPD> {
   loadClaims(claimType: string, year:number, empNo: string, claimStatus: string,
      filter = '', sortDirection = 'asc', pageIndex = 0 , pageSize = 10) {
         this.loadingSubject.next(true);
-        this.auth.getClaims(claimType, year, empNo, claimStatus, filter, sortDirection, pageIndex, pageSize)
+        this.auth.getAllClaims(claimType, year, empNo, claimStatus, filter, sortDirection, pageIndex, pageSize)
         .pipe(
             catchError(() => of([])),
             finalize(() => this.loadingSubject.next(false))

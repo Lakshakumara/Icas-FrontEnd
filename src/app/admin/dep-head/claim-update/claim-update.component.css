@@ -1,7 +1,9 @@
 .full-width {
     width: 100%;
 }
-
+h1{
+    justify-content: center;
+}
 a {
     list-style: none;
     display: inline-block;

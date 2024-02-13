@@ -17,6 +17,7 @@ import { RegistrationComponent } from '../admin/gad/subject/registration/registr
 import { ProfileComponent } from '../login-v1/profile/profile.component';
 import { ClaimManageComponent } from '../admin/gad/subject/claim-manage/claim-manage.component';
 import { TestComponent } from '../test/test.component';
+import { MecComponent } from '../admin/mec/mec/mec.component';
 
 const routes: Routes = [
   { path: 'home', component: HomePageComponent},
@@ -41,7 +42,7 @@ const routes: Routes = [
   {path:'admin/gad/subject/voucher', component:VoucherComponent},
 
   {path:'admin/mec/opd', component:MecOpdComponent},
-  {path:'admin/mec/hs', component:MecHsComponent},
+  {path:'admin/mec/hs', component:MecComponent},
 
   {path:'admin/super/scheme', component:SchemePlanComponent},
   {path:'admin/super/access', component:AccessComponent},

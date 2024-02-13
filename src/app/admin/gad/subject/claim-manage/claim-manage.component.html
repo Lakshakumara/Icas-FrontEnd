@@ -11,7 +11,7 @@
 
             <mat-form-field >
                 <mat-label>Choose a Claim Status</mat-label>
-                <mat-select [(ngModel)]="claimViewOptionSelected" (selectionChange)="claimStatusChange()">
+                <mat-select [(ngModel)]="claimViewOptionSelected" (selectionChange)="loadClaimPage()">
                   <mat-option [value]="claimViewOption" *ngFor="let claimViewOption of claimViewOptions">{{claimViewOption}}
                   </mat-option>
                 </mat-select>

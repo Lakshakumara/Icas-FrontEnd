@@ -33,7 +33,6 @@ export class MecHsComponent implements OnInit{
   constructor(private auth: AuthServiceService, private route: ActivatedRoute) { }
 
   ngOnInit() {
-    this.selectedClaim = this.route.snapshot.data["playload"];
     this.dataSource = new MECDataSource(this.auth);
     this.dataSource.requestData('%', "mec");
   }
