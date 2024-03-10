@@ -5,11 +5,11 @@ import { merge } from 'rxjs';
 import { AuthServiceService } from 'src/app/service/auth-service.service';
 import { Claim } from 'src/app/Model/claim';
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { MECDataSource } from '../mec-dataSource';
 import { MEC_Column_Accept } from 'src/app/Model/claim';
 import { Member } from 'src/app/Model/member';
 import { ActivatedRoute } from '@angular/router';
 import { Constants } from 'src/app/util/constants';
+import { LoadDataSource } from 'src/app/util/LoadData';
 
 @Component({
   selector: 'app-mec-hs',
@@ -21,7 +21,7 @@ export class MecHsComponent implements OnInit{
   selectedClaim !: Claim;
   claimHistory!: Claim[];
   claimCategories = Constants.claimCategory
-  dataSource!: MECDataSource;
+  dataSource!: LoadDataSource;
   displayedColumn: string[] = MEC_Column_Accept.map((col) => col.key);
   columnsSchema: any = MEC_Column_Accept;
 
@@ -33,8 +33,7 @@ export class MecHsComponent implements OnInit{
   constructor(private auth: AuthServiceService, private route: ActivatedRoute) { }
 
   ngOnInit() {
-    this.dataSource = new MECDataSource(this.auth);
-    this.dataSource.requestData('%', "mec");
+    this.dataSource = new LoadDataSource(this.auth);
   }
   ngAfterViewInit() {
     this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
@@ -55,7 +54,7 @@ export class MecHsComponent implements OnInit{
   }
 
   loadClaimPage() {
-    this.dataSource.requestData('%', "mec");
+    this.dataSource.requestData(Constants.CATEGORY_SHE, Constants.CLAIMSTATUS_MEDICAL_DECISION_PENDING);
   }
   onRowClicked(claim: Claim) {
     console.log("claim ", claim);

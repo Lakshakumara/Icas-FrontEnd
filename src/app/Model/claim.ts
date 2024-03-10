@@ -10,7 +10,7 @@ export interface Claim {
   member: Member;
   dependant: Dependant;
 
-  claimData: ClaimData;
+  claimData: ClaimData[];
   category: string;
   requestFor: string;
 
@@ -65,7 +65,7 @@ export const Claim_All = [
     label: 'ID',
   },
   {
-    key: 'member.empNo',
+    key: 'empNo',
     type: 'text',
     label: 'Emp NO',
   },

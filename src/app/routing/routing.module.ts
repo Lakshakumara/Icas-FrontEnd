@@ -6,7 +6,6 @@ import { RegisterComponent } from '../register/register.component';
 import { LoginV1Component } from '../login-v1/login-v1.component';
 import { SchemePlanComponent } from '../admin/super/scheme-plan/scheme-plan.component';
 import { ClaimUpdateComponent } from '../admin/dep-head/claim-update/claim-update.component';
-import { MecOpdComponent } from '../admin/mec/mec-opd/mec-opd.component';
 import { MecHsComponent } from '../admin/mec/mec-hs/mec-hs.component';
 import { VoucherComponent } from '../admin/gad/head/voucher.component';
 import { UserOPDComponent } from '../tableFactory/user-opd/user-opd.component';
@@ -18,6 +17,7 @@ import { ProfileComponent } from '../login-v1/profile/profile.component';
 import { ClaimManageComponent } from '../admin/gad/subject/claim-manage/claim-manage.component';
 import { TestComponent } from '../test/test.component';
 import { MecComponent } from '../admin/mec/mec/mec.component';
+import { Constants } from '../util/constants';
 
 const routes: Routes = [
   { path: 'home', component: HomePageComponent},
@@ -41,8 +41,8 @@ const routes: Routes = [
   {path:'admin/gad/subject/claimupdate', component:ClaimManageComponent},
   {path:'admin/gad/subject/voucher', component:VoucherComponent},
 
-  {path:'admin/mec/opd', component:MecOpdComponent},
-  {path:'admin/mec/hs', component:MecComponent},
+  {path:'admin/mec/opd', component:MecComponent, data: {param: Constants.CATEGORY_OPD}},
+  {path:'admin/mec/hs', component:MecComponent, data: {param: Constants.CATEGORY_SHE}},
 
   {path:'admin/super/scheme', component:SchemePlanComponent},
   {path:'admin/super/access', component:AccessComponent},

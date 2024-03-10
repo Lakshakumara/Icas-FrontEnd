@@ -1,7 +1,17 @@
 .full-width {
     width: 100%;
 }
-
+.hori {
+    display: flex;
+    margin-right: 16px;
+    margin-left: 16px;
+    width: 100%;
+    align-items: baseline;
+    gap: 20px;
+  }
+  .memberData {
+    width: 250px;
+  }
 a {
     list-style: none;
     display: inline-block;
@@ -9,7 +19,10 @@ a {
     display: flex;
     justify-content: left;
 }
-
+h1, table{
+    margin-left: 16px;
+    overflow: auto;
+  }
 .mat-mdc-table .mdc-data-table__row:hover {
     background-color: rgba(236, 236, 236, 0.514) !important;
 }

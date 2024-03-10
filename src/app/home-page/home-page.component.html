@@ -9,9 +9,9 @@
       <mat-card-title>OPD Reimbursement</mat-card-title>
     </mat-card-header>
     <mat-card-content>
-      <mat-label>Requested {{opdRequestSum | currency:'Rs.'}}</mat-label>
+      <mat-label>Requested {{ opdRequestSum | currency : "Rs." }}</mat-label>
       <br />
-      <mat-label>Paid {{opdPaidSum | currency:'Rs.'}}</mat-label>
+      <mat-label>Paid {{ opdPaidSum | currency : "Rs." }}</mat-label>
     </mat-card-content>
 
     <mat-card-actions>
@@ -31,9 +31,9 @@
       <mat-card-title>Surgical & Hospital Charges</mat-card-title>
     </mat-card-header>
     <mat-card-content>
-      <mat-label>Requested {{hsRequestSum | currency:'Rs.'}}</mat-label>
+      <mat-label>Requested {{ hsRequestSum | currency : "Rs." }}</mat-label>
       <br />
-      <mat-label>Paid {{hsPaidSum | currency:'Rs.'}}</mat-label>
+      <mat-label>Paid {{ hsPaidSum | currency : "Rs." }}</mat-label>
     </mat-card-content>
     <mat-card-actions>
       <button mat-raised-button color="primary" (click)="hospitalClaim()">
@@ -54,7 +54,7 @@
 
     <mat-card-content> </mat-card-content>
     <mat-card-actions>
-      <button mat-raised-button color="primary" (click)="newClaimTest()">
+      <button mat-raised-button color="primary" (click)="inquiry()">
         Inquires
       </button>
     </mat-card-actions>

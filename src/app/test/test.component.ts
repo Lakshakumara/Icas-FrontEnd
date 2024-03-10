@@ -56,6 +56,7 @@ export class TestComponent implements OnInit {
   }
 
   ngOnInit() {
+    
     this.schemeService.getSchemeTitle().subscribe((title: SchemeTitles[]) => {
       title.forEach((st)=>{
         st.idText.map((t)=>{

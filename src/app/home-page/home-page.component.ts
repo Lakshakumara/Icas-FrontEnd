@@ -5,11 +5,10 @@ import { SharedService } from '../shared/shared.service';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { HospitalComponent } from '../pop/hospital/hospital.component';
-import { ClaimFormComponent } from '../pop/claim-form/claim-form.component';
 import { Member } from '../Model/member';
-import { catchError, finalize } from 'rxjs';
 import { Claim } from '../Model/claim';
 import { Utils } from '../util/utils';
+import { Constants } from '../util/constants';
 
 @Component({
   selector: 'app-home-page',
@@ -43,21 +42,19 @@ export class HomePageComponent implements OnInit {
       .subscribe((receiveData: any) => {
         this.claimSummary = receiveData
         this.claimSummary.forEach((c) => {
-          if (c.category == 'opd') {
+          if (c.category == Constants.CATEGORY_OPD) {
             this.opdRequestSum += c.requestAmount;
             this.opdPaidSum += c.paidAmount;
-          } else {
+          } else if (c.category == Constants.CATEGORY_SHE){
             this.hsRequestSum += c.requestAmount;
             this.hsPaidSum += c.paidAmount;
           }
         })
       });
-
-
   }
 
-  newClaimTest() {
-    this.Openpopup(0, 'New Claims', ClaimFormComponent, HomePageComponent);
+  inquiry() {
+    Constants.Toast.fire("Under Construction");
   }
 
   opdClaim() {

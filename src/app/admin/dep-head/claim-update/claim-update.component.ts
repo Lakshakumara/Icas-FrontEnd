@@ -9,6 +9,7 @@ import Swal from 'sweetalert2';
 import { Claim, Claim_Head_Accept } from 'src/app/Model/claim';
 import { ClaimDataSource } from './claim-dataSource';
 import { SharedService } from 'src/app/shared/shared.service';
+import { Constants } from 'src/app/util/constants';
 
 @Component({
   selector: 'app-claim-update',
@@ -18,13 +19,13 @@ import { SharedService } from 'src/app/shared/shared.service';
 export class ClaimUpdateComponent implements OnInit {
   loggeduser: any;
   claim !: Claim;
-  selectedClaim !: Claim;
+  selectedClaim!: Claim | null;
 
   dataSource!: ClaimDataSource;
   displayedColumn: string[] = Claim_Head_Accept.map((col) => col.key);
   columnsSchema: any = Claim_Head_Accept;
 
-  selectedData!: Member[];
+
   search: any;
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -37,7 +38,7 @@ export class ClaimUpdateComponent implements OnInit {
     this.loggeduser = this.share.getUser();
     if (this.loggeduser == null) this.router.navigate(['/signin']);
     this.dataSource = new ClaimDataSource(this.auth);
-    this.dataSource.requestData("pending");
+    this.dataSource.requestData(Constants.CLAIMSTATUS_PENDING);
   }
   ngAfterViewInit() {
     this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
@@ -54,45 +55,48 @@ export class ClaimUpdateComponent implements OnInit {
   }
 
   loadClaimPage() {
-    this.selectedData = <Member[]>{};
-    this.selectedClaim = <Claim>{};
-    this.dataSource.requestData("pending");
+
+    this.selectedClaim = null;
+    this.dataSource.requestData(Constants.CLAIMSTATUS_PENDING);
     console.log("Claim Loaded")
   }
   onRowClicked(claim: Claim) {
-    this.selectedData = [claim.member];
     this.selectedClaim = claim;
   }
 
   acceptClaim() {
+    if(this.selectedClaim == null) return
     let tobeUpdated: any = [];
     tobeUpdated.push({
       criteria: "headaccept",
       id: this.selectedClaim.id,
-      claimStatus: "head_approved",
+      claimStatus: Constants.CLAIMSTATUS_HEAD_APPROVED,
       acceptedBy: this.loggeduser.id,
     });
 
     Swal.fire({
-      title: 'Update Details',
+      title: 'Accept claim',
       icon: 'question',
       showCancelButton: true,
-      confirmButtonText: 'Update',
+      confirmButtonText: 'Accept',
       showLoaderOnConfirm: true,
       preConfirm: async () => {
-        const ret = this.auth.updateClaim(tobeUpdated).subscribe((a) => {
+        return await this.auth.updateClaim_new(tobeUpdated)
+       /* .subscribe((a) => {
           if (a >= 1) {
-            return Swal.showValidationMessage('Updated');
+            return Swal.showValidationMessage('Accepted');
           }
           else return Swal.showValidationMessage(' Not Updated Try againg');
         });
-        return ret;
+        return ret;*/
       },
       allowOutsideClick: () => !Swal.isLoading(),
     }).then((result) => {
       if (result.isConfirmed) {
-        Swal.fire('Saving', '', 'info');
-        this.loadClaimPage();
+        if (result.value >= 1) {
+          Swal.fire('Claim Accepted', '', 'success');
+          this.loadClaimPage();
+        } else Swal.fire('Error', "Failed to Accept", 'error');
       }
     });
   }

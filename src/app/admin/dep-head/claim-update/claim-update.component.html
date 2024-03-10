@@ -9,15 +9,15 @@
         </mat-form-field>
       </mat-card-content>
 
-      <div *ngIf="selectedData">
+      <div *ngIf="selectedClaim">
         <fieldset>
           <legend>Selected Member</legend>
-          <li *ngFor="let m of selectedData">
-            <a>EmpNo: {{m.empNo}}</a>
-            <a>Name: {{m.name}}</a>
-            <span>NIC: {{m.nic}}</span>
+          <li>
+            <a>EmpNo: {{selectedClaim.member.empNo}}</a>
+            <a>Name: {{selectedClaim.member.name}}</a>
+            <span>NIC: {{selectedClaim.member.nic}}</span>
           </li>
-          <button mat-button color="primary" (click)="acceptClaim()">Accept Claim Sheet</button>
+          <button mat-raised-button color="primary" (click)="acceptClaim()">Accept Claim Sheet</button>
         </fieldset>
 
         <!--fieldset>

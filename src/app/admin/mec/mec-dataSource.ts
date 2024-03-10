@@ -4,15 +4,15 @@ import { MatSort } from '@angular/material/sort';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { Observable, BehaviorSubject, of } from 'rxjs';
 import { AuthServiceService } from 'src/app/service/auth-service.service';
-import { ClaimOPD } from 'src/app/Model/claimOPD';
+import { Claim } from 'src/app/Model/claim';
 
-export class MECDataSource extends DataSource<ClaimOPD> {
-    data: ClaimOPD[] | undefined;
+export class MECDataSource extends DataSource<Claim> {
+    //data: Claim[] | undefined;
     paginator: MatPaginator | undefined;
     sort: MatSort | undefined;
     filter: string ="";
 
-    private claimSubject = new BehaviorSubject<ClaimOPD[]>([]);
+    private claimSubject = new BehaviorSubject<Claim[]>([]);
     private loadingSubject = new BehaviorSubject<boolean>(false);
     public loading$ = this.loadingSubject.asObservable();
 
@@ -23,7 +23,7 @@ export class MECDataSource extends DataSource<ClaimOPD> {
      * the returned stream emits new items.
      * @returns A stream of the items to be rendered.
      */
-    connect(collectionViewer: CollectionViewer): Observable<ClaimOPD[]> {
+    connect(collectionViewer: CollectionViewer): Observable<Claim[]> {
         return this.claimSubject.asObservable();
     }
 
@@ -35,12 +35,11 @@ export class MECDataSource extends DataSource<ClaimOPD> {
         this.claimSubject.complete();
         this.loadingSubject.complete();
     }
-
+/*
     requestData(claimType:string, claimStatus: string,
         filter= this.filter, sortDirection = 'asc', pageIndex = this.paginator?.pageIndex, pageSize = this.paginator?.pageSize) {
 
         this.loadingSubject.next(true);
-        console.log("send claimStatus ", claimStatus)
         this.auth.getAllClaims(claimType, 0, '', claimStatus, filter, sortDirection, pageIndex, pageSize)
             .pipe(
                 catchError(() => of([])),
@@ -49,4 +48,26 @@ export class MECDataSource extends DataSource<ClaimOPD> {
             .subscribe((receiveData: any) => this.claimSubject.next(receiveData));
         console.log("fetch data set ", this.claimSubject)
     }
+    
+    async loadCurrentClaimData(claimId: number) {
+        this.loadingSubject.next(true);
+        let currentClaimData: any[] = [];
+        return this.auth.getClaim(claimId)
+          .then((claim) => {
+            let x = <any><unknown>claim;
+            x.claimData.forEach((d:any) => {
+              let status: string;
+              if (d.rejectedDate != null) status = " Rejected - " + d.rejectRemarks;
+              else if (d.deductionAmount != null) status = " Deducted - Rs. " + d.deductionAmount;
+              else status = (d.remarks == null)?"Approved ":"Approved - "+d.remarks;
+    
+              currentClaimData.push({
+                title: d.scheme.title + "-" + d.scheme.idText,
+                status: status,
+              });
+            });
+    
+            return currentClaimData;
+          });
+      }*/
 }

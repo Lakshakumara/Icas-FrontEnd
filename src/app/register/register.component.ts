@@ -18,6 +18,7 @@ import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
 import { BeneficiaryComponent } from './beneficiary/beneficiary.component';
 import { Member } from '../Model/member';
+import { Constants } from '../util/constants';
 
 @Component({
   selector: 'app-register',
@@ -26,7 +27,7 @@ import { Member } from '../Model/member';
 })
 export class RegisterComponent implements OnInit {
   formGroup!: FormGroup;
-  schemeType: string = 'Individual';
+  schemeType: string = Constants.SCHEME_INDIVIDUAL;
   member!: Member;
   data!: any;
   Roles: any = [
@@ -75,10 +76,13 @@ export class RegisterComponent implements OnInit {
       if (
         this.member.memberRegistrations &&
         this.member.memberRegistrations.find((r) => {
-          return r.year == Utils.currentYear - 1 && r.schemeType == 'Family';
+          return (
+            r.year == Utils.currentYear - 1 &&
+            r.schemeType == Constants.SCHEME_FAMILY
+          );
         })
       ) {
-        this.schemeType = 'Family';
+        this.schemeType = Constants.SCHEME_FAMILY;
         if (this.member.dependants)
           this.member.dependants.forEach((d) => {
             this.dependantData.data = [d, ...this.dependantData.data];
@@ -225,7 +229,7 @@ export class RegisterComponent implements OnInit {
         this.setDep();
         this.setBen();
         this.formGroup.patchValue({
-          roles: [{ role: 'user' }],
+          roles: [{ role: Constants.ROLE_USER }],
           memberRegistrations: [
             {
               id: null,
@@ -235,8 +239,8 @@ export class RegisterComponent implements OnInit {
           ],
           mDate: Utils.today,
           registrationOpen: 0,
-          status: 'pending',
-          password: 'user',
+          status: Constants.REGISTRATION_PENDING,
+          password: Constants.DEFAULT_PASSWORD,
           scheme: this.schemeType,
         });
         console.log('tobe insert ', this.formGroup.value);
@@ -261,7 +265,23 @@ export class RegisterComponent implements OnInit {
                       m.empNo
                     );
                   }
-                  this.router.navigate(['/home']);
+
+                  const reg = m.memberRegistrations.find((r) => {
+                    return (
+                      r.year == Utils.currentYear && r.acceptedDate != null
+                    );
+                  });
+                  if (reg !== undefined) {
+                    this.router.navigate(['/home']);
+                  } else {
+                    Swal.fire(
+                      'Membership acceptace is required',
+                      `Contact Department Head`,
+                      'warning'
+                    ).then(() => {
+                      this.router.navigate(['/signin']);
+                    });
+                  }
                 });
                 this.formGroup.reset();
                 return m;
@@ -271,8 +291,6 @@ export class RegisterComponent implements OnInit {
       allowOutsideClick: () => !Swal.isLoading(),
     }).then((result) => {
       if (result.isConfirmed) {
-        console.log('result ', result);
-        console.log('result.value ', result.value);
       }
     });
   }
@@ -449,11 +467,11 @@ export class RegisterComponent implements OnInit {
     return data;
   }
   editBenificiary(name: any) {
-    this.Openpopup(2, name, 'Add Benificiary details', BeneficiaryComponent);
+    this.Openpopup(2, name, 'Add Beneficiary details', BeneficiaryComponent);
   }
 
   removeBenificiary(name: string) {
-    console.log('before removing Benificiary ', this.beneficiaryData.data);
+    console.log('before removing Beneficiary ', this.beneficiaryData.data);
     this.beneficiaryData.data = this.beneficiaryData.data.filter(
       (u: Beneficiary) => {
         u.name !== name;

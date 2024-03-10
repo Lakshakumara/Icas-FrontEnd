@@ -7,7 +7,6 @@ import { LoaderService } from '../service/loader.service';
 import { Utils } from '../util/utils';
 import Swal from 'sweetalert2';
 import { Scheme } from '../Model/scheme';
-import { Constants } from '../util/constants';
 
 @Component({
   selector: 'app-login-v1',

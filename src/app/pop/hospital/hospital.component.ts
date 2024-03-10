@@ -4,6 +4,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { Dependant } from 'src/app/Model/dependant';
 import { Member } from 'src/app/Model/member';
+import { Scheme } from 'src/app/Model/scheme';
 import { AuthServiceService } from 'src/app/service/auth-service.service';
 import { SharedService } from 'src/app/shared/shared.service';
 import { Constants } from 'src/app/util/constants';
@@ -22,6 +23,7 @@ export class HospitalComponent implements OnInit {
   schemeTitles!: string[];
   today = Utils.today;
   beforeThreeMonth = Utils.threeMonthbeforetoday;
+  SCHEME_INDIVIDUAL: string = Constants.SCHEME_INDIVIDUAL;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: any,
@@ -36,7 +38,10 @@ export class HospitalComponent implements OnInit {
   formGroup = this.buildr.group({
     id: this.buildr.control(''),
     memberId: this.buildr.control(0),
-    dependant: this.buildr.control({ value:<Dependant>{}, disabled:true}, Validators.required),
+    dependant: this.buildr.control(
+      { value: <Dependant>{}, disabled: true },
+      Validators.required
+    ),
     category: this.buildr.control(Constants.CATEGORY_SHE),
     requestFor: this.buildr.control(''),
 
@@ -84,7 +89,7 @@ export class HospitalComponent implements OnInit {
     claimDate: this.buildr.control(Utils.today),
     startDate: this.buildr.control(''),
     requestAmount: this.buildr.control('', Validators.required),
-    claimStatus: this.buildr.control('pending'),
+    claimStatus: this.buildr.control(Constants.CLAIMSTATUS_PENDING),
   });
 
   disableDependants(checked: any) {
@@ -121,18 +126,21 @@ export class HospitalComponent implements OnInit {
 
   ngOnInit(): void {
     this.member = this.share.getUser();
+    console.log('Member ', this.member);
     if (this.member) {
       this,
         this.member.dependants.forEach((b) => {
           this.claimers.push(b.relationship + '-' + b.name);
         });
-    }
-     else{
+    } else {
       this.router.navigate(['/signin']);
     }
   }
   onNotifySelected(schemeTitles: string[]) {
     this.schemeTitles = schemeTitles;
+  }
+  onNotifySelectedScheme(schemeTitles: Scheme[]) {
+    this.schemeTitles = [schemeTitles[0].title];
   }
 
   closePopup() {
@@ -178,12 +186,16 @@ export class HospitalComponent implements OnInit {
 
   saveClaim() {
     if (this.schemeTitles == undefined) {
+      Constants.Toast.fire('Select Scheme Titles');
       return;
     }
+
     this.formGroup.patchValue({
       memberId: this.member.id,
       requestFor: this.schemeTitles.toString(),
     });
+
+    console.log('saveClaim send to save ', this.formGroup.value);
 
     const steps = ['1', '2', '3'];
     const Queue = Swal.mixin({
@@ -204,21 +216,21 @@ export class HospitalComponent implements OnInit {
         showLoaderOnConfirm: true,
         allowOutsideClick: () => false,
         preConfirm: async () => {
-          let res:any;
-        try {
-          res = await this.authService.addClaim(this.formGroup.value);
-          console.log('received from backend ', res);
-        } catch (error) {
-          Swal.showValidationMessage(`
+          let res: any;
+          try {
+            console.log('saveClaim send to save ', this.formGroup.value);
+            res = await this.authService.addClaim(this.formGroup.value);
+            console.log('saveClaim received from backend ', res);
+          } catch (error) {
+            Swal.showValidationMessage(`
           Request failed: ${error}
         `);
-        }
-        return res;
+          }
+          return res;
         },
       });
 
       if (result.isConfirmed) {
-        console.log('Saved Result ', result);
         await Queue.fire({
           title: 'Download Claim Application',
           text: `Claim Saved ref Number: ${result.value}`,
@@ -228,9 +240,9 @@ export class HospitalComponent implements OnInit {
           allowOutsideClick: () => false,
           preConfirm: async () => {
             try {
-              let response: any = await this.authService.downloadClaim(result.value);
-              console.log('received from backend ', response);
-
+              let response: any = await this.authService.downloadClaim(
+                result.value
+              );
               let dataType = response.type;
               let binaryData = [];
               binaryData.push(response);

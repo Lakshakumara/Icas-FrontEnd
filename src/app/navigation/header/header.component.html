@@ -7,8 +7,8 @@
   <div>
     <a routerLink="/home">Home</a>
   </div>
-  <div fxFlex fxLayout fxLayoutAlign="center">
-    <a *ngIf="member">{{ member.name }}</a>
+  <div fxFlex fxLayout fxLayoutAlign="center" fxHide.xs>
+    <mat-label *ngIf="member">{{ member.name }}</mat-label>
   </div>
   <div fxFlex fxLayout fxLayoutAlign="end" fxHide.xs>
     <ul fxLayout fxLayoutGap="15px" class="navigation-items">
@@ -37,35 +37,37 @@
         </button>
       </li>
       <li>
-        <button *ngIf="isAdmin" mat-button matBadgeColor="accent" [matMenuTriggerFor]="admin">
+        <button *ngIf="isDepHead || isAdmin || isSuperAdmin || isGADHead || isMec || isMo" mat-button
+          matBadgeColor="accent" [matMenuTriggerFor]="admin">
           Admin
         </button>
       </li>
     </ul>
+
     <mat-menu #switch="matMenu">
       <button *ngFor="let role of roles" mat-menu-item>{{ role }}</button>
     </mat-menu>
 
     <mat-menu #admin="matMenu">
-      <button mat-menu-item [matMenuTriggerFor]="dep_head">
+      <button *ngIf="isDepHead" mat-menu-item [matMenuTriggerFor]="dep_head">
         Department Head
       </button>
-      <button mat-menu-item [matMenuTriggerFor]="subject_cleark">
+      <button *ngIf="isAdmin" mat-menu-item [matMenuTriggerFor]="subject_cleark">
         Claim Management
       </button>
-      <button mat-menu-item [matMenuTriggerFor]="mec">MEC</button>
-      <button mat-menu-item [matMenuTriggerFor]="super_admin">
+      <button *ngIf="isMo || isMec" mat-menu-item [matMenuTriggerFor]="mec">MEC</button>
+      <button *ngIf="isSuperAdmin" mat-menu-item [matMenuTriggerFor]="super_admin">
         Super Admin
       </button>
     </mat-menu>
+
     <mat-menu #dep_head="matMenu">
-      <button *ngIf="isDepHead" routerLink="admin/head/member" mat-menu-item>
+      <button routerLink="admin/head/member" mat-menu-item>
         Membership Acceptance
       </button>
-      <button *ngIf="isDepHead" routerLink="admin/head/claim" mat-menu-item>
+      <button routerLink="admin/head/claim" mat-menu-item>
         Claims Acceptance
       </button>
-      <button *ngIf="!isDepHead" mat-menu-item>No Access</button>
     </mat-menu>
 
     <mat-menu #subject_cleark="matMenu">
@@ -79,8 +81,8 @@
     </mat-menu>
 
     <mat-menu #mec="matMenu">
-      <button routerLink="admin/mec/opd" mat-menu-item>OPD Claims</button>
-      <button routerLink="admin/mec/hs" mat-menu-item>H&S Claims</button>
+      <button *ngIf="isMo" routerLink="admin/mec/opd" mat-menu-item>OPD Claims</button>
+      <button *ngIf="isMec" routerLink="admin/mec/hs" mat-menu-item>H&S Claims</button>
     </mat-menu>
 
     <mat-menu #super_admin="matMenu">

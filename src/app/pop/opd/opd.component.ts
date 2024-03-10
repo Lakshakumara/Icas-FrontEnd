@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, Validators } from '@angular/forms';
+import { FormBuilder, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { AuthServiceService } from 'src/app/service/auth-service.service';
 import { Utils } from 'src/app/util/utils';
@@ -7,6 +7,7 @@ import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
 import { SharedService } from 'src/app/shared/shared.service';
 import { Member } from 'src/app/Model/member';
+import { Constants } from 'src/app/util/constants';
 
 @Component({
   selector: 'app-opd',
@@ -23,8 +24,8 @@ export class OpdComponent implements OnInit {
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: any,
     private ref: MatDialogRef<OpdComponent>,
-    private buildr: FormBuilder,
     private auth: AuthServiceService,
+    private buildr: FormBuilder,
     private router: Router,
     private share: SharedService
   ) {
@@ -36,7 +37,7 @@ export class OpdComponent implements OnInit {
     /**
      * OPD or SHE(Surgical &Hospital Expenses)
      */
-    category: this.buildr.control('opd'),
+    category: this.buildr.control(Constants.CATEGORY_OPD),
     /**
      * Outdoor, Spectacles, covid test etc..
      */
@@ -44,14 +45,36 @@ export class OpdComponent implements OnInit {
     incidentDate: this.buildr.control('', Validators.required),
     claimDate: this.buildr.control(Utils.today, Validators.required),
     applyDate: this.buildr.control(''),
-    requestAmount: this.buildr.control('', Validators.required),
-    claimStatus: this.buildr.control('pending'),
+    requestAmount: this.buildr.control({ value: <number>{}, disabled: false }, Validators.required),
+    claimStatus: this.buildr.control(Constants.CLAIMSTATUS_PENDING),
   });
   ngOnInit() {
     this.member = this.share.getUser();
     if (this.member == null) {
       this.router.navigate(['/signin']);
-    } else console.log('delete', this.member);
+    }
+  }
+
+  saveValidator() {
+    if (!this.dForm.valid) return;
+    else {
+      if (
+        this.dForm.value?.requestAmount != undefined &&
+        this.dForm.value?.requestAmount > 15000
+      ) {
+        Swal.fire({
+          title: 'Request Amount is exceed the limit',
+          icon: 'warning',
+          showCancelButton: true,
+          showConfirmButton: true,
+          confirmButtonText: 'Proceed',
+        }).then((result) => {
+          if (result.isConfirmed) {
+            this.saveClaim();
+          }
+        });
+      } else this.saveClaim();
+    }
   }
   saveClaim() {
     this.dForm.patchValue({
@@ -79,6 +102,7 @@ export class OpdComponent implements OnInit {
           let claimId;
           try {
             claimId = await this.auth.saveOPD(this.dForm.value);
+            this.dForm.reset();
           } catch (error) {
             return Swal.showValidationMessage(` ${error} `);
           }
@@ -129,25 +153,6 @@ export class OpdComponent implements OnInit {
         }
       });
     })();
-
-    /*
-
-    Swal.fire({
-      title: 'Request OPD claim',
-      text: 'Confirm',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, Save',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.auth.saveOPD(this.dForm.value).subscribe((d) => {
-          Swal.fire('Saved', `Your reference number ${d}`, 'success');
-          this.closePopup();
-        });
-      }
-    });*/
   }
 
   closePopup() {

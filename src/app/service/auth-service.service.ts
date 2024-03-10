@@ -3,12 +3,10 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment.development';
 import { Member } from '../Model/member';
-import { map } from 'rxjs/operators';
+import { delay, map, tap } from 'rxjs/operators';
 import { Dependant } from '../Model/dependant';
-import { ClaimOPD } from '../Model/claimOPD';
 import { Claim } from '../Model/claim';
 import { Utils } from '../util/utils';
-import Swal from 'sweetalert2';
 
 @Injectable({
   providedIn: 'root',
@@ -16,7 +14,8 @@ import Swal from 'sweetalert2';
 export class AuthServiceService {
   private API_URL = environment.baseUrl;
 
-  constructor(private http: HttpClient) {}
+
+  constructor(private http: HttpClient) { }
 
   getMembers(
     searchFor: string,
@@ -53,6 +52,7 @@ export class AuthServiceService {
       .get(`${this.API_URL}/member/${empNo}`)
       .pipe<Member>(map((data: any) => data));
   }
+
   /**
    *
    * @param criteria Member Details
@@ -101,11 +101,7 @@ export class AuthServiceService {
         return error;
       });
   }
-  /*async saveOPD(claimOPD: any){
-    return this.http
-      .post(`${this.API_URL}/claim/opd`, claimOPD)
-      .subscribe((data: any) => data);
-  }*/
+
   login(data: any): Observable<any> {
     return this.http.post(`${this.API_URL}/member/signin`, data);
   }
@@ -141,7 +137,7 @@ export class AuthServiceService {
     sortDirection: string = 'asc',
     pageIndex: number = 0,
     pageSize: number = 10
-  ) {
+  ): Observable<Claim[]> {
     console.log('getAllClaims calls claimType= ', claimType);
     return this.http
       .get(`${this.API_URL}/claim/getAll`, {
@@ -169,69 +165,30 @@ export class AuthServiceService {
    * @param pageSize
    * @returns
    */
-  /*getClaims(
-    claimType: string,
-    year: number,
-    empNo: string,
-    claimStatus: string,
-    filter: string,
-    sortDirection: string,
-    pageIndex: number,
-    pageSize: number
-  ) {
-    console.log('getClaims calls claimType= ', claimType);
-    return this.http
-      .get(`${this.API_URL}/claim/getAll`, {
-        params: new HttpParams()
-          .set('claimType', claimType)
-          .set('year', year)
-          .set('empNo', empNo)
-          .set('claimStatus', claimStatus)
-          .set('filter', filter)
-          .set('sortOrder', sortDirection)
-          .set('pageNumber', pageIndex.toString())
-          .set('pageSize', pageSize.toString()),
+
+  async getClaim(claimId: number): Promise<Observable<Claim>> {
+    return await fetch(`${this.API_URL}/claim/get/${claimId}`, {
+      method: 'get',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then((res) => res.json())
+      .then((responseJson: any) => {
+        /*responseJson
+        .pipe(
+          tap((receivedData: Claim) => console.log(receivedData)),
+          map((receivedData: Claim) => {
+            console.log(receivedData.claimData)
+            return receivedData;
+          }));*/
+        console.log('auth getClaims ', responseJson);
+        return responseJson;
       })
-      .pipe<ClaimOPD[]>(map((res: any) => res));
-  }*/
-  /* getPendingOPDClaims(
-     filter: string,
-     sortDirection: string,
-     pageIndex: number,
-     pageSize: number
-   ) {
-     return this.getClaims(
-       'opd',
-       0,
-       '',
-       'pending',
-       filter,
-       sortDirection,
-       pageIndex,
-       pageSize
-     );
-   }
- 
-  getOPD(
-     empNo: any,
-     filter = '',
-     sortOrder = 'asc',
-     pageNumber = 0,
-     pageSize = 3
-   ): Observable<ClaimOPD[]> {
-     return this.http
-       .get(`${this.API_URL}/claim/get`, {
-         params: new HttpParams()
-           .set('type', 'opd')
-           .set('empNo', empNo)
-           .set('filter', filter)
-           .set('sortOrder', sortOrder)
-           .set('pageNumber', pageNumber.toString())
-           .set('pageSize', pageSize.toString()),
-       })
-       .pipe<ClaimOPD[]>(map((res: any) => res)); //res["payload"]
-   }
- */
+      .catch((error) => {
+        return new Error(error);
+      });
+  }
 
   async addClaim(claim: any): Promise<Observable<any>> {
     return await fetch(`${this.API_URL}/claim/add`, {
@@ -251,26 +208,15 @@ export class AuthServiceService {
       });
   }
 
-  updateClaim(claim: any): Observable<any> {
-    return this.http
-      .put(`${this.API_URL}/claim/update`, claim)
-      .pipe<number>(map((data: any) => data));
-  }
-
-  async updateMECClaim(claim: any): Promise<Observable<any>> {
-    try {
-      const response = await fetch(`${this.API_URL}/claim/add`, {
-        method: 'post',
-        body: JSON.stringify(claim), // data can be `string` or {object}!
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      if (response.ok) return response.json();
-      else throw Error('Error generating pdf');
-    } catch (error) {
-      throw Error('Failed to Fetch data');
-    }
+  async updateClaim_new(claim: any) {
+    const response = await fetch(`${this.API_URL}/claim/update`, {
+      method: 'put',
+      body: JSON.stringify(claim),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    return response.json();
   }
 
   getDashboardData(year: number, empNo: string): any {
@@ -330,7 +276,17 @@ export class AuthServiceService {
         return error;
       });
   }
-
+  async getVouchers(): Promise<number[]> {
+    try {
+      const response = await fetch(
+        `${this.API_URL}/claim/voucherIds`
+      );
+      if (response.ok) return response.json();
+      else throw Error('Error getting Voucher');
+    } catch (error) {
+      throw Error('Failed to Fetch data');
+    }
+  }
   async downloadClaim(claimId: number) {
     try {
       const response = await fetch(
@@ -341,6 +297,41 @@ export class AuthServiceService {
     } catch (error) {
       throw Error('Failed to Fetch data');
     }
+  }
+
+  async downloadVoucher(voucherId: number) {
+    try {
+      const response = await fetch(
+        `${this.API_URL}/download/voucher/${voucherId}`
+      );
+      if (response.ok) return response.blob();
+      else throw Error('Error generating pdf');
+    } catch (error) {
+      throw Error('Failed to Fetch data');
+    }
+  }
+
+  async deleteClaimData(id: number): Promise<boolean> {
+    try {
+      const response = await fetch(
+        `${this.API_URL}/claim/delete/${id}`, {
+        method: 'delete',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+      );
+      if (response.ok) return response.json();
+      else throw Error('Error deleting Item');
+    } catch (error) {
+      throw Error('Failed to communicate');
+    }
+  }
+
+  async waiter(claim: any = '') {
+    setTimeout(function () {
+      return 100;
+    }, 10000);
   }
 
   /*update(criteria: string, data: any): Observable<number> {
@@ -354,5 +345,73 @@ export class AuthServiceService {
   /* updateMember(criteria: string, data: any) {
     console.log('updateMember ', criteria, data);
     return this.http.post(`${this.API_URL}/member/signup`, data);
+  }
+  // not used 
+  updateClaim(claim: any): Observable<any> {
+    return this.http
+      .put(`${this.API_URL}/claim/update`, claim)
+      .pipe<number>(map((data: any) => data));
+  }
+
+async updateClaim_async(claim: any): Promise<Observable<any>> {
+    try {
+      const response = await fetch(`${this.API_URL}/claim/update`, {
+        method: 'put',
+        body: JSON.stringify(claim), // data can be `string` or {object}!
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      if (response.ok) return response.json();
+      else throw Error('Error generating pdf');
+    } catch (error) {
+      throw Error('Failed to Fetch data');
+    }
   }*/
+  /*async saveOPD(claimOPD: any){
+  return this.http
+    .post(`${this.API_URL}/claim/opd`, claimOPD)
+    .subscribe((data: any) => data);
+}*/
+
+  /* getPendingOPDClaims(
+   filter: string,
+   sortDirection: string,
+   pageIndex: number,
+   pageSize: number
+ ) {
+   return this.getClaims(
+     'opd',
+     0,
+     '',
+     'pending',
+     filter,
+     sortDirection,
+     pageIndex,
+     pageSize
+   );
+ }
+ 
+getOPD(
+   empNo: any,
+   filter = '',
+   sortOrder = 'asc',
+   pageNumber = 0,
+   pageSize = 3
+ ): Observable<ClaimOPD[]> {
+   return this.http
+     .get(`${this.API_URL}/claim/get`, {
+       params: new HttpParams()
+         .set('type', 'opd')
+         .set('empNo', empNo)
+         .set('filter', filter)
+         .set('sortOrder', sortOrder)
+         .set('pageNumber', pageNumber.toString())
+         .set('pageSize', pageSize.toString()),
+     })
+     .pipe<ClaimOPD[]>(map((res: any) => res)); //res["payload"]
+ }
+*/
+
+
 }

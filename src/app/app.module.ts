@@ -39,7 +39,6 @@ import { MemberComponent } from './admin/dep-head/staff-member/member.component'
 import { RegistrationComponent } from './admin/gad/subject/registration/registration.component';
 
 import { AngularSplitModule } from 'angular-split';
-import { ClaimFormComponent } from './pop/claim-form/claim-form.component';
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 import { ProfileComponent } from './login-v1/profile/profile.component';
 
@@ -79,7 +78,6 @@ import { ChipSelectorComponent } from './util/my/chip-selector/chip-selector.com
     MemberComponent,
     RegistrationComponent,
     MemberComponent,
-    ClaimFormComponent,
     ProfileComponent,
     ClaimManageComponent,
     MecComponent,

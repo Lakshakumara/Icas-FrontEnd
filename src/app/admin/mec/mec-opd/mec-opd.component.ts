@@ -1,6 +1,5 @@
 import { Component, ViewChild, OnInit } from '@angular/core';
 import { AuthServiceService } from 'src/app/service/auth-service.service';
-import { MECDataSource } from '../mec-dataSource';
 import { Claim, MEC_Column_Accept } from 'src/app/Model/claim';
 import Swal from 'sweetalert2';
 import { Member } from 'src/app/Model/member';
@@ -11,6 +10,8 @@ import { Observable, filter, map, merge, startWith, tap } from 'rxjs';
 import { FormBuilder, FormControl, Validators } from '@angular/forms';
 import { SchemeTitles } from 'src/app/Model/scheme';
 import { SchemeService } from 'src/app/service/scheme.service';
+import { LoadDataSource } from 'src/app/util/LoadData';
+import { Constants } from 'src/app/util/constants';
 
 export const _filter = (opt: string[], value: string): string[] => {
   const filterValue = value.toLowerCase();
@@ -25,10 +26,10 @@ export const _filter = (opt: string[], value: string): string[] => {
 export class MecOpdComponent implements OnInit {
   panelOpenState = false;
   claim!: Claim;
-  selectedClaim!: Claim;
+  selectedClaim!: Claim | null;
   selectedMember!: Member[];
 
-  dataSource!: MECDataSource;
+  dataSource!: LoadDataSource;
   displayedColumn: string[] = MEC_Column_Accept.map((col) => col.key);
   columnsSchema: any = MEC_Column_Accept;
 
@@ -60,6 +61,7 @@ export class MecOpdComponent implements OnInit {
       { value: '', disabled: true },
       Validators.required
     ),
+    remarks: new FormControl(''),
   });
   disableField(checked: any) {
     if (!checked) {
@@ -70,10 +72,10 @@ export class MecOpdComponent implements OnInit {
   }
   ngOnInit() {
     this.claim = this.route.snapshot.data['claim'];
-    this.dataSource = new MECDataSource(this.auth);
+    this.dataSource = new LoadDataSource(this.auth);
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
-    this.dataSource.requestData('%', 'mec');
+    this.dataSource.requestData(Constants.CATEGORY_OPD, Constants.CLAIMSTATUS_MEDICAL_DECISION_PENDING);
 
     this.schemeService.getSchemeTitle().subscribe((titles: any) => {
       this.stateGroups = titles;
@@ -102,9 +104,9 @@ export class MecOpdComponent implements OnInit {
   }
 
   loadClaimPage() {
-    this.selectedMember=<Member[]>{};
-    this.selectedClaim = <Claim>{};
-    this.dataSource.requestData('%', 'mec');
+    this.selectedMember=<Member[]>[{}];
+    this.selectedClaim = null;//<Claim>{};
+    this.dataSource.requestData(Constants.CATEGORY_OPD, Constants.CLAIMSTATUS_MEDICAL_DECISION_PENDING);
     if (this.dataSource.paginator) {
       this.dataSource.paginator.firstPage();
     }
@@ -114,7 +116,6 @@ export class MecOpdComponent implements OnInit {
     this.selectedClaim = claim;
   }
   loadMedicalHistory() {
-  
   }
 
   updateClaim() {
@@ -124,10 +125,10 @@ export class MecOpdComponent implements OnInit {
     this.tobeUpdated = [];
       this.tobeUpdated.push({
         criteria: 'opdupdate',
-        id: this.selectedClaim.id,
-        claimStatus: 'mec_approved',
+        id: this.selectedClaim!.id,
+        claimStatus: Constants.CLAIMSTATUS_MEDICAL_DECISION_APPROVED,
         idText: scheme[1],
-        requestAmount: this.selectedClaim.requestAmount,
+        requestAmount: this.selectedClaim!.requestAmount,
         deductionAmount: this.formGroup.value.deductionAmount,
         mecremarks: this.formGroup.value.mecremarks,
         mecreturndate: new Date(),
@@ -135,6 +136,7 @@ export class MecOpdComponent implements OnInit {
         rejectremarks: this.formGroup.value.rejected
           ? this.formGroup.value.rejectremarks
           : null,
+        remarks: this.formGroup.value.remarks,
       });
 
     console.log(this.tobeUpdated);
@@ -145,18 +147,16 @@ export class MecOpdComponent implements OnInit {
       confirmButtonText: 'Update',
       showLoaderOnConfirm: true,
       preConfirm: async () => {
-        const ret = this.auth.updateClaim(this.tobeUpdated).subscribe((a) => {
-          if (a >= 1) {
-            this.loadClaimPage();
-            return Swal.showValidationMessage('Updated');
-          } else return Swal.showValidationMessage('Not Updated Try againg');
-        });
-        return ret;
+        return await this.auth.updateClaim_new(this.tobeUpdated);
       },
       allowOutsideClick: () => !Swal.isLoading(),
     }).then((result) => {
       if (result.isConfirmed) {
-        Swal.fire('Saving', '', 'info');
+        if (result.value >= 1) {
+          Swal.fire('Claim Updated', '', 'success');
+          this.formGroup.reset();
+          this.loadClaimPage();
+        } else Swal.fire('Error', "Failed to Update", 'error');
       }
     });
   }

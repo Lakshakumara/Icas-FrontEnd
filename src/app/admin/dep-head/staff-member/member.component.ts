@@ -77,7 +77,6 @@ export class MemberComponent implements OnInit, AfterViewInit {
   }
   onRowClicked(member: Member) {
     this.member = member;
-    console.log('selected member ', this.member);
   }
   acceptRegistration() {
     this.member.currentRegistration.acceptedDate = new Date();
@@ -91,10 +90,10 @@ export class MemberComponent implements OnInit, AfterViewInit {
       year: 0,
     };
     Swal.fire({
-      title: 'Update Details',
+      title: 'Accept Registration',
       icon: 'question',
       showCancelButton: true,
-      confirmButtonText: 'Update',
+      confirmButtonText: 'Accept',
       showLoaderOnConfirm: true,
       preConfirm: async () => {
         const ret = this.auth
@@ -103,9 +102,8 @@ export class MemberComponent implements OnInit, AfterViewInit {
             console.log('a ', a);
             if (a >= 1) {
               this.loadMemberPage();
-              return Swal.showValidationMessage('Updated');
-            }
-            else return Swal.showValidationMessage(' Not Updated Try againg');
+              return Swal.showValidationMessage('Accepted');
+            } else return Swal.showValidationMessage(' Not Updated Try againg');
           });
 
         return ret;
@@ -113,8 +111,9 @@ export class MemberComponent implements OnInit, AfterViewInit {
       allowOutsideClick: () => !Swal.isLoading(),
     }).then((result) => {
       if (result.isConfirmed) {
-        Swal.fire('Saving', '', 'success');
+        Swal.fire('Accepting', '', 'success');
       }
+      this.loadMemberPage();
     });
   }
 }

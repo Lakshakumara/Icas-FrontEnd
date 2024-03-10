@@ -73,6 +73,12 @@ export class TableComponent implements OnInit, AfterViewInit, OnChanges {
    * @description Lifecycle hook that is called after a component's view has been fully initialized.
    */
   @Output() getSelectedRows = new EventEmitter();
+  /**
+   * @description enable Action of rows ie, edit, remove
+   */
+  @Input() enableRowAction!: boolean;
+
+  @Output() rowAction = new EventEmitter();
 
   ngAfterViewInit() {
     this.dataSource.sort != this.sort;
@@ -132,6 +138,16 @@ export class TableComponent implements OnInit, AfterViewInit, OnChanges {
       this.sqColumnDefinition.splice(0, 0, {
         name: 'select',
         displayName: '#',
+
+      });
+    }
+
+    if (this.enableRowAction) {
+      this.columnNames.push( 'action');
+      this.sqColumnDefinition.push({
+        name: 'action',
+        displayName: '',
+        disableSorting:true,
       });
     }
 
@@ -141,6 +157,8 @@ export class TableComponent implements OnInit, AfterViewInit, OnChanges {
   }
   /** Highlights the selected row on row click. */
   highlight(row: any) {
+    console.log('row ',row)
     this.selectedRowIndex = row.position;
   }
+ 
 }

@@ -26,8 +26,7 @@ input.example-right-align {
   grid-gap: 12px;
   grid-template-areas:
     "header header header"
-    "nav content rside"
-    "footer footer footer";
+    "nav content rside";
   height: 85vh;
 }
 .header {
@@ -70,8 +69,7 @@ input.example-right-align {
       "header"
       "nav"
       "content"
-      "rside"
-      "footer";
+      "rside";
     grid-template-rows: auto auto 1fr minmax(70px, auto) auto;
   }
 }

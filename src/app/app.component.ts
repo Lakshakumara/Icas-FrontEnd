@@ -3,6 +3,7 @@ import { SharedService } from './shared/shared.service';
 import { Router } from '@angular/router';
 import { LoaderService } from './service/loader.service';
 import { Member } from './Model/member';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-root',
@@ -19,10 +20,11 @@ export class AppComponent implements DoCheck, OnInit {
     private loaderService: LoaderService,
     private share: SharedService
   ) {}
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    console.log("back end ip ", environment.baseUrl)
+  }
 
   ngDoCheck(): void {
-    console.log('ngDoCheck');
     let currentUrl = this.router.url;
     if (currentUrl == '/isValid' || currentUrl == '/signin') {
       this.isMenuShow = false;

@@ -5,9 +5,10 @@ import { UserOPDDataSource } from './user-opd-datasource';
 import { AuthServiceService } from 'src/app/service/auth-service.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Member } from 'src/app/Model/member';
-import { ClaimOPD } from 'src/app/Model/claimOPD';
 import { Utils } from 'src/app/util/utils';
 import { SharedService } from 'src/app/shared/shared.service';
+import { Constants } from 'src/app/util/constants';
+import { Claim } from 'src/app/Model/claim';
 
 @Component({
   selector: 'app-user-opd',
@@ -18,9 +19,11 @@ import { SharedService } from 'src/app/shared/shared.service';
 export class UserOPDComponent implements OnInit, AfterViewInit {
   member!: Member;
   year: number = Utils.currentYear;
-  claimStatus: any = ['All', 'Pending', 'Paid'];
-  selectedStatus: string = 'All';
-  claimOPD!: ClaimOPD;
+  claimCategory: string[] = [Constants.ALL, Constants.CATEGORY_OPD, Constants.CATEGORY_SHE] 
+  selectedCategory: string = Constants.ALL;
+  claimStatus: any = [Constants.ALL, 'Pending', 'Paid'];
+  selectedStatus: string = Constants.ALL;
+  claim!: Claim;
   dataSource!: UserOPDDataSource;
   displayedColumns = [
     'id',
@@ -45,8 +48,9 @@ export class UserOPDComponent implements OnInit, AfterViewInit {
     this.member = this.share.getUser();
     if (this.member != undefined) {
       this.dataSource = new UserOPDDataSource(this.auth);
+      //this.loadClaimPage();
       this.dataSource.loadClaims(
-        'opd',
+        this.selectedCategory === 'All' ? '%' : this.selectedCategory,
         this.year,
         this.member.empNo,
         this.selectedStatus === 'All' ? '%' : this.selectedStatus,
@@ -62,7 +66,7 @@ export class UserOPDComponent implements OnInit, AfterViewInit {
 
   loadClaimPage() {
     this.dataSource.loadClaims(
-      'opd',
+      this.selectedCategory === 'All' ? '%' : this.selectedCategory,
       this.year,
       this.member.empNo,
       this.selectedStatus === 'All' ? '%' : this.selectedStatus,
@@ -72,11 +76,14 @@ export class UserOPDComponent implements OnInit, AfterViewInit {
       this.paginator.pageSize
     );
   }
-  onRowClicked(claimOPD: ClaimOPD) {
-    console.log(claimOPD);
+  onRowClicked(claim: Claim) {
+    console.log(claim);
   }
 
   search() {
+    console.log('selectedStatus ', this.selectedStatus)
+    console.log('year ', this.year)
+    console.log('selectedCategory ', this.selectedCategory)
     this.loadClaimPage();
     /*this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
     merge(this.sort.sortChange, this.paginator.page)

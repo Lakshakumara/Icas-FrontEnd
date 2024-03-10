@@ -1,8 +1,8 @@
 <form [formGroup]="formGroup">
   <mat-form-field class="example-chip-list">
-    <mat-label>Scheme Titles</mat-label>
+    <mat-label>Reasons for claim</mat-label>
     <mat-chip-grid #chipGrid aria-label="Title selection">
-      <div *ngFor="let title of selectedTitles"> 
+      <div *ngFor="let title of selectedTitles">
 
         <mat-chip-row (removed)="remove(title)">
           {{title}}
@@ -13,15 +13,14 @@
 
       </div>
     </mat-chip-grid>
-    <input placeholder="New Titles..." #titleInput formControlName="schemeTitles"
-      [matChipInputFor]="chipGrid" [matAutocomplete]="auto"
-      [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
-      (matChipInputTokenEnd)="add($event)"/>
+    <input placeholder="Add another reason..." #titleInput formControlName="schemeTitles" [matChipInputFor]="chipGrid"
+      [matAutocomplete]="auto" [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+      (matChipInputTokenEnd)="add($event)" />
     <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
-      <div *ngFor="let title of titles |async;"> 
-  
+      <div *ngFor="let title of titles |async;">
+
         <mat-option [value]="title">{{title}}</mat-option>
-      
+
       </div>
     </mat-autocomplete>
   </mat-form-field>

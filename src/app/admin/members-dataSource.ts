@@ -1,15 +1,18 @@
 import { CollectionViewer, DataSource } from '@angular/cdk/collections';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
+import { catchError, finalize, map } from 'rxjs/operators';
 import { Observable, BehaviorSubject, of } from 'rxjs';
 import { AuthServiceService } from 'src/app/service/auth-service.service';
+import { Member } from 'src/app/Model/member';
 import { Claim } from 'src/app/Model/claim';
 
-export class VoucherDataSource extends DataSource<Claim> {
+export class MemberDataSource extends DataSource<Member> {
+  data: Member[] | undefined;
   paginator: MatPaginator | undefined;
   sort: MatSort | undefined;
 
-  private dataSetSubject = new BehaviorSubject<Claim[]>([]);
+  private dataSetSubject = new BehaviorSubject<Member[]>([]);
   private loadingSubject = new BehaviorSubject<boolean>(false);
   public loading$ = this.loadingSubject.asObservable();
 
@@ -22,7 +25,7 @@ export class VoucherDataSource extends DataSource<Claim> {
    * the returned stream emits new items.
    * @returns A stream of the items to be rendered.
    */
-  connect(collectionViewer: CollectionViewer): Observable<Claim[]> {
+  connect(collectionViewer: CollectionViewer): Observable<Member[]> {
     return this.dataSetSubject.asObservable();
   }
 
@@ -35,43 +38,42 @@ export class VoucherDataSource extends DataSource<Claim> {
     this.loadingSubject.complete();
   }
 
-  /*requestData(claimStatus: string,
-        filter = '', sortDirection = 'asc', pageIndex = 0, pageSize = 10) {
-            console.log("send in voucher");
-        this.loadingSubject.next(true);
-
-        this.auth.getAllClaims('%', 0, '', claimStatus, filter, sortDirection, pageIndex, pageSize)
-            .pipe(
-                catchError(() => of([])),
-                finalize(() => this.loadingSubject.next(false))
-            )
-            .subscribe((receiveData: any) => this.dataSetSubject.next(receiveData));
-        console.log("fetch data set ", this.dataSetSubject)
-    }*/
   /**
    *
-   * @param claimStatus  String pattern
-   * @param filter  '' to ignor
-   * @param sortDirection  default asc
-   * @param pageIndex  default 0
-   * @param pageSize default 10
-   * @returns
+   * @param searchFor
+   * @param searchText
+   * @param filter
+   * @param sortDirection
+   * @param pageIndex
+   * @param pageSize
    */
-  requestAllData(
-    claimStatus: string,
+  loadMember(
+    searchFor: string,
+    searchText: string,
     filter = '',
     sortDirection = 'asc',
     pageIndex = 0,
-    pageSize = 10) {
+    pageSize = 10
+  ) {
     this.loadingSubject.next(true);
-    return this.auth.getAllClaims(
-      '%',
-      0,
-      '',
-      claimStatus,
-      filter,
-      sortDirection,
-      pageIndex,
-      pageSize);
+
+    this.auth
+      .getMembers(
+        searchFor,
+        searchText,
+        filter,
+        sortDirection,
+        pageIndex,
+        pageSize
+      )
+      .pipe(
+        catchError(() => of([])),
+        finalize(() => this.loadingSubject.next(false))
+      )
+      .subscribe((member: Member[]) => {
+        member.sort((a, b) => a.id - b.id);
+        this.dataSetSubject.next(member);
+      });
+    console.log('fetch data set ', this.dataSetSubject);
   }
 }
