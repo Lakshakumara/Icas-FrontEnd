@@ -38,9 +38,7 @@ export class MemberDataSource extends DataSource<Member> {
 
     loadMember(searchFor: string,
         filter = '', sortDirection = 'asc', pageIndex = 0, pageSize = 10) {
-
         this.loadingSubject.next(true);
-
         this.auth.getMembers(searchFor, '',filter, sortDirection, pageIndex, pageSize)
             .pipe(
                 catchError(() => of([])),

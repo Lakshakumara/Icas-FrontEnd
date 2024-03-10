@@ -1,28 +1,48 @@
-import { COMMA, ENTER } from '@angular/cdk/keycodes';
-import { AfterViewInit, Component, ElementRef, EventEmitter, OnInit, Output, ViewChild, inject } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  EventEmitter,
+  OnInit,
+  Output,
+  ViewChild,
+} from '@angular/core';
 import { Member, Member_Column_Accept } from 'src/app/Model/member';
 import { Role, Access_type } from 'src/app/Model/role';
-import { MemberDataSource } from './members-dataSource';
+import { MemberDataSource } from '../../../members-dataSource';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { AuthServiceService } from 'src/app/service/auth-service.service';
 import { ActivatedRoute } from '@angular/router';
+import {
+  debounceTime,
+  distinctUntilChanged,
+  fromEvent,
+  merge,
+  tap,
+} from 'rxjs';
+import {
+  FormBuilder,
+  FormControl,
+  Validators,
+  FormGroup,
+} from '@angular/forms';
 
-import { debounceTime, distinctUntilChanged, filter, fromEvent, map, merge, startWith, tap } from 'rxjs';
-import { FormBuilder, FormControl, Validators, FormGroup } from '@angular/forms';
-
-import { IDropdownSettings, } from 'ng-multiselect-dropdown';
+import { IDropdownSettings } from 'ng-multiselect-dropdown';
 import { Utils } from 'src/app/util/utils';
 import Swal from 'sweetalert2';
+import { Claim } from 'src/app/Model/claim';
+import { Constants } from 'src/app/util/constants';
 
 @Component({
   selector: 'app-sub_registration',
-  templateUrl: './member-manage.html', //registration.component
+  templateUrl: './member-manage.html', //registration
   styleUrls: ['./registration.component.css'],
 })
 export class RegistrationComponent implements OnInit, AfterViewInit {
   currentYear = Utils.currentYear;
   member: Member | undefined;
+  claims: Claim[] | undefined;
   dataSource!: MemberDataSource;
   displayedColumn: string[] = Member_Column_Accept.map((col) => col.key);
   columnsSchema: any = Member_Column_Accept;
@@ -31,29 +51,33 @@ export class RegistrationComponent implements OnInit, AfterViewInit {
   roleGroup!: FormGroup;
   roleData = [{}];
   dropdownSettings: IDropdownSettings = {};
-  selectedItems = [{}];
+  selectedRoles!: any[];
+  tobeUpdated!: any;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
-  @ViewChild('input') input !: ElementRef;
+  @ViewChild('input') input!: ElementRef;
 
   @Output() sidenavClose = new EventEmitter();
   panelOpenState = false;
 
-  constructor(private auth: AuthServiceService, private route: ActivatedRoute,
-    private buildr: FormBuilder) { }
+  constructor(
+    private auth: AuthServiceService,
+    private route: ActivatedRoute,
+    private buildr: FormBuilder
+  ) {}
 
   ngOnInit() {
-    this.member = this.route.snapshot.data["member"];
+    //this.member = this.route.snapshot.data['member'];
     this.dataSource = new MemberDataSource(this.auth);
     this.roleData = [
-      { item_id: 1, role: 'user' },
-      { item_id: 2, role: 'admin' },
-      { item_id: 3, role: 'GADHead' },
-      { item_id: 4, role: 'DepHead' },
-      { item_id: 5, role: 'mo' },
-      { item_id: 6, role: 'mec' },
-      { item_id: 7, role: 'superAdmin' }
+      { item_id: 1, role: Constants.ROLE_USER },
+      { item_id: 2, role: Constants.ROLE_ADMIN },
+      { item_id: 3, role: Constants.ROLE_GAD_HEAD },
+      { item_id: 4, role: Constants.ROLE_DEP_HEAD },
+      { item_id: 5, role: Constants.ROLE_MO },
+      { item_id: 6, role: Constants.ROLE_MEC },
+      { item_id: 7, role: Constants.ROLE_SUPER_ADMIN },
     ];
 
     this.dropdownSettings = {
@@ -64,6 +88,7 @@ export class RegistrationComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
+    console.log('ngAfterViewInit ');
     // server-side search
     fromEvent(this.input.nativeElement, 'keyup')
       .pipe(
@@ -73,72 +98,66 @@ export class RegistrationComponent implements OnInit, AfterViewInit {
           //this.paginator.pageIndex = 0;
           this.loadMemberPage();
         })
-      ).subscribe();
+      )
+      .subscribe();
 
     // reset the paginator after sorting
-    this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
+    this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
 
     // on sort or paginate events, load a new page
-    merge(this.sort.sortChange, this.paginator?.page)
-      .pipe(
-        tap(() => this.loadMemberPage())
-      )
-
+    merge(this.sort.sortChange, this.paginator?.page).pipe(
+      tap(() => this.loadMemberPage())
+    );
   }
 
   loadMemberPage() {
-    this.dataSource.loadMember("name", this.input.nativeElement.value);
+    let filterValue = this.input.nativeElement.value;
+    if (isNaN(Number(filterValue))) {
+      this.dataSource.loadMember('name', filterValue);
+    } else {
+      this.dataSource.loadMember('empNo', filterValue);
+    }
   }
 
   onRowClicked(member: Member) {
-    //TODO update memberRegistration 
-    //accepted date timestamp
-    // id of accepter
     this.member = member;
-
+    this.selectedRoles = [];
     const rr: Role[] = this.member.roles;
-    rr.every(r=>{
-      console.log(r.role)
-      this.selectedItems.pop();
-      if(r.role =='user') this.selectedItems.push({ item_id: 1, role: 'user' })
-      else if(r.role =='admin') this.selectedItems.push({ item_id: 2, role: 'admin' })
-      else if(r.role =='GADHead') this.selectedItems.push({ item_id: 3, role: 'GADHead' })
-      else if(r.role =='DepHead') this.selectedItems.push({ item_id: 4, role: 'DepHead' })
-      else if(r.role =='mo') this.selectedItems.push({ item_id: 5, role: 'mo' })
-      else if(r.role =='mec') this.selectedItems.push({ item_id: 6, role: 'mec' })
-      else if(r.role =='superAdmin') this.selectedItems.push({ item_id: 7, role: 'superAdmin' })
-    })
+    rr.forEach((r) => {
+      console.log(this.selectedRoles);
+      if (r.role == Constants.ROLE_USER)
+        this.selectedRoles.push({ item_id: 1, role: Constants.ROLE_USER });
+      else if (r.role == Constants.ROLE_ADMIN)
+        this.selectedRoles.push({ item_id: 2, role: Constants.ROLE_ADMIN });
+      else if (r.role == Constants.ROLE_GAD_HEAD)
+        this.selectedRoles.push({ item_id: 3, role: Constants.ROLE_GAD_HEAD });
+      else if (r.role == Constants.ROLE_DEP_HEAD)
+        this.selectedRoles.push({ item_id: 4, role: Constants.ROLE_DEP_HEAD });
+      else if (r.role == Constants.ROLE_MO)
+        this.selectedRoles.push({ item_id: 5, role: Constants.ROLE_MO });
+      else if (r.role == Constants.ROLE_MEC)
+        this.selectedRoles.push({ item_id: 6, role: Constants.ROLE_MEC });
+      else if (r.role == Constants.ROLE_SUPER_ADMIN)
+        this.selectedRoles.push({
+          item_id: 7,
+          role: Constants.ROLE_SUPER_ADMIN,
+        });
+    });
 
     this.roleGroup = this.buildr.group({
-      selectedRoles: [this.selectedItems]
+      selectedRoles: [this.selectedRoles],
     });
+    this.auth
+      .getAllClaims('%', 0, this.member.empNo)
+      .subscribe((claim: any) => {
+        this.claims = claim;
+        this.claims?.sort((a, b) => a.id - b.id);
+      });
   }
 
-  applyFilter(event: Event) {
-    const filterValue = (event.target as HTMLInputElement).value;
-    //console.log(filterValue);
-    if (isNaN(+filterValue))
-      this.dataSource.loadMember("name", filterValue);
-    else this.dataSource.loadMember("empNo", filterValue);
-    //this.dataSource.filter = filterValue.trim().toLowerCase();
-  }
-
-  /**
-   * adding Role selector
-   */
-
- /* roles = this.buildr.group({
-    user: new FormControl(''),
-    manager: new FormControl(''),
-    head: new FormControl(''),
-    mec: new FormControl(''),
-    depHead: new FormControl(''),
-    superAdmin: new FormControl(''),
-  });
-*/
   reNew = this.buildr.group({
-    year: new FormControl(this.currentYear + 1, [Validators.required]),
-    selector: new FormControl(''),
+    year: this.buildr.control(this.currentYear + 1, [Validators.required]),
+    selector: this.buildr.control(''),
   });
 
   formGroup = this.buildr.group({
@@ -159,12 +178,9 @@ export class RegistrationComponent implements OnInit, AfterViewInit {
   registerProcess() {
     this.formGroup.patchValue({
       mDate: new Date(),
-      status: "pending",
+      status: Constants.REGISTRATION_PENDING,
     });
-    this.auth.register(this.formGroup.value).subscribe(
-      (response: any) => {
-      }
-    );
+    this.auth.register(this.formGroup.value).subscribe((response: any) => {});
   }
 
   clearReg() {
@@ -172,36 +188,49 @@ export class RegistrationComponent implements OnInit, AfterViewInit {
   }
 
   roleUpdate() {
-    console.log(this.roleGroup.value);
-    
-const x = this.roleGroup.value as Array<Role>
-  console.log("r ", );
-  //console.log("r ", r);
+    if (this.member == undefined) return;
+    const x = this.roleGroup.value.selectedRoles as Array<Role>;
+    console.log(
+      'this.roleGroup.value.selectedRoles ',
+      this.roleGroup.value.selectedRoles
+    );
+    this.tobeUpdated = {
+      criteria: 'role',
+      memberId: this.member?.id,
+      empNo: this.member?.empNo,
+      newrole: x.map((r) => {
+        return r.role;
+      }),
+    };
 
-    this.auth.updateMember('role', this.roleGroup.value).subscribe(data => {
+    console.log(this.tobeUpdated);
+    this.auth.update('role', this.tobeUpdated).subscribe((data) => {
       Swal.fire({
         icon: 'info',
-        title: 'Sucess',
-        text: 'Updated '+data+ 'rows'
+        title: 'Roles Updated',
+        text: 'Success',
+      }).then((result) => {
+        this.input.nativeElement.value = this.member?.empNo;
+        this.loadMemberPage();
       });
     });
   }
 
   public onSidenavClose = () => {
     this.sidenavClose.emit();
-  }
+  };
 
   registrationOpen() {
-    if (this.reNew.value.selector !== "all") {
+    if (this.reNew.value.selector !== 'all') {
       this.reNew.patchValue({
         selector: this.member?.empNo,
-      })
+      });
     }
-    this.auth.updateMember('registerOpen', this.reNew.value).subscribe(data => {
+    this.auth.update('registerOpen', this.reNew.value).subscribe((data) => {
       Swal.fire({
         icon: 'info',
         title: 'Sucess',
-        text: 'Updated '+data+ 'rows'
+        text: 'Updated ' + data + 'rows',
       });
     });
   }

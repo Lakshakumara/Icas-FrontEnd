@@ -1,125 +1,161 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, Validators } from '@angular/forms';
+import { FormBuilder, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { ClaimOPD } from 'src/app/Model/claimOPD';
-import { Test } from 'src/app/Model/test';
 import { AuthServiceService } from 'src/app/service/auth-service.service';
-import { Constants } from 'src/app/util/constants';
 import { Utils } from 'src/app/util/utils';
 import Swal from 'sweetalert2';
+import { Router } from '@angular/router';
+import { SharedService } from 'src/app/shared/shared.service';
+import { Member } from 'src/app/Model/member';
+import { Constants } from 'src/app/util/constants';
 
 @Component({
   selector: 'app-opd',
   templateUrl: './opd.component.html',
-  styleUrls: ['./opd.component.css']
+  styleUrls: ['./opd.component.css'],
 })
 export class OpdComponent implements OnInit {
+  member!: Member;
   inputdata: any;
   claimTypes: any = ['Outdoor', 'Spectacles', 'Covid Test'];
-  schemeTitles: any = ['title 1', 'title 2', 'title 3'];
   today = Utils.today;
   beforeThreeMonth = Utils.threeMonthbeforetoday;
-  constructor(@Inject(MAT_DIALOG_DATA) public data: any,
+
+  constructor(
+    @Inject(MAT_DIALOG_DATA) public data: any,
     private ref: MatDialogRef<OpdComponent>,
-    private buildr: FormBuilder, private auth: AuthServiceService) {
+    private auth: AuthServiceService,
+    private buildr: FormBuilder,
+    private router: Router,
+    private share: SharedService
+  ) {
     this.inputdata = this.data;
   }
   dForm = this.buildr.group({
     id: this.buildr.control(''),
-    memberId: new FormControl(),
+    memberId: this.buildr.control(0),
     /**
      * OPD or SHE(Surgical &Hospital Expenses)
      */
-    category: this.buildr.control(''),
+    category: this.buildr.control(Constants.CATEGORY_OPD),
     /**
      * Outdoor, Spectacles, covid test etc..
      */
-    requestFor: this.buildr.control(''),
-    schemeTitle: this.buildr.control(''),
-    startDate: this.buildr.control('', Validators.required),
-    endDate: this.buildr.control(''),
-    claimDate: this.buildr.control(new Date, Validators.required),
+    requestFor: this.buildr.control('', Validators.required),
+    incidentDate: this.buildr.control('', Validators.required),
+    claimDate: this.buildr.control(Utils.today, Validators.required),
     applyDate: this.buildr.control(''),
-    acceptedDate: this.buildr.control(''),
-
-    requestAmount: this.buildr.control(''),
-    deductionAmount: this.buildr.control(''),
-    paidAmount: this.buildr.control(''),
-    place: this.buildr.control(''),
-    nature: this.buildr.control(''),
-    incident: this.buildr.control(''),
-    claimStatus: this.buildr.control(''),
+    requestAmount: this.buildr.control({ value: <number>{}, disabled: false }, Validators.required),
+    claimStatus: this.buildr.control(Constants.CLAIMSTATUS_PENDING),
   });
   ngOnInit() {
+    this.member = this.share.getUser();
+    if (this.member == null) {
+      this.router.navigate(['/signin']);
+    }
   }
-  addOpdData() {
-    this.dForm.patchValue({
-      memberId: 1,
-      category: "opd",
-      claimDate: Utils.today,
-      claimStatus: "pending",
-    });
 
-    //test
-    /*
+  saveValidator() {
+    if (!this.dForm.valid) return;
+    else {
+      if (
+        this.dForm.value?.requestAmount != undefined &&
+        this.dForm.value?.requestAmount > 15000
+      ) {
         Swal.fire({
-          title: 'Place a OPD claim',
-          text: "Confirm",
+          title: 'Request Amount is exceed the limit',
           icon: 'warning',
           showCancelButton: true,
-          confirmButtonText: 'Save',
-          showLoaderOnConfirm: true,
-          preConfirm: () => {
-            return fetch(`//claim/opd`)
-              .then(response => {
-                if (!response.ok) {
-                  throw new Error(response.statusText)
-                }
-                return response.json()
-              })
-              .catch(error => {
-                Swal.showValidationMessage(
-                  `Request failed: ${error}`
-                )
-              })
-          },
-          allowOutsideClick: () => !Swal.isLoading()})
-        .then((result) => {
+          showConfirmButton: true,
+          confirmButtonText: 'Proceed',
+        }).then((result) => {
           if (result.isConfirmed) {
-            Swal.fire({
-              title: `${result.value.login}'s avatar`,
-              imageUrl: result.value.avatar_url
-            })
+            this.saveClaim();
           }
-        })
-    */
-
-    //end test
-    console.log("opd data submit ", this.dForm.value)
-    Swal.fire({
-      title: 'Place a OPD claim',
-      text: "Confirm",
-      icon: 'warning',
-      //footer: JSON.stringify(this.dForm.value),
+        });
+      } else this.saveClaim();
+    }
+  }
+  saveClaim() {
+    this.dForm.patchValue({
+      memberId: this.member.id,
+    });
+    const steps = ['1', '2', '3'];
+    const Queue = Swal.mixin({
+      progressSteps: steps,
       showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, Save'
-    }).then((result) => {
+      cancelButtonText: 'Cancel',
+      // optional classes to avoid backdrop blinking between steps
+      showClass: { backdrop: 'swal2-noanimation' },
+      hideClass: { backdrop: 'swal2-noanimation' },
+    });
+
+    (async () => {
+      let result = await Queue.fire({
+        title: 'Save Claim Details',
+        icon: 'warning',
+        currentProgressStep: 0,
+        confirmButtonText: 'Save',
+        showLoaderOnConfirm: true,
+        allowOutsideClick: () => false,
+        preConfirm: async () => {
+          let claimId;
+          try {
+            claimId = await this.auth.saveOPD(this.dForm.value);
+            this.dForm.reset();
+          } catch (error) {
+            return Swal.showValidationMessage(` ${error} `);
+          }
+          return claimId;
+        },
+      });
+
       if (result.isConfirmed) {
-        this.auth.saveOPD(this.dForm.value).subscribe(d => {
-          Swal.fire(
-            'Saved',
-            `Your reference number ${d}`,
-            'success');
-          this.closePopup();
+        console.log('Saved Result ', result);
+        await Queue.fire({
+          title: 'Download Claim Application',
+          text: `Claim Saved ref Number: ${result.value}`,
+          currentProgressStep: 1,
+          confirmButtonText: 'Download',
+          showLoaderOnConfirm: true,
+          allowOutsideClick: () => false,
+          preConfirm: async () => {
+            try {
+              let response: any = await this.auth.downloadClaim(result.value);
+              console.log('received from backend ', response);
+
+              let dataType = response.type;
+              let binaryData = [];
+              binaryData.push(response);
+              let downloadLink = document.createElement('a');
+              downloadLink.href = window.URL.createObjectURL(
+                new Blob(binaryData, { type: dataType })
+              );
+              downloadLink.setAttribute('download', 'Claim form.pdf');
+              document.body.appendChild(downloadLink);
+              downloadLink.click();
+            } catch (error) {
+              Swal.showValidationMessage(` ${error} `);
+            }
+          },
         });
       }
-    });
+
+      await Queue.fire({
+        title: 'Finish',
+        icon: 'success',
+        showCancelButton: false,
+        currentProgressStep: 2,
+        confirmButtonText: 'OK',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this.closePopup();
+        }
+      });
+    })();
   }
 
   closePopup() {
-    console.log('cancel pressed');
     this.ref.close(this.dForm.value);
   }
 }
