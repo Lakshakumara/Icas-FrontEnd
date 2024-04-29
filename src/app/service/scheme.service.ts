@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { forkJoin, Observable } from 'rxjs';
-import { Scheme } from '../Model/scheme';
+import { Observable } from 'rxjs';
+import { Scheme, SchemeTitles } from '../Model/scheme';
 import { map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment.development';
 
@@ -9,10 +9,16 @@ import { environment } from 'src/environments/environment.development';
   providedIn: 'root',
 })
 export class SchemeService {
-  private serviceUrl = environment.baseUrl+"/admin/scheme";
+  private serviceUrl = environment.baseUrl + '/admin/scheme';
 
   constructor(private http: HttpClient) {}
 
+  getSchemeTitle(category: string): Observable<SchemeTitles[]> {
+    console.log(category);
+    return this.http
+      .get(`${this.serviceUrl}/titles/${category}`)
+      .pipe<SchemeTitles[]>(map((data: any) => data));
+  }
   getScheme(): Observable<Scheme[]> {
     return this.http
       .get(this.serviceUrl)
@@ -20,7 +26,6 @@ export class SchemeService {
   }
 
   updateScheme(scheme: Scheme): Observable<Scheme> {
-    console.log("update data ",scheme);
     return this.http.patch<Scheme>(`${this.serviceUrl}/${scheme.id}`, scheme);
   }
 
@@ -31,12 +36,4 @@ export class SchemeService {
   deleteScheme(id: number): Observable<Scheme> {
     return this.http.delete<Scheme>(`${this.serviceUrl}/${id}`);
   }
-/*
-  deleteUsers(schemes: Scheme[]): Observable<Scheme[]> {
-    return forkJoin(
-      schemes.map((scheme) =>
-        this.http.delete<Scheme>(`${this.serviceUrl}/${scheme.id}`)
-      )
-    );
-  }*/
 }

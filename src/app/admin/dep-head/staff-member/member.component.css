@@ -34,3 +34,10 @@ li {
 .mat-mdc-table .mdc-data-table__row{
     height: 35px;
   }
+  .hori {
+    display: flex;
+    margin: 16px;
+    width: 100%;
+    align-items: baseline;
+    gap: 20px;
+  }

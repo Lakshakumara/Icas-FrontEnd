@@ -1,62 +1,110 @@
-import { Dependant } from './../Model/dependant';
-import { Component } from '@angular/core';
-import {DataSource} from '@angular/cdk/collections';
-import {Observable, ReplaySubject} from 'rxjs';
+import { COMMA, ENTER } from '@angular/cdk/keycodes';
+import {
+  Component,
+  ElementRef,
+  EventEmitter,
+  OnInit,
+  Output,
+  ViewChild,
+  inject,
+} from '@angular/core';
+import { FormBuilder, FormControl, Validators } from '@angular/forms';
+import { Observable } from 'rxjs';
+import { startWith, map } from 'rxjs/operators';
+import { SchemeTitles } from '../Model/scheme';
+import { SchemeService } from '../service/scheme.service';
+import { MatChipInputEvent } from '@angular/material/chips';
+import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { LiveAnnouncer } from '@angular/cdk/a11y';
 
-const ELEMENT_DATA: Dependant[] = [
-  {id: 1, name: "Hydrogen", nic: "773661227v", dob:new Date(), relationship:"father"},
-];
+export const _filter = (opt: string[], value: string): string[] => {
+  const filterValue = value.toLowerCase();
+  return opt.filter((item) => item.toLowerCase().includes(filterValue));
+};
 
 /**
  * @title Adding and removing data when using an observable-based datasource.
  */
-/*
-@Component({
-  selector: 'table-dynamic-observable-data-example',
-  styleUrls: ['table-dynamic-observable-data-example.css'],
-  templateUrl: 'table-dynamic-observable-data-example.html',
-  standalone: true,
-  imports: [MatButtonModule, MatTableModule],
-})*/
+
 @Component({
   selector: 'app-test',
   templateUrl: './test.component.html',
-  styleUrls: ['./test.component.css']
+  styleUrls: ['./test.component.css'],
 })
-export class TestComponent {
-  displayedColumns: string[] = ['id', 'Name', 'NIC', 'DOB'];
-  dataToDisplay = [...ELEMENT_DATA];
+export class TestComponent implements OnInit {
+  separatorKeysCodes: number[] = [ENTER, COMMA];
+  allTitles: string[] = [];
+  selectedTitles: string[] = [];
+  titles!: Observable<string[]>;
 
-  dataSource = new ExampleDataSource(this.dataToDisplay);
+  formGroup = this.fb.group({
+    schemeTitles: new FormControl('', [Validators.required]),
+  });
 
-  addData() {
-    const randomElementIndex = Math.floor(Math.random() * ELEMENT_DATA.length);
-    this.dataToDisplay = [...this.dataToDisplay, ELEMENT_DATA[randomElementIndex]];
-    //this.dataSource = [...this.dataToDisplay, null];
-    this.dataSource.setData(this.dataToDisplay);
+  
+  @ViewChild('titleInput') titleInput!: ElementRef<HTMLInputElement>;
+
+  @Output() getTitles = new EventEmitter();
+  
+  announcer = inject(LiveAnnouncer);
+
+  constructor(private fb: FormBuilder, private schemeService: SchemeService) {
+    this.titles = this.formGroup.get('schemeTitles')!.valueChanges.pipe(
+      startWith(null),
+      map((title: string | null) => (title ? this._filter(title) : this.allTitles.slice())),
+    );
   }
 
-  removeData() {
-    this.dataToDisplay = this.dataToDisplay.slice(0, -1);
-    this.dataSource.setData(this.dataToDisplay);
-  }
-}
-
-class ExampleDataSource extends DataSource<Dependant> {
-  private _dataStream = new ReplaySubject<Dependant[]>();
-
-  constructor(initialData: Dependant[]) {
-    super();
-    this.setData(initialData);
-  }
-
-  connect(): Observable<Dependant[]> {
-    return this._dataStream;
+  ngOnInit() {
+    
+    this.schemeService.getSchemeTitle("all").subscribe((title: SchemeTitles[]) => {
+      title.forEach((st)=>{
+        st.idText.map((t)=>{
+          this.allTitles.push(t);
+          
+        })
+      });
+    });
+    
   }
 
-  disconnect() {}
+  add(event: MatChipInputEvent): void {
+    const value = (event.value || '').trim();
 
-  setData(data: Dependant[]) {
-    this._dataStream.next(data);
+    // Add our fruit
+    if (this.allTitles.includes(value)) {
+      this.selectedTitles.push(value);
+      this.getTitles.emit(this.selectedTitles)
+    }
+
+    // Clear the input value
+    event.chipInput!.clear();
+
+    this.formGroup.get('schemeTitles')!.setValue(null);
+  }
+
+  remove(title: string): void {
+    const index = this.selectedTitles.indexOf(title);
+
+    if (index >= 0) {
+      this.selectedTitles.splice(index, 1);
+      this.getTitles.emit(this.selectedTitles)
+      this.announcer.announce(`Removed ${title}`);
+    }
+  }
+
+  selected(event: MatAutocompleteSelectedEvent): void {
+    this.selectedTitles.push(event.option.viewValue);
+    this.getTitles.emit(this.selectedTitles)
+    this.titleInput.nativeElement.value = '';
+    this.formGroup.get('schemeTitles')!.setValue(null);
+  }
+
+  private _filter(value: string): string[] {
+    const filterValue = value.toLowerCase();
+
+    return this.allTitles.filter((title) =>
+      title.toLowerCase().includes(filterValue)
+    );
   }
 }

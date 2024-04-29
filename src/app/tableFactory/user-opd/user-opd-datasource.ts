@@ -2,13 +2,17 @@ import { CollectionViewer, DataSource } from '@angular/cdk/collections';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { catchError, finalize, map } from 'rxjs/operators';
-import { Observable, of as observableOf, merge, BehaviorSubject, of } from 'rxjs';
+import {
+  Observable,
+  of as observableOf,
+  merge,
+  BehaviorSubject,
+  of,
+} from 'rxjs';
 import { AuthServiceService } from 'src/app/service/auth-service.service';
 import { ClaimOPD } from 'src/app/Model/claimOPD';
 
-
 // TODO: replace this with real data from your application
-
 
 /**
  * Data source for the UserOPD view. This class should
@@ -24,7 +28,9 @@ export class UserOPDDataSource extends DataSource<ClaimOPD> {
   private loadingSubject = new BehaviorSubject<boolean>(false);
   public loading$ = this.loadingSubject.asObservable();
 
-  constructor(private auth: AuthServiceService) {super();}
+  constructor(private auth: AuthServiceService) {
+    super();
+  }
 
   /**
    * Connect this data source to the table. The table will only update when
@@ -32,16 +38,16 @@ export class UserOPDDataSource extends DataSource<ClaimOPD> {
    * @returns A stream of the items to be rendered.
    */
   connect(collectionViewer: CollectionViewer): Observable<ClaimOPD[]> {
-   /* if (this.paginator && this.sort) {
-      // Combine everything that affects the rendered data into one update
-      // stream for the data-table to consume.
-      return merge(observableOf(this.data), this.paginator.page, this.sort.sortChange)
-        .pipe(map(() => {
-          return this.getPagedData(this.getSortedData([...this.data ]));
-        }));
-    } else {
-      throw Error('Please set the paginator and sort on the data source before connecting.');
-    }*/
+    /* if (this.paginator && this.sort) {
+       // Combine everything that affects the rendered data into one update
+       // stream for the data-table to consume.
+       return merge(observableOf(this.data), this.paginator.page, this.sort.sortChange)
+         .pipe(map(() => {
+           return this.getPagedData(this.getSortedData([...this.data ]));
+         }));
+     } else {
+       throw Error('Please set the paginator and sort on the data source before connecting.');
+     }*/
 
     return this.claimSubject.asObservable();
   }
@@ -52,36 +58,51 @@ export class UserOPDDataSource extends DataSource<ClaimOPD> {
    */
   disconnect(collectionViewer: CollectionViewer): void {
     this.claimSubject.complete();
-        this.loadingSubject.complete();
+    this.loadingSubject.complete();
   }
 
-
-  loadClaims(claimType: string, year:number, empNo: string, claimStatus: string,
-     filter = '', sortDirection = 'asc', pageIndex = 0 , pageSize = 10) {
-
-        this.loadingSubject.next(true);
-
-        this.auth.getClaims(claimType, year, empNo, claimStatus, filter, sortDirection, pageIndex, pageSize)
-        .pipe(
-            catchError(() => of([])),
-            finalize(() => this.loadingSubject.next(false))
-        )
-        .subscribe((claims: any) => this.claimSubject.next(claims));
-          console.log("fetch data set ", this.claimSubject)
-}  
+  loadClaims(
+    claimType: string,
+    year: number,
+    empNo: string,
+    claimStatus: string,
+    filter = '',
+    sortDirection = 'asc',
+    pageIndex = 0,
+    pageSize = 10
+  ) {
+    this.loadingSubject.next(true);
+    this.auth
+      .getAllClaims(
+        claimType,
+        year,
+        empNo,
+        claimStatus,
+        filter,
+        sortDirection,
+        pageIndex,
+        pageSize
+      )
+      .pipe(
+        catchError(() => of([])),
+        finalize(() => this.loadingSubject.next(false))
+      )
+      .subscribe((claims: any) => this.claimSubject.next(claims));
+    console.log('fetch data set ', this.claimSubject);
+  }
 
   /**
    * Paginate the data (client-side). If you're using server-side pagination,
    * this would be replaced by requesting the appropriate data from the server.
    */
- /* private getPagedData(data: ClaimOPD[]): ClaimOPD[] {
-    if (this.paginator) {
-      const startIndex = this.paginator.pageIndex * this.paginator.pageSize;
-      return data.splice(startIndex, this.paginator.pageSize);
-    } else {
-      return data;
-    }
-  }*/
+  /* private getPagedData(data: ClaimOPD[]): ClaimOPD[] {
+     if (this.paginator) {
+       const startIndex = this.paginator.pageIndex * this.paginator.pageSize;
+       return data.splice(startIndex, this.paginator.pageSize);
+     } else {
+       return data;
+     }
+   }*/
 
   /**
    * Sort the data (client-side). If you're using server-side sorting,
