@@ -153,7 +153,7 @@ export class VoucherComponent implements OnInit {
       inputValidator: (value) => {
         return new Promise((resolve) => {
           if (+value <= this.selectedClaims![0].requestAmount) {
-            resolve();
+            resolve('');
           } else {
             resolve(
               'Max is Request Amount Rs. ' +
