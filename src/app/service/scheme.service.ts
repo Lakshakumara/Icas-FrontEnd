@@ -9,12 +9,15 @@ import { environment } from 'src/environments/environment.development';
   providedIn: 'root',
 })
 export class SchemeService {
-  private serviceUrl = environment.baseUrl+"/admin/scheme";
+  private serviceUrl = environment.baseUrl + '/admin/scheme';
 
   constructor(private http: HttpClient) {}
-  
+
   getSchemeTitle(category: string): Observable<SchemeTitles[]> {
-    return this.http.get(`${this.serviceUrl}/titles/${category}`).pipe<SchemeTitles[]>(map((data: any) => data));
+    console.log(category);
+    return this.http
+      .get(`${this.serviceUrl}/titles/${category}`)
+      .pipe<SchemeTitles[]>(map((data: any) => data));
   }
   getScheme(): Observable<Scheme[]> {
     return this.http

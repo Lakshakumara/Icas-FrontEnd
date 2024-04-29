@@ -31,7 +31,6 @@ import { AdminPanelComponent } from './admin/admin-panel/admin-panel.component';
 import { VoucherComponent } from './admin/gad/head/voucher.component';
 import { MyTableModule } from './tableFactory/tableModel/table.module';
 import { AccessComponent } from './admin/super/access/access/access.component';
-import { MecOpdComponent } from './admin/mec/mec-opd/mec-opd.component';
 import { MecHsComponent } from './admin/mec/mec-hs/mec-hs.component';
 import { BeneficiaryComponent } from './register/beneficiary/beneficiary.component';
 import { DownloadComponent } from './download/download.component';
@@ -71,7 +70,6 @@ import { ChipSelectorComponent } from './util/my/chip-selector/chip-selector.com
     TableComponent,
     VoucherComponent,
     AccessComponent,
-    MecOpdComponent,
     MecHsComponent,
     BeneficiaryComponent,
     DownloadComponent,

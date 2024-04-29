@@ -1,18 +1,3 @@
-FROM node:alpine as node
-
-WORKDIR /app
-
-COPY . .
-
-RUN npm install -g @angular/cli
-
-RUN npm install
-
-RUN npm run build --prod
-
-# Serve Application using Nginx Server
-FROM nginx:alpine
-COPY --from=node /app/dist/icas-frontend/ /usr/share/nginx/html
-EXPOSE 80
-
-CMD ["ng", "serve", "--host", "0.0.0.0","--disable-host-check"]
+FROM nginx:1.17.1-alpine
+COPY nginx.conf /etc/nginx/nginx.conf
+COPY /dist /usr/share/nginx/html

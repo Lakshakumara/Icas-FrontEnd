@@ -36,7 +36,7 @@ export class VoucherComponent implements OnInit {
 
   tablePaginationSettings: TablePaginationSettingsModel = <
     TablePaginationSettingsModel
-    >{};
+  >{};
 
   rowData!: Claim[];
   selectedClaims!: Claim[] | null;
@@ -45,9 +45,11 @@ export class VoucherComponent implements OnInit {
 
   onNotifySelected(selectedRows: Claim[]) {
     this.selectedClaims = selectedRows;
+    console.log(selectedRows);
     this.claimData = [];
     if (selectedRows.length === 1)
       selectedRows[selectedRows.length - 1].claimData.forEach((d: any) => {
+        console.log(d);
         let status: string;
         if (d.claimDataStatus == 'Rejected')
           status = 'Rejected - ' + d.rejectRemarks;
@@ -56,6 +58,7 @@ export class VoucherComponent implements OnInit {
         else if (d.claimDataStatus == 'Approved')
           status = d.remarks == null ? 'Approved ' : 'Approved - ' + d.remarks;
         else status = 'Other';
+        console.log(d.scheme);
         if (d.scheme != null)
           this.claimData?.push({
             id: d.id,
@@ -154,7 +157,7 @@ export class VoucherComponent implements OnInit {
           } else {
             resolve(
               'Max is Request Amount Rs. ' +
-              this.selectedClaims![0].requestAmount
+                this.selectedClaims![0].requestAmount
             );
           }
         });
@@ -215,8 +218,8 @@ export class VoucherComponent implements OnInit {
     if (this.selectedClaims == undefined) return;
     this.tobeUpdated = [];
     let selected = this.selectedClaims.map((s) => {
-      if(s.paidAmount <= 0 ) {
-        Constants.Toast.fire("Payment not set for the Claim "+s.id+" ")
+      if (s.paidAmount <= 0) {
+        Constants.Toast.fire('Payment not set for the Claim ' + s.id + ' ');
         return;
       }
       this.tobeUpdated?.push({
@@ -259,7 +262,7 @@ export class VoucherComponent implements OnInit {
     });
   }
   downloadVoucher() {
-    console.log('this.selectedvoucherId ', this.selectedvoucherId)
+    console.log('this.selectedvoucherId ', this.selectedvoucherId);
     if (this.selectedvoucherId == undefined) {
       return;
     }
@@ -271,7 +274,9 @@ export class VoucherComponent implements OnInit {
       allowOutsideClick: () => false,
       preConfirm: async () => {
         try {
-          let response: any = await this.auth.downloadVoucher(this.selectedvoucherId!);
+          let response: any = await this.auth.downloadVoucher(
+            this.selectedvoucherId!
+          );
           let dataType = response.type;
           let binaryData = [];
           binaryData.push(response);
@@ -287,7 +292,6 @@ export class VoucherComponent implements OnInit {
         }
       },
     });
-
   }
   showVoucher() {
     Constants.Toast.fire('Under Construction');

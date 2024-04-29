@@ -77,7 +77,7 @@ export class MecOpdComponent implements OnInit {
     this.dataSource.sort = this.sort;
     this.dataSource.requestData(Constants.CATEGORY_OPD, Constants.CLAIMSTATUS_MEDICAL_DECISION_PENDING);
 
-    this.schemeService.getSchemeTitle().subscribe((titles: any) => {
+    this.schemeService.getSchemeTitle("opd").subscribe((titles: any) => {
       this.stateGroups = titles;
     });
 
