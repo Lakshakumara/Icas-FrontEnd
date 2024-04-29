@@ -121,6 +121,7 @@ export class OpdComponent implements OnInit {
           allowOutsideClick: () => false,
           preConfirm: async () => {
             try {
+              if(result.value == undefined) throw ''
               let claimid : number = result.value;
               let response: any = await this.auth.downloadClaim(claimid);
               console.log('received from backend ', response);
